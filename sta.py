@@ -375,5 +375,5 @@ def sta_run():
     res_data = mySequences.copy()
     res_data["trending_scanpath"] = getAbstractedSequence(commonSequence)
 
+    # to get JSON use return str(sta_run()) when calling this alg
     return json.dumps(res_data)
-    # print "Common Sequence:", getAbstractedSequence(commonSequence)
