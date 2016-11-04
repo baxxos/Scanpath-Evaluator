@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="gazerApp">
-<head ng-include="'../static/partials/common.head.html'"></head>
-<body>
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Personalized gaze visualization</title>
+    <!-- Own CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <!-- Bootstrap minified CSS -->
+    <link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous">
+</head>
+<body ng-controller="gazerAppCtrl">
     <!-- Common top navigation & breadcrumbs area -->
-    <nav ng-include="'../static/partials/common.nav.html'"></nav>
+    <nav ng-include="'static/partials/common.nav.html'"></nav>
     <!-- Main content view -->
     <div ui-view></div>
     <!-- Common footer area -->
-    <footer ng-include="'../static/partials/common.footer.html'"></footer>
+    <footer ng-include="'static/partials/common.footer.html'"></footer>
 </body>
     <!-- AngularJS 1.5.8 -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
     <!-- Angular UI-router JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
     <!-- Angular-Breadcrumbs for UI-router -->
@@ -24,6 +35,6 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
     <!-- Own JS -->
-    <script type="text/javascript" src="../static/js/app.js"></script>
-    <script type="text/javascript" src="../static/js/app.config.js"></script>
+    <script type="text/javascript" src="static/js/app.js"></script>
+    <script type="text/javascript" src="static/js/app.config.js"></script>
 </html>

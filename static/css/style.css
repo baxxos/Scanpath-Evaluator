@@ -1,0 +1,16 @@
+#login_panel_main .input-group-addon {
+    min-width: 0%;
+}
+
+#login_panel_main .panel-heading a {
+    text-decoration: underline;
+}
+
+
+#login_panel_main .input-group {
+    width: 100%;
+}
+
+#login_panel_main button {
+    width: 100%;
+}

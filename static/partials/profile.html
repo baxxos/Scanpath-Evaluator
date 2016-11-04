@@ -1,5 +1,34 @@
-<div class="container">
-    <div class="col-md-12">
-        PROFILE.HTML
+<div class="container" xmlns="http://www.w3.org/1999/html">
+    <div class="col-lg-4 col-lg-offset-4 col-md-6 col-md-offset-3">
+        <div class="panel panel-primary text-left" id="login_panel_main">
+            <div class="panel-heading">
+                <h3 class="panel-title">Please log in or <a href="#">register</a></h3>
+            </div>
+            <div class="panel-body text-left">
+                <form>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="login_form_email">E-mail or username:</label>
+                            <input type="email" class="form-control" placeholder="example@gmail.com"
+                                   id="login_form_email" aria-describedby="login_input_username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="login_form_psswd">Password:</label>
+                            <input type="password" class="form-control" placeholder="Your password"
+                                   id="login_form_passwd" aria-describedby="login_input_psswd">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Log in</button>
+                </form>
+                <div class="text-center">
+                    <hr />
+                    <button class="btn">Log in with Google</button>
+                    <hr />
+                    <a href="#">Don't have an account yet? Create one for free</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
