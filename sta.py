@@ -3,11 +3,11 @@ import json
 
 # STA Algorithm - INPUT PARAMETERS
 # Provide the link for the segmentation file without the .txt extension. See example file 'Apple.txt'.
-SegmentationPath = "D:\FIIT\Ostatne\BP\Eraslan_EyeTrackingStudy_\MojRun\SegmentedPages"
+SegmentationPath = "data/regions/test_sta/SegmentedPages"
 # Provide the link for the related page
 EyeTrackingURL = "http://ncc.metu.edu.tr/"
 # Provide the link for the folder that includes eye tracking data for each participant.
-EyeTrackingPath = "D:\FIIT\Ostatne\BP\Eraslan_EyeTrackingStudy_\MojRun\EyeTrackingData\\"
+EyeTrackingPath = "data/scanpaths/test_sta/"
 # Provide the list of participant IDs, such as [3,4,15,18,21,23,31,32,33,38]
 pList = [1, 2]
 # Provide the degree of accuracy of an eye tracker, such as 0.5.

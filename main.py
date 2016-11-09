@@ -1,12 +1,17 @@
-from flask import Flask, render_template, make_response
-from sta import *
+from flask import Flask, render_template
+from sta import sta_run
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def redirect_index():
-    return make_response(open('templates/index.html').read())
+    return render_template('index.html');
+
+
+@app.route('/sta')
+def trending_scanpath():
+    return sta_run();
 
 
 if __name__ == '__main__':

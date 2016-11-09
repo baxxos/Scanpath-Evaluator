@@ -14,3 +14,16 @@
 #login_panel_main button {
     width: 100%;
 }
+
+select, optgroup {
+    font-size: 14px;
+    font-weight: 400;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 4px;
+}
+
+optgroup {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

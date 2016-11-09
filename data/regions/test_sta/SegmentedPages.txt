@@ -1,0 +1,4 @@
+Element1 150 850 20 40 A
+Element2 150 850 60 200 B
+Element3 150 850 260 100 C
+Element4 150 850 360 200 D
