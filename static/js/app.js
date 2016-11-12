@@ -2,11 +2,23 @@
 
 var gazerApp = angular.module("gazerApp", ['ngAnimate', 'ngTouch', 'ui.router', 'ui.bootstrap', 'ncy-angular-breadcrumb']);
 
-gazerApp.controller("gazerAppCtrl", function($scope, $state){
+gazerApp.controller("defaultCtrl", function($scope, $state, $http, $animate){
+	$scope.getUserScanpaths = function() {
+		$http.get('get_scanpaths').then(
+			function(response){
+				$scope.data.userScanpaths = response.data;
+			},
+			function(data){
+				console.log('Failed to get user scanpaths: ' + data);
+			}
+		);
+    };
+
     $scope.init = function() {
-		//console.log($state.includes('profile'));
         $scope.$state = $state;
 		$scope.isNavCollapsed = true;
+		$scope.data = {};
+		$scope.getUserScanpaths();
 	};
 
 	$scope.init();

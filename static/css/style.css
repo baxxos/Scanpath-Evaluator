@@ -26,4 +26,5 @@ optgroup {
     padding-top: 6px;
     padding-bottom: 6px;
 }
+
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

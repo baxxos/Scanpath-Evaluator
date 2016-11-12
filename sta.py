@@ -1,4 +1,5 @@
 from pylab import *
+from dataset import *
 import json
 
 # STA Algorithm - INPUT PARAMETERS
@@ -20,40 +21,18 @@ resolutionOfScreenX = 1280
 resolutionOfScreenY = 1024
 # Provide the size of the screen in inches, such as 17.
 sizeOfScreen = 17
+# Storage for all loaded data
+my_dataset = Dataset('data/scanpaths/test_sta/',
+                     'data/regions/test_sta/SegmentedPages.txt',
+                     'http://ncc.metu.edu.tr/')
 
 
 def getParticipants(pList, Path, pageName):
-    participants = {}
-    for x in pList:
-        fo = open(Path + "P" + str(x) + ".txt", "r")
-        myFile = fo.read()
-        myRecords = myFile.split('\n')
-        myRecords_templist = []
-
-        for y in range(1, len(myRecords) - 1):
-            try:
-                if myRecords[y].index(pageName) > 0:
-                    myRecords_templist.append(myRecords[y].split('\t'))
-            except:
-                continue
-        if x > 9:
-            participants["P" + str(x)] = myRecords_templist
-        else:
-            participants["P0" + str(x)] = myRecords_templist
-    return participants
+    return my_dataset.participants
 
 
 def getAoIs(Path):
-    AoIs = []
-    fo = open(Path + ".txt", "r")
-    myFile = fo.read()
-    mySegments = myFile.split('\n')
-
-    for x in range(0, len(mySegments)):
-        temp = mySegments[x].split(' ')
-        AoIs.append([temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]])
-
-    return AoIs
+    return my_dataset.aois
 
 
 def calculateErrorRateArea(accuracyDegree, Distance, screenResolutionX, screenResolutionY, screenDiagonalSize):
@@ -332,15 +311,38 @@ def getValueableAoIs(AoIList):
     return valuableAoIs
 
 
-# STA Algorithm
 
-# Preliminary Stage
-def sta_run():
-    myParticipants = getParticipants(pList, EyeTrackingPath, EyeTrackingURL)
-    myAoIs = getAoIs(SegmentationPath)
+
+
+def get_scanpaths_json():
+    # TODO get rid of redundant data calls - make a class with scanpath lists
     myErrorRateArea = calculateErrorRateArea(degreeOfAccuracy, distanceBetweenEyeTrackerAndParticipants,
                                              resolutionOfScreenX, resolutionOfScreenY, sizeOfScreen)
-    mySequences = createSequences(myParticipants, myAoIs, myErrorRateArea)
+    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
+
+    keys = mySequences.keys()
+    for y in range(0, len(keys)):
+        mySequences[keys[y]] = mySequences[keys[y]].split('.')
+        del mySequences[keys[y]][len(mySequences[keys[y]]) - 1]
+    for y in range(0, len(keys)):
+        for z in range(0, len(mySequences[keys[y]])):
+            mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
+
+    formatted_sequences = []
+    for it in range (0, len(mySequences)):
+        act_rec = {}
+        act_rec['identifier'] = keys[it]
+        act_rec['data'] = mySequences[keys[it]]
+        formatted_sequences.append(act_rec)
+
+    return json.dumps(formatted_sequences)
+
+# STA Algorithm
+# Preliminary Stage
+def sta_run():
+    myErrorRateArea = calculateErrorRateArea(degreeOfAccuracy, distanceBetweenEyeTrackerAndParticipants,
+                                             resolutionOfScreenX, resolutionOfScreenY, sizeOfScreen)
+    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
 
     keys = mySequences.keys()
     for y in range(0, len(keys)):

@@ -5,7 +5,7 @@
     <div class="col-md-10">
         <form>
             <div class="form-group">
-                <label for="selectAlgorithm">Please select an algorithm for common scanpath comptutation:</label>
+                <label for="selectAlgorithm">Select an algorithm for common scanpath comptutation:</label>
                 <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm">
                     <option value="">Choose an algorithm..</option>
                     <optgroup label="Custom algorithms">
@@ -20,9 +20,32 @@
             <button type="submit" class="btn btn-primary" ng-click="getCommonScanpath()">Submit</button>
         </form>
         <hr />
-        <span>Common scanpath:</span>
-        <p>
+        <p>Common scanpath:
             <span ng-repeat="region in commonScanpath.trending_scanpath">{{ region }} </span>
         </p>
+        <hr />
+        <table class="table table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Scanpath (area<sup>ms</sup>)</th>
+                    <th>Scanpath length</th>
+                    <th>Most similiar to <sup>(%)</sup></th>
+                    <th>Least similiar to <sup>(%)</sup></th>
+                    <th>Similiarity to common<sup> (%)</sup></th>
+                </tr>
+            </thead>
+            <tr ng-repeat="scanpath in data.userScanpaths">
+                <td>{{ scanpath.identifier }}</td>
+                <td>
+                    <span ng-repeat="fixation in scanpath.data">{{ fixation[0]}}<sup>{{ fixation[1]  }}</sup> - </span>
+                    <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
+                </td>
+                <td>{{ scanpath.data.length }}</td>
+                <td>ID1</td>
+                <td>ID1</td>
+                <td>67,3</td>
+            </tr>
+        </table>
     </div>
 </div>
