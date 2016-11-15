@@ -1,5 +1,6 @@
+from __future__ import division
 from pylab import *
-from dataset import *
+from Dataset import *
 import json
 
 # STA Algorithm - INPUT PARAMETERS
@@ -25,14 +26,6 @@ sizeOfScreen = 17
 my_dataset = Dataset('data/scanpaths/test_sta/',
                      'data/regions/test_sta/SegmentedPages.txt',
                      'http://ncc.metu.edu.tr/')
-
-
-def getParticipants(pList, Path, pageName):
-    return my_dataset.participants
-
-
-def getAoIs(Path):
-    return my_dataset.aois
 
 
 def calculateErrorRateArea(accuracyDegree, Distance, screenResolutionX, screenResolutionY, screenDiagonalSize):
@@ -101,7 +94,7 @@ def getNumberedSequence(Sequence):
             numberedSequence.append([Sequence[y][0], getSequenceNumber(Sequence[0:y], Sequence[y][0]), Sequence[y][1]])
 
     AoIList = getExistingAoIListForSequence(numberedSequence)
-    AoINames = getAoIs(SegmentationPath)
+    AoINames = my_dataset.aois
     AoINames = [w[5] for w in AoINames]
     newSequence = []
 
@@ -311,7 +304,117 @@ def getValueableAoIs(AoIList):
     return valuableAoIs
 
 
+def calc_edit_distances(scanpaths):
+    # Store scanpaths as an array of modified original scanpaths
+    scanpath_strs = []
 
+    # For each scanpath get rid the fixations so only the string of AOIs remains
+    # An improvement would be to multiply AOIs based on fixation length
+    for act_scanpath in scanpaths:
+        act_scanpath_str = ''
+        for fixation in act_scanpath['data']:
+            act_scanpath_str += fixation[0]
+        # Store the identifier and extracted string sequence in an object
+        temp_scanpath = {}
+        temp_scanpath['identifier'] = act_scanpath['identifier']
+        temp_scanpath['raw_str'] = act_scanpath_str
+        # Push the object to the array
+        scanpath_strs.append(temp_scanpath)
+
+    # Compare each pair of scanpaths in the array
+    for i_first in range(0, len(scanpath_strs)):
+        # Each scanpath has a similarity object - similarity[id] represents
+        # the level of similarity to the scanpath identified by id
+
+        # If the similarity object of first scanpath does not exist yet - create it
+        if not scanpath_strs[i_first].get('similarity'):
+            scanpath_strs[i_first]['similarity'] = {}
+        for i_second in range (i_first + 1, len(scanpath_strs)):
+            # Calculate the edit (Levenshtein) distance of first and second string sequence
+            edit_distance = levenshtein(scanpath_strs[i_first]['raw_str'], scanpath_strs[i_second]['raw_str'])
+
+            # Calculate similarity as edit 1 - distance/length(longer string)
+            # Division operator '/' imported from Python 3.X to avoid forced integer division (use '//' instead)
+            len_first = len(scanpath_strs[i_first]['raw_str'])
+            len_second = len(scanpath_strs[i_second]['raw_str'])
+            similarity = 1 - (edit_distance / (len_first if len_first > len_second else len_second))
+            # Set similarity as percentage
+            similarity *= 100
+
+            identifier_first = scanpath_strs[i_first]['identifier']
+            identifier_second = scanpath_strs[i_second]['identifier']
+
+            # Set the similarity for the first scanpath
+            scanpath_strs[i_first]['similarity'][identifier_second] = similarity
+
+            # If the similarity object of second scanpath does not exist yet - create it
+            if not scanpath_strs[i_second].get('similarity'):
+                scanpath_strs[i_second]['similarity'] = {}
+
+            # Set the same similarity as above for the second scanpath
+            scanpath_strs[i_second]['similarity'][identifier_first] = similarity
+
+        # Save the calculations to the original scanpaths object
+        scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
+
+
+def calc_max_similarity(scanpaths):
+    """ Function calculates most similiar double for each scanpath in the set """
+    for scanpath in scanpaths:
+        # Create empty max_similarity object
+        max_similar = {}
+        max_similar['identifier'] = ''
+        max_similar['value'] = -1
+        # Iterate through previously calculated similarity values of given scanpath
+        for similarity_iter in scanpath['similarity']:
+            similarity_val = scanpath['similarity'][similarity_iter]
+            if similarity_val > max_similar['value']:
+                max_similar['value'] = similarity_val
+                max_similar['identifier'] = similarity_iter
+        # Assign max_similarity object to scanpath (in JSON-style)
+        scanpath['maxSimilarity'] = max_similar
+
+    return scanpaths
+
+def calc_min_similarity(scanpaths):
+    """ Function calculates most similiar double for each scanpath in the set """
+    for scanpath in scanpaths:
+        # Create empty max_similarity object
+        min_similar = {}
+        min_similar['identifier'] = ''
+        min_similar['value'] = 101
+        # Iterate through previously calculated similarity values of given scanpath
+        for similarity_iter in scanpath['similarity']:
+            similarity_val = scanpath['similarity'][similarity_iter]
+            if similarity_val < min_similar['value']:
+                min_similar['value'] = similarity_val
+                min_similar['identifier'] = similarity_iter
+        # Assign max_similarity object to scanpath (in JSON-style)
+        scanpath['minSimilarity'] = min_similar
+
+    return scanpaths
+
+def levenshtein(s1, s2):
+    # Code origin is the wikipedia page of Levenshtein's distance
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[
+                             j + 1] + 1  # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1  # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
 
 
 def get_scanpaths_json():
@@ -334,6 +437,10 @@ def get_scanpaths_json():
         act_rec['identifier'] = keys[it]
         act_rec['data'] = mySequences[keys[it]]
         formatted_sequences.append(act_rec)
+
+    calc_edit_distances(formatted_sequences)
+    calc_max_similarity(formatted_sequences)
+    calc_min_similarity(formatted_sequences)
 
     return json.dumps(formatted_sequences)
 

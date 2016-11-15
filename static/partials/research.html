@@ -28,22 +28,26 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Scanpath (area<sup>ms</sup>)</th>
+                    <th class="col-md-4">Scanpath (area <sup>ms</sup>)</th>
                     <th>Scanpath length</th>
-                    <th>Most similiar to <sup>(%)</sup></th>
-                    <th>Least similiar to <sup>(%)</sup></th>
-                    <th>Similiarity to common<sup> (%)</sup></th>
+                    <th>Most similar to (ID)</th>
+                    <th>Most similar to (val)</th>
+                    <th>Least similar to (ID)</th>
+                    <th>Least similar to (val)</th>
+                    <th>Similarity to common</th>
                 </tr>
             </thead>
             <tr ng-repeat="scanpath in data.userScanpaths">
                 <td>{{ scanpath.identifier }}</td>
                 <td>
-                    <span ng-repeat="fixation in scanpath.data">{{ fixation[0]}}<sup>{{ fixation[1]  }}</sup> - </span>
+                    <span ng-repeat="fixation in scanpath.data"  class="text-nowrap">{{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> - </span>
                     <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
                 </td>
                 <td>{{ scanpath.data.length }}</td>
-                <td>ID1</td>
-                <td>ID1</td>
+                <td>{{ scanpath.maxSimilarity.identifier }}</td>
+                <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+                <td>{{ scanpath.minSimilarity.identifier }}</td>
+                <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
                 <td>67,3</td>
             </tr>
         </table>
