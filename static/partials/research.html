@@ -1,55 +1,77 @@
 <div class="container">
-    <div class="col-md-2">
-        Some kind of data/experiment navigation
-    </div>
-    <div class="col-md-10">
-        <form>
-            <div class="form-group">
-                <label for="selectAlgorithm">Select an algorithm for common scanpath comptutation:</label>
-                <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm">
-                    <option value="">Choose an algorithm..</option>
-                    <optgroup label="Custom algorithms">
-                        <option>Scanpath trend analysis</option>
-                    </optgroup>
-                    <optgroup label="String-edit algorithms">
-                        <option>Longest common subsequence</option>
-                        <option>Shortest common supersequence</option>
-                    </optgroup>
-                </select>
+    <div class="row">
+        <div class="col-md-2">
+            Some kind of data/experiment navigation
+        </div>
+        <div class="col-md-10">
+            <form>
+                <div class="form-group">
+                    <label for="selectAlgorithm">Select an algorithm for common scanpath comptutation:</label>
+                    <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm">
+                        <option value="">Choose an algorithm..</option>
+                        <optgroup label="Custom algorithms">
+                            <option>Scanpath trend analysis</option>
+                        </optgroup>
+                        <optgroup label="String-edit algorithms">
+                            <option>Longest common subsequence</option>
+                            <option>Shortest common supersequence</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" ng-click="getCommonScanpath()">Submit</button>
+            </form>
+            <hr />
+            <h3>Dataset overview</h3>
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>Common scanpath:</h4>
+                    <p>
+                        <span ng-hide="dataset.commonScanpath">Not available</span>
+                        <span ng-repeat="region in dataset.commonScanpath.trending_scanpath">{{ region }} </span>
+                    </p>
+                    <h4>Average similarity to the common scanpath:</h4>
+                    <p>
+                        <span ng-show="dataset.commonScanpath.avgSimToCommon">
+                            {{ dataset.commonScanpath.avgSimToCommon | number: 2 }}%
+                        </span>
+                        <span ng-hide="dataset.commonScanpath.avgSimToCommon">N/A</span>
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <img class="img-responsive" ng-src="{{ dataset.visualMain }}">
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" ng-click="getCommonScanpath()">Submit</button>
-        </form>
-        <hr />
-        <p>Common scanpath:
-            <span ng-repeat="region in commonScanpath.trending_scanpath">{{ region }} </span>
-        </p>
-        <hr />
-        <table class="table table-hover table-responsive">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th class="col-md-4">Scanpath (area <sup>ms</sup>)</th>
-                    <th>Scanpath length</th>
-                    <th>Most similar to (ID)</th>
-                    <th>Most similar to (val)</th>
-                    <th>Least similar to (ID)</th>
-                    <th>Least similar to (val)</th>
-                    <th>Similarity to common</th>
+            <hr />
+            <table class="table table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th class="col-md-4" ng-click="setSort('scanpathSort', 'identifier')">Scanpath (area <sup>ms</sup>)</th>
+                        <th ng-click="setSort('scanpathSort', 'identifier')">Scanpath length</th>
+                        <th ng-click="setSort('scanpathSort', 'maxSimilarity.identifier')">Most similar to (ID)</th>
+                        <th ng-click="setSort('scanpathSort', 'maxSimilarity.value')">Most similar to (val)</th>
+                        <th ng-click="setSort('scanpathSort', 'minSimilarity.identifier')">Least similar to (ID)</th>
+                        <th ng-click="setSort('scanpathSort', 'minSimilarity.value')">Least similar to (val)</th>
+                        <th ng-click="setSort('scanpathSort', 'simToCommon')">Similarity to common</th>
+                    </tr>
+                </thead>
+                <tr ng-repeat="scanpath in dataset.userScanpaths | orderBy: [scanpathSort, 'identifier']">
+                    <td>{{ scanpath.identifier }}</td>
+                    <td>
+                        <span ng-repeat="fixation in scanpath.fixations"  class="text-nowrap">{{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> - </span>
+                        <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
+                    </td>
+                    <td>{{ scanpath.data.length }}</td>
+                    <td>{{ scanpath.maxSimilarity.identifier }}</td>
+                    <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+                    <td>{{ scanpath.minSimilarity.identifier }}</td>
+                    <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
+                    <td ng-show="dataset.commonScanpath">
+                        {{ scanpath.simToCommon | number: 2 }}%
+                    </td>
+                    <td ng-hide="dataset.commonScanpath">N/A</td>
                 </tr>
-            </thead>
-            <tr ng-repeat="scanpath in data.userScanpaths">
-                <td>{{ scanpath.identifier }}</td>
-                <td>
-                    <span ng-repeat="fixation in scanpath.data"  class="text-nowrap">{{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> - </span>
-                    <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
-                </td>
-                <td>{{ scanpath.data.length }}</td>
-                <td>{{ scanpath.maxSimilarity.identifier }}</td>
-                <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
-                <td>{{ scanpath.minSimilarity.identifier }}</td>
-                <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-                <td>67,3</td>
-            </tr>
-        </table>
+            </table>
+        </div>
     </div>
 </div>

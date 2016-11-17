@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from sta import *
 
+
 app = Flask(__name__)
 
 

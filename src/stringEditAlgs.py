@@ -1,7 +1,25 @@
 from __future__ import division
 
 
-def calc_edit_distances(scanpath_strs):
+def convert_to_strs(scanpaths):
+    scanpath_strs = []
+    # Extract scanpaths as raw string sequences with identifiers
+    for act_scanpath in scanpaths:
+        act_scanpath_str = ''
+        for fixation in act_scanpath['fixations']:
+            act_scanpath_str += fixation[0]
+        # Store the identifier and extracted string sequence in an object
+        temp_scanpath = {
+            'identifier': act_scanpath['identifier'],
+            'raw_str': act_scanpath_str
+        }
+        # Push the object to the array
+        scanpath_strs.append(temp_scanpath)
+
+    return scanpath_strs
+
+
+def calc_similarity(scanpath_strs):
     for i_first in range(0, len(scanpath_strs)):
         # Each scanpath has a similarity object - similarity[id] represents
         # the level of similarity to the scanpath identified by id
@@ -14,7 +32,7 @@ def calc_edit_distances(scanpath_strs):
             edit_distance = levenshtein(scanpath_strs[i_first]['raw_str'], scanpath_strs[i_second]['raw_str'])
 
             # Calculate similarity as edit 1 - distance/length(longer string)
-            # Division operator '/' imported from Python 3.X to avoid forced integer division (use '//' instead)
+            # Non-integer division (python future import)
             len_first = len(scanpath_strs[i_first]['raw_str'])
             len_second = len(scanpath_strs[i_second]['raw_str'])
             similarity = 1 - (edit_distance / (len_first if len_first > len_second else len_second))
@@ -33,6 +51,25 @@ def calc_edit_distances(scanpath_strs):
 
             # Set the same similarity as above for the second scanpath
             scanpath_strs[i_second]['similarity'][identifier_first] = similarity
+
+
+def calc_similarity_to_common(scanpath_strs, scanpath_common):
+    # Object storing similarities of each individual scanpath to the common one
+    similarity_obj = {}
+    len_common = len(scanpath_common)
+    # Calculate similarity of each scanpath to the common (trending) scanpath
+    for scanpath_str in scanpath_strs:
+        edit_distance = levenshtein(scanpath_str['raw_str'], scanpath_common)
+        len_act = len(scanpath_str['raw_str'])
+        # Calculate similarity as edit 1 - distance/length(longer string)
+        # Non-integer division (python future import)
+        similarity = 1 - (edit_distance / (len_act if len_act > len_common else len_common))
+        # Set similarity as percentage
+        similarity *= 100
+
+        similarity_obj[scanpath_str['identifier']] = similarity
+
+    return similarity_obj
 
 
 def levenshtein(s1, s2):

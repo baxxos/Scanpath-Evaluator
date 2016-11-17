@@ -1,6 +1,8 @@
 from os import listdir
 
 
+# TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
+# TODO the same goes for error area - once calculated set it as property
 class Dataset:
     """Common class for grouping a set of scanpaths together"""
 
@@ -65,7 +67,23 @@ class Dataset:
     def load_visuals(self):
         print 'hello'
 
-    def calc_max_similarity(self, scanpaths):
+    def get_formatted_sequences(self, sequences):
+        """
+        {'01': [[A, 150], [B, 250]], '02': ...} gets transformed into:
+        [{'identifier': '01', 'fixations': [[A, 150], [B, 250]]}, {'identifier': '02' ... }]
+        """
+        formatted_sequences = []
+        keys = sequences.keys()
+        for it in range(0, len(sequences)):
+            act_rec = {
+                'identifier': keys[it],
+                'fixations': sequences[keys[it]]
+            }
+            formatted_sequences.append(act_rec)
+
+        return formatted_sequences
+
+    def get_max_similarity(self, scanpaths):
         """ Function calculates most similiar double for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
@@ -81,7 +99,7 @@ class Dataset:
             # Assign max_similarity object to scanpath (in JSON-style)
             scanpath['maxSimilarity'] = max_similar
 
-    def calc_min_similarity(self, scanpaths):
+    def get_min_similarity(self, scanpaths):
         """ Function calculates most similiar double for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object

@@ -7,7 +7,7 @@ import json
 # Storage for all loaded data
 my_dataset = Dataset('data/template_sta/scanpaths/',
                      'data/template_sta/regions/SegmentedPages.txt',
-                     'data/template_sta/visuals/placeholder.png',
+                     'static/images/datasets/template_sta/placeholder.png',
                      'http://ncc.metu.edu.tr/')
 # Environment in which the eye tracking experiment was performed
 my_env = Environment(0.5, 60, 1280, 1024, 17)
@@ -273,32 +273,21 @@ def getValueableAoIs(AoIList):
     return valuableAoIs
 
 
+# TODO presunut do dataset classy
 def get_edit_distances(scanpaths):
-    # Store scanpaths as an array of modified original scanpaths
-    scanpath_strs = []
-
-    # Extract scanpaths as raw string sequences with identifiers
-    for act_scanpath in scanpaths:
-        act_scanpath_str = ''
-        for fixation in act_scanpath['data']:
-            act_scanpath_str += fixation[0]
-        # Store the identifier and extracted string sequence in an object
-        temp_scanpath = {
-            'identifier': act_scanpath['identifier'],
-            'raw_str': act_scanpath_str
-        }
-        # Push the object to the array
-        scanpath_strs.append(temp_scanpath)
+    # Store scanpaths as an array of string-converted original scanpaths
+    scanpath_strs = convert_to_strs(scanpaths)
 
     # Calculate the edit distances
     # The order of records in scanpaths and scanpath_strs must be the same!
-    calc_edit_distances(scanpath_strs)
+    calc_similarity(scanpath_strs)
 
     for i_first in range(0, len(scanpath_strs)):
         # Save the calculations to the original scanpaths object
         scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
 
 
+# TODO malo by to byt skor get_dataset_json - neloadim len scanpathy ale aj visuals a ine veci
 def get_scanpaths_json():
     myErrorRateArea = my_env.get_error_rate_area()
     mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
@@ -311,19 +300,19 @@ def get_scanpaths_json():
         for z in range(0, len(mySequences[keys[y]])):
             mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
 
-    formatted_sequences = []
-    for it in range (0, len(mySequences)):
-        act_rec = {
-            'identifier': keys[it],
-            'data': mySequences[keys[it]]
-        }
-        formatted_sequences.append(act_rec)
+    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
 
     get_edit_distances(formatted_sequences)
-    my_dataset.calc_max_similarity(formatted_sequences)
-    my_dataset.calc_min_similarity(formatted_sequences)
+    my_dataset.get_max_similarity(formatted_sequences)
+    my_dataset.get_min_similarity(formatted_sequences)
 
-    return json.dumps(formatted_sequences)
+    ret_dataset = {
+        'userScanpaths': formatted_sequences,
+        'visualMain': my_dataset.file_path_visual,
+        'mySequences': mySequences
+    }
+
+    return json.dumps(ret_dataset)
 
 # STA Algorithm
 # Preliminary Stage
@@ -361,8 +350,15 @@ def sta_run():
     for y in range(0, len(myFinalList)):
         commonSequence.append(myFinalList[y][0])
 
+    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
+
+    # Store scanpaths as an array of string-converted original scanpaths
+    scanpath_strs = convert_to_strs(formatted_sequences)
+
+    common_scanpath = getAbstractedSequence(commonSequence)
     res_data = {
-        'trending_scanpath': getAbstractedSequence(commonSequence)
+        'trending_scanpath': common_scanpath,
+        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath)
     }
 
     # to get JSON use return str(sta_run()) when calling this alg
