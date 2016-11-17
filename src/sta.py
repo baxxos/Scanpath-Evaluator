@@ -309,7 +309,6 @@ def get_scanpaths_json():
     ret_dataset = {
         'userScanpaths': formatted_sequences,
         'visualMain': my_dataset.file_path_visual,
-        'mySequences': mySequences
     }
 
     return json.dumps(ret_dataset)
@@ -357,7 +356,7 @@ def sta_run():
 
     common_scanpath = getAbstractedSequence(commonSequence)
     res_data = {
-        'trending_scanpath': common_scanpath,
+        'fixations': common_scanpath,
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath)
     }
 

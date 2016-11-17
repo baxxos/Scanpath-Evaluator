@@ -27,7 +27,7 @@
                     <h4>Common scanpath:</h4>
                     <p>
                         <span ng-hide="dataset.commonScanpath">Not available</span>
-                        <span ng-repeat="region in dataset.commonScanpath.trending_scanpath">{{ region }} </span>
+                        <span ng-repeat="region in dataset.commonScanpath.fixations">{{ region }} </span>
                     </p>
                     <h4>Average similarity to the common scanpath:</h4>
                     <p>
@@ -42,12 +42,12 @@
                 </div>
             </div>
             <hr />
-            <table class="table table-hover table-responsive">
+            <table class="table table-hover table-responsive" id="scanpathTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th class="col-md-4" ng-click="setSort('scanpathSort', 'identifier')">Scanpath (area <sup>ms</sup>)</th>
-                        <th ng-click="setSort('scanpathSort', 'identifier')">Scanpath length</th>
+                        <th ng-click="setSort('scanpathSort', 'identifier')">ID</th>
+                        <th class="col-md-4">Eye fixations (ms)</th>
+                        <th ng-click="setSort('scanpathSort', 'fixations.length')">Scanpath length</th>
                         <th ng-click="setSort('scanpathSort', 'maxSimilarity.identifier')">Most similar to (ID)</th>
                         <th ng-click="setSort('scanpathSort', 'maxSimilarity.value')">Most similar to (val)</th>
                         <th ng-click="setSort('scanpathSort', 'minSimilarity.identifier')">Least similar to (ID)</th>
@@ -61,7 +61,7 @@
                         <span ng-repeat="fixation in scanpath.fixations"  class="text-nowrap">{{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> - </span>
                         <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
                     </td>
-                    <td>{{ scanpath.data.length }}</td>
+                    <td>{{ scanpath.fixations.length }}</td>
                     <td>{{ scanpath.maxSimilarity.identifier }}</td>
                     <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
                     <td>{{ scanpath.minSimilarity.identifier }}</td>

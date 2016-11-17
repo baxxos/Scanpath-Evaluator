@@ -38,16 +38,17 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 	$scope.getCommonScanpath = function() {
 		$http.get('sta').then(
 			function(response){
+				// Get the common scanpath
 				$scope.dataset.commonScanpath = response.data;
+				// Get the average similarity of user scanpath to the common scanpath
 				$scope.dataset.commonScanpath.avgSimToCommon = getAvgSimToCommon();
 
+				// Assign each user scanpath its similarity to the common scanpath
 				var similarities = $scope.dataset.commonScanpath.similarity;
-				for (var identifier in similarities) {
-					for (var iter in $scope.dataset.userScanpaths) {
-						if ($scope.dataset.userScanpaths[iter].identifier == identifier) {
-							$scope.dataset.userScanpaths[iter].simToCommon = similarities[identifier];
-						}
-					}
+
+				for (var index in $scope.dataset.userScanpaths) {
+					var act_scanpath = $scope.dataset.userScanpaths[index];
+					act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
 				}
 			},
 			function(data){

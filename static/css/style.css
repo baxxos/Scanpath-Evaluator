@@ -1,5 +1,5 @@
 #login_panel_main .input-group-addon {
-    min-width: 0%;
+    min-width: 0;
 }
 
 #login_panel_main .panel-heading a {
@@ -27,4 +27,7 @@ optgroup {
     padding-bottom: 6px;
 }
 
-.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+#scanpathTable th:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}

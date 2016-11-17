@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2290f7ac-5c03-4f9f-be6a-fc3b8a2fd236" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/partials/placeholder.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/data/template_sta/visuals/placeholder.png" afterPath="$PROJECT_DIR$/static/images/datasets/template_sta/placeholder.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Dataset.py" afterPath="$PROJECT_DIR$/src/Dataset.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sta.py" afterPath="$PROJECT_DIR$/src/sta.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/stringEditAlgs.py" afterPath="$PROJECT_DIR$/src/stringEditAlgs.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/css/style.css" afterPath="$PROJECT_DIR$/static/css/style.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/js/app.js" afterPath="$PROJECT_DIR$/static/js/app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/partials/research.html" afterPath="$PROJECT_DIR$/static/partials/research.html" />
     </list>
@@ -24,9 +21,9 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/untitled$untitled.coverage" NAME="untitled Coverage Results" MODIFIED="1476961842316" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/scanpath_app$sta__1_.coverage" NAME="sta (1) Coverage Results" MODIFIED="1479405970959" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/scanpath_app$sta__1_.coverage" NAME="sta (1) Coverage Results" MODIFIED="1479421467492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/flask_test$untitled__1_.coverage" NAME="untitled (1) Coverage Results" MODIFIED="1477223970414" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/scanpath_app$main.coverage" NAME="main Coverage Results" MODIFIED="1479420771282" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/scanpath_app$main.coverage" NAME="main Coverage Results" MODIFIED="1479422554079" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/scanpath_app$dataset.coverage" NAME="dataset Coverage Results" MODIFIED="1478985053631" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/scanpath_app$sta.coverage" NAME="sta Coverage Results" MODIFIED="1479238592546" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -42,18 +39,18 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/static/js/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="46" column="70" selection-start-line="46" selection-start-column="70" selection-end-line="46" selection-end-column="70" />
+            <state relative-caret-position="269">
+              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="research.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="research.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/static/partials/research.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1188">
-              <caret line="54" column="74" selection-start-line="54" selection-start-column="74" selection-end-line="54" selection-end-column="74" />
+            <state relative-caret-position="218">
+              <caret line="30" column="24" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -62,21 +59,11 @@
       <file leaf-file-name="sta.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/sta.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="278" column="14" selection-start-line="278" selection-start-column="14" selection-end-line="278" selection-end-column="14" />
+            <state relative-caret-position="281">
+              <caret line="358" column="18" selection-start-line="358" selection-start-column="18" selection-end-line="358" selection-end-column="18" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="stringEditAlgs.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/stringEditAlgs.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="27" column="41" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="41" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -91,11 +78,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/static/css/style.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="271">
+              <caret line="27" column="1" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Dataset.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="69" column="12" selection-start-line="69" selection-start-column="8" selection-end-line="69" selection-end-column="12" />
+            <state relative-caret-position="22">
+              <caret line="74" column="32" selection-start-line="74" selection-start-column="32" selection-end-line="74" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -104,8 +101,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="40" selection-start-line="0" selection-start-column="40" selection-end-line="0" selection-end-column="40" />
+            <state relative-caret-position="22">
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -157,7 +154,6 @@
         <option value="$PROJECT_DIR$/static/js/angular-sanitize.min.js" />
         <option value="$PROJECT_DIR$/dataset.py" />
         <option value="$PROJECT_DIR$/static/partials/common.nav.html" />
-        <option value="$PROJECT_DIR$/static/css/style.css" />
         <option value="$PROJECT_DIR$/src/dataset.py" />
         <option value="$PROJECT_DIR$/src/levenshtein.c" />
         <option value="$PROJECT_DIR$/src/_levenshtein.h" />
@@ -168,13 +164,14 @@
         <option value="$PROJECT_DIR$/src/Environment.py" />
         <option value="$PROJECT_DIR$/sta.py" />
         <option value="$PROJECT_DIR$/data/template_sta/scanpaths/03.txt" />
-        <option value="$PROJECT_DIR$/src/Dataset.py" />
         <option value="$PROJECT_DIR$/templates/index.html" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/src/stringEditAlgs.py" />
+        <option value="$PROJECT_DIR$/src/Dataset.py" />
         <option value="$PROJECT_DIR$/static/js/app.js" />
-        <option value="$PROJECT_DIR$/static/partials/research.html" />
+        <option value="$PROJECT_DIR$/static/css/style.css" />
         <option value="$PROJECT_DIR$/src/sta.py" />
+        <option value="$PROJECT_DIR$/static/partials/research.html" />
       </list>
     </option>
   </component>
@@ -286,6 +283,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="template_sta" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scanpath_app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scanpath_app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="css" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -745,7 +760,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479243956396</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Implemented similarity calculations&#10;&#10;Other minor improvenemts. Refactoring needed ($scope should be able to access scanpaths directly by given identifier - store as an object instead of simple array)">
+      <created>1479421176976</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1479421176976</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -791,7 +813,8 @@
     <MESSAGE value="Removed ng-include for nav element because of triggering unwanted animations (ui-bootstrap issue #5474). Introduced the &quot;Dataset&quot; class in backend." />
     <MESSAGE value="In-between scanpath similarity calculation (edit distance) added to backend." />
     <MESSAGE value="Changed data structure, introduced Environment class&#10;&#10;Each experiment (or dataset) now has its own scanpaths+regions+visuals folders containing related data. All python sources were moved to src folder.&#10;&#10;Environment class stores the parameters affecting eye tracking measurements such as screen resolution, distance from eyetrecker and the like. It is also used for computing the error area and screen PPI." />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed data structure, introduced Environment class&#10;&#10;Each experiment (or dataset) now has its own scanpaths+regions+visuals folders containing related data. All python sources were moved to src folder.&#10;&#10;Environment class stores the parameters affecting eye tracking measurements such as screen resolution, distance from eyetrecker and the like. It is also used for computing the error area and screen PPI." />
+    <MESSAGE value="Implemented similarity calculations&#10;&#10;Other minor improvenemts. Refactoring needed ($scope should be able to access scanpaths directly by given identifier - store as an object instead of simple array)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented similarity calculations&#10;&#10;Other minor improvenemts. Refactoring needed ($scope should be able to access scanpaths directly by given identifier - store as an object instead of simple array)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -802,7 +825,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="39" />
+      <option name="time" value="40" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -972,22 +995,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/static/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="24" column="10" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/template_sta/visuals/placeholder.png" />
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="40" selection-start-line="0" selection-start-column="40" selection-end-line="0" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/static/js/app.config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="491">
@@ -999,21 +1007,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="178">
           <caret line="231" column="16" selection-start-line="231" selection-start-column="16" selection-end-line="231" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/partials/research.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1188">
-          <caret line="54" column="74" selection-start-line="54" selection-start-column="74" selection-end-line="54" selection-end-column="74" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/app.js">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="46" column="70" selection-start-line="46" selection-start-column="70" selection-end-line="46" selection-end-column="70" />
+        <state relative-caret-position="22">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/stringEditAlgs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-115">
+          <caret line="23" column="69" selection-start-line="23" selection-start-column="67" selection-end-line="23" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="74" column="32" selection-start-line="74" selection-start-column="32" selection-end-line="74" selection-end-column="32" />
           <folding />
         </state>
       </provider>
@@ -1026,28 +1043,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Dataset.py">
+    <entry file="file://$PROJECT_DIR$/static/css/style.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="69" column="12" selection-start-line="69" selection-start-column="8" selection-end-line="69" selection-end-column="12" />
+        <state relative-caret-position="271">
+          <caret line="27" column="1" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/sta.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="278" column="14" selection-start-line="278" selection-start-column="14" selection-end-line="278" selection-end-column="14" />
+        <state relative-caret-position="281">
+          <caret line="358" column="18" selection-start-line="358" selection-start-column="18" selection-end-line="358" selection-end-column="18" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/stringEditAlgs.py">
+    <entry file="file://$PROJECT_DIR$/static/partials/research.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="27" column="41" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="41" />
+        <state relative-caret-position="218">
+          <caret line="30" column="24" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
           <folding />
         </state>
       </provider>
