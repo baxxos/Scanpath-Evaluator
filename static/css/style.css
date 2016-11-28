@@ -27,7 +27,7 @@ optgroup {
     padding-bottom: 6px;
 }
 
-#scanpathTable th:hover {
+#scanpathTable th:not(:nth-child(2)):hover {
     cursor: pointer;
     text-decoration: underline;
 }

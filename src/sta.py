@@ -220,6 +220,7 @@ def calculateNumberDurationOfFixationsAndNSV(Sequences):
         Sequences[keys[x]] = myAbstractedSequence
 
     keys = Sequences.keys()
+
     for x in range(0, len(keys)):
         for y in range(0, len(Sequences[keys[x]])):
             if len(Sequences[keys[x]]) < 2:
@@ -242,10 +243,10 @@ def calculateTotalNumberDurationofFixationsandNSV(AoIList, Sequences):
         for y in range(0, len(keys)):
             for k in range(0, len(Sequences[keys[y]])):
                 if Sequences[keys[y]][k][0:2] == AoIList[x]:
-                    counter = counter + Sequences[keys[y]][k][2]
-                    duration = duration + Sequences[keys[y]][k][3]
-                    totalNSV = totalNSV + Sequences[keys[y]][k][4]
-                    flag = flag + 1
+                    counter += Sequences[keys[y]][k][2]
+                    duration += Sequences[keys[y]][k][3]
+                    totalNSV += Sequences[keys[y]][k][4]
+                    flag += 1
         if flag == len(Sequences):
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [True]
         else:
@@ -288,6 +289,7 @@ def get_edit_distances(scanpaths):
 
 
 # TODO malo by to byt skor get_dataset_json - neloadim len scanpathy ale aj visuals a ine veci
+# TODO presunut prvych 20 riadkov do samostatnej funkcie a zistit co robia tie 2 cykly
 def get_scanpaths_json():
     myErrorRateArea = my_env.get_error_rate_area()
     mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
@@ -339,9 +341,13 @@ def sta_run():
 
     # Second-Pass
     myNewAoIList = getExistingAoIList(myNewSequences)
+
+    # B gets flagged as false
     myNewAoIList = calculateTotalNumberDurationofFixationsandNSV(myNewAoIList,
                                                                  calculateNumberDurationOfFixationsAndNSV(myNewSequences))
+    # B gets removed
     myFinalList = getValueableAoIs(myNewAoIList)
+
     myFinalList.sort(key=lambda x: (x[4], x[3], x[2]))
     myFinalList.reverse()
 
@@ -358,6 +364,36 @@ def sta_run():
     res_data = {
         'fixations': common_scanpath,
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath)
+    }
+
+    # to get JSON use return str(sta_run()) when calling this alg
+    return json.dumps(res_data)
+
+
+def custom_run(custom_scanpath):
+    myErrorRateArea = my_env.get_error_rate_area()
+    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
+
+    keys = mySequences.keys()
+    for y in range(0, len(keys)):
+        mySequences[keys[y]] = mySequences[keys[y]].split('.')
+        del mySequences[keys[y]][len(mySequences[keys[y]]) - 1]
+    for y in range(0, len(keys)):
+        for z in range(0, len(mySequences[keys[y]])):
+            mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
+
+    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
+
+    # Store scanpaths as an array of string-converted original scanpaths
+    scanpath_strs = convert_to_strs(formatted_sequences)
+
+    custom_scanpath_arr = []
+    for i in range (0, len(custom_scanpath)):
+        custom_scanpath_arr.append(custom_scanpath[i])
+
+    res_data = {
+        'fixations': custom_scanpath_arr,
+        'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath_arr)
     }
 
     # to get JSON use return str(sta_run()) when calling this alg

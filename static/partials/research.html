@@ -4,10 +4,11 @@
             Some kind of data/experiment navigation
         </div>
         <div class="col-md-10">
-            <form>
+            <!-- Input calculation parameters -->
+            <form class="form-vertical">
                 <div class="form-group">
-                    <label for="selectAlgorithm">Select an algorithm for common scanpath comptutation:</label>
-                    <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm">
+                    <label for="selectAlgorithm">Algorithm for common scanpath comptutation:</label>
+                    <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm" ng-disabled="customScanpath">
                         <option value="">Choose an algorithm..</option>
                         <optgroup label="Custom algorithms">
                             <option>Scanpath trend analysis</option>
@@ -18,30 +19,74 @@
                         </optgroup>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary" ng-click="getCommonScanpath()">Submit</button>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="customScanpath">
+                        I want to provide my own common scanpath
+                    </label>
+                </div>
+
+                <div class="form-group" ng-show="customScanpath ">
+                    <label for="customScanpathText">Enter the expected common scanpath</label>
+                    <div>
+                        <input class="text-uppercase" type="text" id="customScanpathText" maxlength="40" placeholder="A B C D..">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" ng-click="fillTableDetails()">Submit</button>
             </form>
             <hr />
-            <h3>Dataset overview</h3>
+
+            <!-- Dataset overview -->
             <div class="row">
                 <div class="col-md-8">
-                    <h4>Common scanpath:</h4>
-                    <p>
-                        <span ng-hide="dataset.commonScanpath">Not available</span>
-                        <span ng-repeat="region in dataset.commonScanpath.fixations">{{ region }} </span>
-                    </p>
-                    <h4>Average similarity to the common scanpath:</h4>
-                    <p>
-                        <span ng-show="dataset.commonScanpath.avgSimToCommon">
-                            {{ dataset.commonScanpath.avgSimToCommon | number: 2 }}%
-                        </span>
-                        <span ng-hide="dataset.commonScanpath.avgSimToCommon">N/A</span>
-                    </p>
+                    <h2>Dataset overview</h2>
+                    <!-- Calculated common scanpath -->
+                    <div class="row" ng-show="!customScanpath">
+                        <div class="col-md-12">
+                            <h3>Common scanpath:</h3>
+                            <p>
+                                <span ng-hide="dataset.commonScanpath">Not available</span>
+                                <span ng-repeat="region in dataset.commonScanpath.fixations">{{ region }} </span>
+                            </p>
+
+                            <h4>Average similarity to the common scanpath:</h4>
+                            <p>
+                                <span ng-show="dataset.commonScanpath.avgSimToCommon">
+                                    {{ dataset.commonScanpath.avgSimToCommon | number: 2 }}%
+                                </span>
+                                <span ng-hide="dataset.commonScanpath.avgSimToCommon">N/A</span>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Custom common scanpath -->
+                    <div class="row" ng-show="customScanpath">
+                        <div class="col-md-12">
+                            <h3>Custom scanpath:</h3>
+                            <p>
+                                <span ng-hide="dataset.customScanpath">Not available</span>
+                                <span ng-repeat="region in dataset.customScanpath.fixations">{{ region }} </span>
+                            </p>
+
+                            <h4>Average similarity to the custom scanpath:</h4>
+                            <p>
+                                <span ng-show="dataset.customScanpath.avgSimToCommon">
+                                    {{ dataset.customScanpath.avgSimToCommon | number: 2 }}%
+                                </span>
+                                <span ng-hide="dataset.customScanpath.avgSimToCommon">N/A</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
+                <!-- Dataset visuals -->
                 <div class="col-md-4">
                     <img class="img-responsive" ng-src="{{ dataset.visualMain }}">
                 </div>
             </div>
             <hr />
+
+            <!-- Results overview -->
             <table class="table table-hover table-responsive" id="scanpathTable">
                 <thead>
                     <tr>
@@ -66,10 +111,10 @@
                     <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
                     <td>{{ scanpath.minSimilarity.identifier }}</td>
                     <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-                    <td ng-show="dataset.commonScanpath">
+                    <td ng-show="dataset.commonScanpath || dataset.customScanpath">
                         {{ scanpath.simToCommon | number: 2 }}%
                     </td>
-                    <td ng-hide="dataset.commonScanpath">N/A</td>
+                    <td ng-show="!dataset.commonScanpath && !dataset.customScanpath">N/A</td>
                 </tr>
             </table>
         </div>
