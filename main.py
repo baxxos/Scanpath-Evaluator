@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from sta import *
 
 
@@ -10,10 +10,12 @@ def redirect_index():
     return render_template('index.html')
 
 
-@app.route('/custom/<string:custom_scanpath>')
-def get_similarity_to_custom(custom_scanpath):
+@app.route('/custom', methods=['GET', 'POST'])
+def get_similarity_to_custom():
     # TODO validation also getting fixations besides scanpath itself
-    return custom_run(custom_scanpath)
+    # TODO consistent case across frontend/backend
+    json_data = json.loads(request.data)
+    return custom_run(json_data["customScanpath"])
 
 
 @app.route('/sta')

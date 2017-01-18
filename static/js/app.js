@@ -2,20 +2,19 @@
 
 var gazerApp = angular.module("gazerApp", ['ngAnimate', 'ngTouch', 'ui.router', 'ui.bootstrap', 'ncy-angular-breadcrumb']);
 
-gazerApp.controller("defaultCtrl", function($scope, $state, $http, $animate){
-    $scope.init = function() {
+gazerApp.controller("defaultCtrl", function($scope, $state, $animate){
+    $scope.initDefault = function() {
         $scope.$state = $state;
 		$scope.isNavCollapsed = true;
 	};
-
-	$scope.init();
+	$scope.initDefault();
 });
 
 gazerApp.controller("customCtrl", function($scope, $state, $http){
 	$scope.getUserScanpaths = function() {
 		$http.get('get_scanpaths').then(
 			function(response){
-				$scope.dataset.userScanpaths = response.data.userScanpaths;
+				$scope.dataset.scanpaths = response.data.scanpaths;
 				$scope.dataset.visualMain = response.data.visualMain
 			},
 			function(data){
@@ -24,14 +23,20 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 		);
     };
 
-    var getAvgSimToCommon = function() {
+    // Calculate average similarity to a custom scanpath based on previous similarity calculations
+    var calcAvgSimToCommon = function() {
 		var similarity = 0, total = 0;
 
 		for (var scanpath in $scope.dataset.commonScanpath.similarity) {
-			similarity += $scope.dataset.commonScanpath.similarity[scanpath];
-			total++;
+			if ($scope.dataset.commonScanpath.similarity.hasOwnProperty(scanpath)) {
+				similarity += $scope.dataset.commonScanpath.similarity[scanpath];
+				// Keep track of the total number of scanpaths as there is no keys.length in dict
+				total++;
+			}
+			else {
+				console.error('Missing property ' + scanpath + ' in similarity object');
+			}
 		}
-
 		return similarity / total;
 	};
 
@@ -41,14 +46,19 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 				// Get the common scanpath
 				$scope.dataset.commonScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.dataset.commonScanpath.avgSimToCommon = getAvgSimToCommon();
+				$scope.dataset.commonScanpath.avgSimToCommon = calcAvgSimToCommon();
 
 				// Assign each user scanpath its similarity to the common scanpath
 				var similarities = $scope.dataset.commonScanpath.similarity;
 
-				for (var index in $scope.dataset.userScanpaths) {
-					var act_scanpath = $scope.dataset.userScanpaths[index];
-					act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
+				for (var index in $scope.dataset.scanpaths) {
+					if ($scope.dataset.scanpaths.hasOwnProperty(index)) {
+						var act_scanpath = $scope.dataset.scanpaths[index];
+						act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
+					}
+					else {
+						console.error('Missing property ' + index + ' in scanpaths object');
+					}
 				}
 			},
 			function(data){
@@ -57,36 +67,53 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 		);
     };
 
-    var getAvgSimToCustom = function() {
+    // Calculate average similarity to a custom scanpath based on previous similarity calculations
+    var calcAvgSimToCustom = function() {
 		var similarity = 0, total = 0;
 
 		for (var scanpath in $scope.dataset.customScanpath.similarity) {
-			similarity += $scope.dataset.customScanpath.similarity[scanpath];
-			total++;
+			if ($scope.dataset.customScanpath.similarity.hasOwnProperty(scanpath)) {
+				similarity += $scope.dataset.customScanpath.similarity[scanpath];
+				// Keep track of the total number of scanpaths as there is no keys.length in dict
+				total++;
+			}
+			else {
+				console.error('Missing property ' + scanpath + ' in similarity object');
+			}
 		}
-
 		return similarity / total;
 	};
 
-	var getCustomScanpathDetails = function(customScanpath) {
+	var getCustomScanpathDetails = function(customScanpathStr) {
 		// Convert user input to uppercase and remove all whitespaces by regex
-		customScanpath = customScanpath.toUpperCase();
-		customScanpath = customScanpath.replace(/\s/g, "");
+		customScanpathStr = customScanpathStr.toUpperCase();
+		customScanpathStr = customScanpathStr.replace(/\s/g, "");
+		// Regex to normalize the scanpath (remove repeated AOIs: AABC -> ABC)
+		// The Regex /(.)\1+/ matches any single char followed by the same char at least once (+)
+		customScanpathStr = customScanpathStr.replace(/(.)\1+/g, '$1');
 
-		$http.get('custom/' + customScanpath).then(
+		$http({
+			url: "/custom",
+			method: "POST",
+			data: {customScanpath: customScanpathStr}
+		}).then(
 			function(response){
 				// Get the common scanpath
 				$scope.dataset.customScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.dataset.customScanpath.avgSimToCommon = getAvgSimToCustom();
+				$scope.dataset.customScanpath.avgSimToCommon = calcAvgSimToCustom();
 
 				// Assign each user scanpath its similarity to the common scanpath
 				var similarities = $scope.dataset.customScanpath.similarity;
 
-				for (var index in $scope.dataset.userScanpaths) {
-					var act_scanpath = $scope.dataset.userScanpaths[index];
-					// TODO simToCustom instead of simToCommon - html edit needed
-					act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
+				for (var index in $scope.dataset.scanpaths) {
+					if ($scope.dataset.scanpaths.hasOwnProperty(index)) {
+						var act_scanpath = $scope.dataset.scanpaths[index];
+						act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
+					}
+					else {
+						console.error('Missing property ' + index + ' in scanpath object');
+					}
 				}
 			},
 			function(data){
@@ -95,13 +122,13 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 		);
     };
 
+    // jQuery-style utility selector
     var $ = function (elementSelector) {
 		return document.body.querySelector(elementSelector);
 	};
 
 	$scope.fillTableDetails = function() {
 		if ($scope.customScanpath) {
-			console.log('calculating similarities to custom scanpath');
 			getCustomScanpathDetails($('#customScanpathText').value);
 		}
 		else {
@@ -117,11 +144,15 @@ gazerApp.controller("customCtrl", function($scope, $state, $http){
 		}
 	};
 
-    $scope.init = function() {
-		$scope.dataset = {};
+    $scope.initData = function() {
+		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted.
+		$scope.dataset = {
+			customScanpath: {similarity: ''},
+			commonScanpath: {similarity: ''}
+		};
 		$scope.getUserScanpaths();
 		$scope.scanpathSort = 'identifier';
 	};
-
-	$scope.init();
+	// Perform scope data initialization
+	$scope.initData();
 });

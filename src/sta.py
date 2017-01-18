@@ -309,7 +309,7 @@ def get_scanpaths_json():
     my_dataset.get_min_similarity(formatted_sequences)
 
     ret_dataset = {
-        'userScanpaths': formatted_sequences,
+        'scanpaths': formatted_sequences,
         'visualMain': my_dataset.file_path_visual,
     }
 
@@ -388,7 +388,7 @@ def custom_run(custom_scanpath):
     scanpath_strs = convert_to_strs(formatted_sequences)
 
     custom_scanpath_arr = []
-    for i in range (0, len(custom_scanpath)):
+    for i in range(0, len(custom_scanpath)):
         custom_scanpath_arr.append(custom_scanpath[i])
 
     res_data = {

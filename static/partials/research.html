@@ -27,7 +27,7 @@
                     </label>
                 </div>
 
-                <div class="form-group" ng-show="customScanpath ">
+                <div class="form-group" ng-show="customScanpath">
                     <label for="customScanpathText">Enter the expected common scanpath</label>
                     <div>
                         <input class="text-uppercase" type="text" id="customScanpathText" maxlength="40" placeholder="A B C D..">
@@ -48,7 +48,9 @@
                             <h3>Common scanpath:</h3>
                             <p>
                                 <span ng-hide="dataset.commonScanpath">Not available</span>
-                                <span ng-repeat="region in dataset.commonScanpath.fixations">{{ region }} </span>
+                                <span ng-repeat="region in dataset.commonScanpath.fixations track by $index">
+                                    {{ region }}
+                                </span>
                             </p>
 
                             <h4>Average similarity to the common scanpath:</h4>
@@ -66,7 +68,9 @@
                             <h3>Custom scanpath:</h3>
                             <p>
                                 <span ng-hide="dataset.customScanpath">Not available</span>
-                                <span ng-repeat="region in dataset.customScanpath.fixations">{{ region }} </span>
+                                <span ng-repeat="region in dataset.customScanpath.fixations track by $index">
+                                    {{ region }}
+                                </span>
                             </p>
 
                             <h4>Average similarity to the custom scanpath:</h4>
@@ -100,10 +104,12 @@
                         <th ng-click="setSort('scanpathSort', 'simToCommon')">Similarity to common</th>
                     </tr>
                 </thead>
-                <tr ng-repeat="scanpath in dataset.userScanpaths | orderBy: [scanpathSort, 'identifier']">
+                <tr ng-repeat="scanpath in dataset.scanpaths | orderBy: [scanpathSort, 'identifier']">
                     <td>{{ scanpath.identifier }}</td>
                     <td>
-                        <span ng-repeat="fixation in scanpath.fixations"  class="text-nowrap">{{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> - </span>
+                        <span ng-repeat="fixation in scanpath.fixations track by $index" class="text-nowrap">
+                            {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> -
+                        </span>
                         <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
                     </td>
                     <td>{{ scanpath.fixations.length }}</td>
