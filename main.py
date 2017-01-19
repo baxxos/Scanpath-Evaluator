@@ -13,7 +13,6 @@ def redirect_index():
 @app.route('/custom', methods=['GET', 'POST'])
 def get_similarity_to_custom():
     # TODO validation also getting fixations besides scanpath itself
-    # TODO consistent case across frontend/backend
     json_data = json.loads(request.data)
     return custom_run(json_data["customScanpath"])
 
