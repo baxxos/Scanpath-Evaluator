@@ -1,12 +1,12 @@
 angular.module('gazerApp').controller('customCtrl', function($scope, $state, $http) {
 	$scope.getUserScanpaths = function() {
-		$http.get('get_scanpaths').then(
+		$http.get('get_dataset').then(
 			function(response){
 				$scope.dataset.scanpaths = response.data.scanpaths;
 				$scope.dataset.visualMain = response.data.visualMain
 			},
 			function(data){
-				console.log('Failed to get user scanpaths: ' + data);
+				console.log('Failed to get dataset content: ' + data);
 			}
 		);
     };

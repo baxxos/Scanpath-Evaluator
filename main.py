@@ -22,9 +22,9 @@ def get_trending_scanpath():
     return sta_run()
 
 
-@app.route('/get_scanpaths')
-def get_scanpaths():
-    return get_scanpaths_json()
+@app.route('/get_dataset')
+def get_dataset():
+    return get_dataset_json()
 
 
 if __name__ == '__main__':

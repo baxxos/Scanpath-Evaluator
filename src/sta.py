@@ -5,8 +5,8 @@ from Environment import *
 import json
 
 # Storage for all loaded data
-my_dataset = Dataset('data/template_sta/scanpaths/',
-                     'data/template_sta/regions/SegmentedPages.txt',
+my_dataset = Dataset('datasets/template_sta/scanpaths/',
+                     'datasets/template_sta/regions/SegmentedPages.txt',
                      'static/images/datasets/template_sta/placeholder.png',
                      'http://ncc.metu.edu.tr/')
 # Environment in which the eye tracking experiment was performed
@@ -274,37 +274,25 @@ def getValueableAoIs(AoIList):
     return valuableAoIs
 
 
-# TODO presunut do dataset classy
-def get_edit_distances(scanpaths):
-    # Store scanpaths as an array of string-converted original scanpaths
-    scanpath_strs = convert_to_strs(scanpaths)
+def get_raw_sequences():
+    my_error_rate_area = my_env.get_error_rate_area()
+    my_sequences = createSequences(my_dataset.participants, my_dataset.aois, my_error_rate_area)
 
-    # Calculate the edit distances
-    # The order of records in scanpaths and scanpath_strs must be the same!
-    calc_similarity(scanpath_strs)
-
-    for i_first in range(0, len(scanpath_strs)):
-        # Save the calculations to the original scanpaths object
-        scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
-
-
-# TODO malo by to byt skor get_dataset_json - neloadim len scanpathy ale aj visuals a ine veci
-# TODO presunut prvych 20 riadkov do samostatnej funkcie a zistit co robia tie 2 cykly
-def get_scanpaths_json():
-    myErrorRateArea = my_env.get_error_rate_area()
-    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
-
-    keys = mySequences.keys()
+    keys = my_sequences.keys()
     for y in range(0, len(keys)):
-        mySequences[keys[y]] = mySequences[keys[y]].split('.')
-        del mySequences[keys[y]][len(mySequences[keys[y]]) - 1]
+        my_sequences[keys[y]] = my_sequences[keys[y]].split('.')
+        del my_sequences[keys[y]][len(my_sequences[keys[y]]) - 1]
     for y in range(0, len(keys)):
-        for z in range(0, len(mySequences[keys[y]])):
-            mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
+        for z in range(0, len(my_sequences[keys[y]])):
+            my_sequences[keys[y]][z] = my_sequences[keys[y]][z].split('-')
 
-    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
+    return my_sequences
 
-    get_edit_distances(formatted_sequences)
+
+def get_dataset_json():
+    formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
+
+    my_dataset.get_edit_distances(formatted_sequences)
     my_dataset.get_max_similarity(formatted_sequences)
     my_dataset.get_min_similarity(formatted_sequences)
 
@@ -318,16 +306,7 @@ def get_scanpaths_json():
 # STA Algorithm
 # Preliminary Stage
 def sta_run():
-    myErrorRateArea = my_env.get_error_rate_area()
-    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
-
-    keys = mySequences.keys()
-    for y in range(0, len(keys)):
-        mySequences[keys[y]] = mySequences[keys[y]].split('.')
-        del mySequences[keys[y]][len(mySequences[keys[y]]) - 1]
-    for y in range(0, len(keys)):
-        for z in range(0, len(mySequences[keys[y]])):
-            mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
+    mySequences = get_raw_sequences()
 
     # First-Pass
     mySequences_num = {}
@@ -341,7 +320,6 @@ def sta_run():
 
     # Second-Pass
     myNewAoIList = getExistingAoIList(myNewSequences)
-
     # B gets flagged as false
     myNewAoIList = calculateTotalNumberDurationofFixationsandNSV(myNewAoIList,
                                                                  calculateNumberDurationOfFixationsAndNSV(myNewSequences))
@@ -355,7 +333,7 @@ def sta_run():
     for y in range(0, len(myFinalList)):
         commonSequence.append(myFinalList[y][0])
 
-    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
+    formatted_sequences = my_dataset.format_sequences(mySequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = convert_to_strs(formatted_sequences)
@@ -371,18 +349,7 @@ def sta_run():
 
 
 def custom_run(custom_scanpath):
-    myErrorRateArea = my_env.get_error_rate_area()
-    mySequences = createSequences(my_dataset.participants, my_dataset.aois, myErrorRateArea)
-
-    keys = mySequences.keys()
-    for y in range(0, len(keys)):
-        mySequences[keys[y]] = mySequences[keys[y]].split('.')
-        del mySequences[keys[y]][len(mySequences[keys[y]]) - 1]
-    for y in range(0, len(keys)):
-        for z in range(0, len(mySequences[keys[y]])):
-            mySequences[keys[y]][z] = mySequences[keys[y]][z].split('-')
-
-    formatted_sequences = my_dataset.get_formatted_sequences(mySequences)
+    formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = convert_to_strs(formatted_sequences)

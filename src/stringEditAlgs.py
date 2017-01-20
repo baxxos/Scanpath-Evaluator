@@ -19,7 +19,7 @@ def convert_to_strs(scanpaths):
     return scanpath_strs
 
 
-def calc_similarity(scanpath_strs):
+def calc_mutual_similarity(scanpath_strs):
     for i_first in range(0, len(scanpath_strs)):
         # Each scanpath has a similarity object - similarity[id] represents
         # the level of similarity to the scanpath identified by id

@@ -1,4 +1,5 @@
 from os import listdir
+from stringEditAlgs import *
 
 
 # TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
@@ -67,7 +68,7 @@ class Dataset:
     def load_visuals(self):
         print 'hello'
 
-    def get_formatted_sequences(self, sequences):
+    def format_sequences(self, sequences):
         """
         {'01': [[A, 150], [B, 250]], '02': ...} gets transformed into:
         [{'identifier': '01', 'fixations': [[A, 150], [B, 250]]}, {'identifier': '02' ... }]
@@ -84,7 +85,7 @@ class Dataset:
         return formatted_sequences
 
     def get_max_similarity(self, scanpaths):
-        """ Function calculates most similiar double for each scanpath in the set """
+        """ Function calculates most similiar pair for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
             max_similar = {}
@@ -100,7 +101,7 @@ class Dataset:
             scanpath['maxSimilarity'] = max_similar
 
     def get_min_similarity(self, scanpaths):
-        """ Function calculates most similiar double for each scanpath in the set """
+        """ Function calculates most similar pair for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
             min_similar = {}
@@ -114,3 +115,15 @@ class Dataset:
                     min_similar['identifier'] = similarity_iter
             # Assign max_similarity object to scanpath (in JSON-style)
             scanpath['minSimilarity'] = min_similar
+
+    def get_edit_distances(self, scanpaths):
+        # Store scanpaths as an array of string-converted original scanpaths
+        scanpath_strs = convert_to_strs(scanpaths)
+
+        # Calculate the edit distances
+        # The order of records in scanpaths and scanpath_strs must be the same!
+        calc_mutual_similarity(scanpath_strs)
+
+        for i_first in range(0, len(scanpath_strs)):
+            # Save the calculations to the original scanpaths object
+            scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
