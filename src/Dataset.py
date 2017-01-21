@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, path
 from stringEditAlgs import *
 
 
@@ -7,10 +7,10 @@ from stringEditAlgs import *
 class Dataset:
     """Common class for grouping a set of scanpaths together"""
 
-    def __init__(self, folder_path_scanpaths, file_path_aoi, file_path_visual, website_name):
+    def __init__(self, folder_path_scanpaths, file_path_aoi, folder_path_visuals, website_name):
         # Initialize attributes
         self.file_path_aoi = file_path_aoi
-        self.file_path_visual = file_path_visual
+        self.folder_path_visuals = folder_path_visuals
         self.folder_path_scanpaths = folder_path_scanpaths
         self.data_file_format = '.txt'
         self.website_name = website_name
@@ -56,7 +56,7 @@ class Dataset:
         try:
             fo = open(self.file_path_aoi, "r")
         except:
-            print "Failed to open file containing areas of interest"
+            print "Failed to open directory containing areas of interest"
         aoi_file = fo.read()
         file_lines = aoi_file.split('\n')
 
@@ -65,8 +65,23 @@ class Dataset:
             temp = file_lines[x].split(' ')
             self.aois.append([temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]])
 
-    def load_visuals(self):
-        print 'hello'
+    def get_visuals(self):
+        # Fetch all image files in specified folder (relying on extension atm)
+        try:
+            files_list = listdir(self.folder_path_visuals)
+        except:
+            return {}
+
+        images_list = {}
+        valid_extensions = (".jpg", ".jpeg", ".png", ".gif", ".bmp")
+
+        # Verify if the file is image and add it to the collection
+        for filename in files_list:
+            if filename.endswith(valid_extensions):
+                # images[main] = static/images/datasets/template_sta/main.png
+                images_list[path.splitext(filename)[0]] = self.folder_path_visuals + filename
+
+        return images_list
 
     def format_sequences(self, sequences):
         """
@@ -85,7 +100,7 @@ class Dataset:
         return formatted_sequences
 
     def get_max_similarity(self, scanpaths):
-        """ Function calculates most similiar pair for each scanpath in the set """
+        """ Function calculates most similar pair for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
             max_similar = {}

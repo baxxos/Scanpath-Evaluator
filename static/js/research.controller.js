@@ -3,7 +3,7 @@ angular.module('gazerApp').controller('customCtrl', function($scope, $state, $ht
 		$http.get('get_dataset').then(
 			function(response){
 				$scope.dataset.scanpaths = response.data.scanpaths;
-				$scope.dataset.visualMain = response.data.visualMain
+				$scope.dataset.visuals = response.data.visuals;
 			},
 			function(data){
 				console.log('Failed to get dataset content: ' + data);

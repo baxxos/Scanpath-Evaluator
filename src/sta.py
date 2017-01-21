@@ -5,9 +5,11 @@ from Environment import *
 import json
 
 # Storage for all loaded data
+# TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
+# TODO dataset should have a name and all data paths should be based on it
 my_dataset = Dataset('datasets/template_sta/scanpaths/',
                      'datasets/template_sta/regions/SegmentedPages.txt',
-                     'static/images/datasets/template_sta/placeholder.png',
+                     'static/images/datasets/template_sta/',
                      'http://ncc.metu.edu.tr/')
 # Environment in which the eye tracking experiment was performed
 my_env = Environment(0.5, 60, 1280, 1024, 17)
@@ -292,13 +294,15 @@ def get_raw_sequences():
 def get_dataset_json():
     formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
 
+    # Calculate edit distances/similarity between dataset scanpaths
     my_dataset.get_edit_distances(formatted_sequences)
     my_dataset.get_max_similarity(formatted_sequences)
     my_dataset.get_min_similarity(formatted_sequences)
 
+    # Return necessary dataset info which will be processed and rendered on the client side
     ret_dataset = {
         'scanpaths': formatted_sequences,
-        'visualMain': my_dataset.file_path_visual,
+        'visuals': my_dataset.get_visuals()
     }
 
     return json.dumps(ret_dataset)
