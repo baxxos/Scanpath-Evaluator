@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('customCtrl', function($scope, $state, $http) {
+angular.module('gazerApp').controller('researchCtrl', function($scope, $state, $http) {
 	$scope.getUserScanpaths = function() {
 		$http.get('get_dataset').then(
 			function(response){

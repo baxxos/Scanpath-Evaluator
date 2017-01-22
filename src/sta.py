@@ -1,16 +1,11 @@
 from __future__ import division
-from stringEditAlgs import *
 from Dataset import *
 from Environment import *
 import json
 
 # Storage for all loaded data
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
-# TODO dataset should have a name and all data paths should be based on it
-my_dataset = Dataset('datasets/template_sta/scanpaths/',
-                     'datasets/template_sta/regions/SegmentedPages.txt',
-                     'static/images/datasets/template_sta/',
-                     'http://ncc.metu.edu.tr/')
+my_dataset = Dataset('template_sta', 'task1', 'http://ncc.metu.edu.tr/')
 # Environment in which the eye tracking experiment was performed
 my_env = Environment(0.5, 60, 1280, 1024, 17)
 
@@ -276,6 +271,7 @@ def getValueableAoIs(AoIList):
     return valuableAoIs
 
 
+# Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences():
     my_error_rate_area = my_env.get_error_rate_area()
     my_sequences = createSequences(my_dataset.participants, my_dataset.aois, my_error_rate_area)
@@ -291,10 +287,11 @@ def get_raw_sequences():
     return my_sequences
 
 
+# Alter the sequences from their default format to the desired format used on client-side
 def get_dataset_json():
     formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
 
-    # Calculate edit distances/similarity between dataset scanpaths
+    # Additional info - calculate edit distances/similarity between dataset scanpaths
     my_dataset.get_edit_distances(formatted_sequences)
     my_dataset.get_max_similarity(formatted_sequences)
     my_dataset.get_min_similarity(formatted_sequences)
@@ -308,8 +305,8 @@ def get_dataset_json():
     return json.dumps(ret_dataset)
 
 # STA Algorithm
-# Preliminary Stage
 def sta_run():
+    # Preliminary Stage
     mySequences = get_raw_sequences()
 
     # First-Pass
@@ -348,10 +345,10 @@ def sta_run():
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath)
     }
 
-    # to get JSON use return str(sta_run()) when calling this alg
     return json.dumps(res_data)
 
 
+# Reversed STA algorithm - the "common" scanpath is known from the start
 def custom_run(custom_scanpath):
     formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
 
@@ -367,5 +364,4 @@ def custom_run(custom_scanpath):
         'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath_arr)
     }
 
-    # to get JSON use return str(sta_run()) when calling this alg
     return json.dumps(res_data)

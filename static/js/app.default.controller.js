@@ -4,5 +4,6 @@ angular.module('gazerApp').controller("defaultCtrl", function($scope, $state, $a
         $scope.$state = $state;
 		$scope.isNavCollapsed = true;
 	};
+	// Perform scope state initialization
 	$scope.initDefault();
 });

@@ -3,20 +3,28 @@ from stringEditAlgs import *
 
 
 # TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
-# TODO the same goes for error area - once calculated set it as property
 class Dataset:
-    """Common class for grouping a set of scanpaths together"""
+    """Common class for grouping a set of scanpaths together based on files stored on the server """
 
-    def __init__(self, folder_path_scanpaths, file_path_aoi, folder_path_visuals, website_name):
+    DATASET_FOLDER = 'datasets/'
+    AOIS_FILE = 'SegmentedPages.txt'
+
+    def __init__(self, dataset_name, task_name, website_name):
         # Initialize attributes
-        self.file_path_aoi = file_path_aoi
-        self.folder_path_visuals = folder_path_visuals
-        self.folder_path_scanpaths = folder_path_scanpaths
+        self.name = dataset_name
+        self.task_name = task_name
         self.data_file_format = '.txt'
         self.website_name = website_name
+
+        # Join paths to actual data based on dataset/task names
+        self.folder_path_scanpaths = path.join(self.DATASET_FOLDER, self.name, self.task_name, 'scanpaths/')
+        self.file_path_aoi = path.join(self.DATASET_FOLDER, self.name, self.task_name, 'regions', self.AOIS_FILE)
+        self.folder_path_visuals = path.join('static/images/datasets', self.name, self.task_name + '/')
+
         # Data holding objects
         self.participants = {}
         self.aois = []
+
         # Fill the data holding objects
         self.load_participants()
         self.load_aois()
@@ -28,9 +36,9 @@ class Dataset:
         for filename in files_list:
             if filename.endswith(self.data_file_format):
                 try:
-                    fo = open(self.folder_path_scanpaths + filename, "r")
+                    fo = open(self.folder_path_scanpaths + filename, 'r')
                 except:
-                    print "Failed to open specified file - skipping to next one"
+                    print "Failed to open specified file: " + self.folder_path_scanpaths + filename
                     continue
                 act_file_content = fo.read()
 

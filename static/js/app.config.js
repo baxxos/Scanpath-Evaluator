@@ -7,7 +7,7 @@ angular.module('gazerApp')
 			$stateProvider
 				.state("index", {
 					url: "/",
-					controller: 'customCtrl',
+					controller: 'defaultCtrl',
 					templateUrl: 'static/partials/landing.html',
 					ncyBreadcrumb: {
 						label: 'Home'
@@ -15,7 +15,7 @@ angular.module('gazerApp')
 				})
 				.state('profile', {
 					url: '/profile',
-					controller: 'customCtrl',
+					controller: 'defaultCtrl',
 					templateUrl: 'static/partials/profile.html',
 					ncyBreadcrumb: {
 						label: 'Profile',
@@ -24,7 +24,7 @@ angular.module('gazerApp')
 				})
 				.state('research', {
 					url: '/research',
-					controller: 'customCtrl',
+					controller: 'researchCtrl',
 					templateUrl: 'static/partials/research.html',
 					ncyBreadcrumb: {
 						label: 'Research',
