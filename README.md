@@ -38,7 +38,7 @@ Back-end: Python 2.7 + Flask<br />
         </li>
     </ul>
 </p> 
-PAGE RENDERING & NAVIGATION:
+PAGE RENDERING & NAVIGATION:<br />
 HTML files are served by custom Angular routing provider (UI-router). It<br />
 enhances the basic Angular $routeProvider functionality by replacing it with own<br />
 $stateProvider keyword. It can be used for remembering states (e.g. for breadcrumbs) etc.

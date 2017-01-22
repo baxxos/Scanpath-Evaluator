@@ -22,20 +22,52 @@ angular.module('gazerApp')
 						parent: 'index'
 					}
 				})
+				// State displaying static information about datasets and their tasks
 				.state('research', {
 					url: '/research',
-					controller: 'researchCtrl',
-					templateUrl: 'static/partials/research.html',
+					views: {
+						'@': {
+							controller: 'defaultCtrl',
+							templateUrl: 'static/partials/research.layout.html'
+						},
+						'left@research' : {
+							controller: 'researchSidebarCtrl',
+							templateUrl: 'static/partials/research.main.sidebar.html'
+						},
+						'right@research' : {
+							templateUrl: 'static/partials/research.main.static.html'
+						}
+					},
 					ncyBreadcrumb: {
 						label: 'Research',
 						parent: 'index'
 					}
 				})
-				.state('research.sidebar', {
-					templateUrl: 'static/partials/research.sidebar.html',
-					controller: 'researchSidebarCtrl',
+				// State which allows to choose a dataset for an UX experiment stored in the DB
+				.state('research.dataset', {
+					url: '/dataset/:id',
+					views: {
+						'right@research': {
+							templateUrl: 'static/partials/research.main.dataset.html'
+						}
+					},
 					ncyBreadcrumb: {
-						skip: true // Do not consider this state in the breadcrumbs data
+						label: 'Dataset details',
+						parent: 'research'
+					}
+				})
+				// State which allows to choose a task (sub-dataset) from the previously selected dataset
+				.state('research.task', {
+					url: '/task/:id',
+					views: {
+						'right@research': {
+							templateUrl: 'static/partials/research.main.task.html',
+							controller: 'taskCtrl'
+						}
+					},
+					ncyBreadcrumb: {
+						label: 'Task Details',
+						parent: 'research.dataset'
 					}
 				});
 			// Set default fallback URL
