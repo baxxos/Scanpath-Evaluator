@@ -1,3 +1,4 @@
+// Handles all scanpath data related actions such as AJAX calls etc.
 angular.module('gazerApp').controller('researchCtrl', function($scope, $state, $http) {
 	$scope.getUserScanpaths = function() {
 		$http.get('get_dataset').then(
@@ -127,7 +128,7 @@ angular.module('gazerApp').controller('researchCtrl', function($scope, $state, $
 		}
 	};
 
-    $scope.initData = function() {
+    var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.dataset = {
 			customScanpath: {similarity: ''},
@@ -135,7 +136,10 @@ angular.module('gazerApp').controller('researchCtrl', function($scope, $state, $
 		};
 		$scope.getUserScanpaths();
 		$scope.scanpathSort = 'identifier';
+
+		// Set state to the last child (only if current state is nested)
+		$state.go('research.sidebar');
 	};
-	// Perform scope data initialization
-	$scope.initData();
+	// Perform view initialization
+	init();
 });

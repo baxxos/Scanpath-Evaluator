@@ -1,9 +1,9 @@
-// Created by Baxos on 2.11.2016.
 'use strict';
 
+// State machine for named states based on URL and (currently) unnamed corresponding views
 angular.module('gazerApp')
 	.config(['$stateProvider', '$urlRouterProvider', '$locationProvider',
-		function($stateProvider, $urlRouterProvider, $locationProvider) {
+		function($stateProvider, $urlRouterProvider) {
 			$stateProvider
 				.state("index", {
 					url: "/",
@@ -30,7 +30,15 @@ angular.module('gazerApp')
 						label: 'Research',
 						parent: 'index'
 					}
+				})
+				.state('research.sidebar', {
+					templateUrl: 'static/partials/research.sidebar.html',
+					controller: 'researchSidebarCtrl',
+					ncyBreadcrumb: {
+						skip: true // Do not consider this state in the breadcrumbs data
+					}
 				});
+			// Set default fallback URL
 			$urlRouterProvider.otherwise('/');
 }]);
 
