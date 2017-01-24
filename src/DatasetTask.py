@@ -17,9 +17,9 @@ class DatasetTask:
         self.website_name = website_name
 
         # Join paths to actual data based on dataset/task names
-        self.folder_path_scanpaths = path.join(self.DATASET_FOLDER, self.name, self.task_name, 'scanpaths/')
+        self.folder_path_scanpaths = path.join(self.DATASET_FOLDER, self.name, self.task_name, 'scanpaths', '')
         self.file_path_aoi = path.join(self.DATASET_FOLDER, self.name, self.task_name, 'regions', self.AOIS_FILE)
-        self.folder_path_visuals = path.join('static/images/datasets', self.name, self.task_name + '/')
+        self.folder_path_visuals = path.join('static', 'images', 'datasets', self.name, self.task_name, '')
 
         # Data holding objects
         self.participants = {}

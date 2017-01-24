@@ -47,4 +47,5 @@ def get_dataset():
 
 
 if __name__ == '__main__':
-    app.run()
+    # App is threaded=true due to slow loading times on localhost
+    app.run(host='127.0.0.1', port=8888, threaded=True)
