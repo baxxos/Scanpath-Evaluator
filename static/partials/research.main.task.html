@@ -1,5 +1,5 @@
-<h2>Dataset task overview: </h2>
-<p>Task ID: {{ dataset.id }}</p>
+<h2>Task overview: </h2>
+<p>Task ID: {{ task.id }}</p>
 <hr />
 
 <!-- Input calculation parameters -->
@@ -53,18 +53,18 @@
             <div class="col-md-12">
                 <h3>Common scanpath:</h3>
                 <p>
-                    <span ng-hide="dataset.commonScanpath">Not available</span>
-                    <span ng-repeat="region in dataset.commonScanpath.fixations track by $index">
+                    <span ng-hide="task.commonScanpath">Not available</span>
+                    <span ng-repeat="region in task.commonScanpath.fixations track by $index">
                         {{ region }}
                     </span>
                 </p>
 
                 <h4>Average similarity to the common scanpath:</h4>
                 <p>
-                    <span ng-show="dataset.commonScanpath.avgSimToCommon">
-                        {{ dataset.commonScanpath.avgSimToCommon | number: 2 }}%
+                    <span ng-show="task.commonScanpath.avgSimToCommon">
+                        {{ task.commonScanpath.avgSimToCommon | number: 2 }}%
                     </span>
-                    <span ng-hide="dataset.commonScanpath.avgSimToCommon">N/A</span>
+                    <span ng-hide="task.commonScanpath.avgSimToCommon">N/A</span>
                 </p>
             </div>
         </div>
@@ -73,25 +73,25 @@
             <div class="col-md-12">
                 <h3>Custom scanpath:</h3>
                 <p>
-                    <span ng-hide="dataset.customScanpath">Not available</span>
-                    <span ng-repeat="region in dataset.customScanpath.fixations track by $index">
+                    <span ng-hide="task.customScanpath">Not available</span>
+                    <span ng-repeat="region in task.customScanpath.fixations track by $index">
                         {{ region }}
                     </span>
                 </p>
 
                 <h4>Average similarity to the custom scanpath:</h4>
                 <p>
-                    <span ng-show="dataset.customScanpath.avgSimToCommon">
-                        {{ dataset.customScanpath.avgSimToCommon | number: 2 }}%
+                    <span ng-show="task.customScanpath.avgSimToCommon">
+                        {{ task.customScanpath.avgSimToCommon | number: 2 }}%
                     </span>
-                    <span ng-hide="dataset.customScanpath.avgSimToCommon">N/A</span>
+                    <span ng-hide="task.customScanpath.avgSimToCommon">N/A</span>
                 </p>
             </div>
         </div>
     </div>
     <!-- Dataset visuals -->
     <div class="col-md-4">
-        <img class="img-responsive" ng-src="{{ dataset.visuals.main }}">
+        <img class="img-responsive" ng-src="{{ task.visuals.main }}">
     </div>
 </div>
 <hr />
@@ -110,7 +110,7 @@
             <th ng-click="setSort('scanpathSort', 'simToCommon')">Similarity to common</th>
         </tr>
     </thead>
-    <tr ng-repeat="scanpath in dataset.scanpaths | orderBy: [scanpathSort, 'identifier']">
+    <tr ng-repeat="scanpath in task.scanpaths | orderBy: [scanpathSort, 'identifier']">
         <td>{{ scanpath.identifier }}</td>
         <td>
             <span ng-repeat="fixation in scanpath.fixations track by $index" class="text-nowrap">
@@ -123,9 +123,9 @@
         <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
         <td>{{ scanpath.minSimilarity.identifier }}</td>
         <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-        <td ng-show="dataset.commonScanpath || dataset.customScanpath">
+        <td ng-show="task.commonScanpath || task.customScanpath">
             {{ scanpath.simToCommon | number: 2 }}%
         </td>
-        <td ng-show="!dataset.commonScanpath && !dataset.customScanpath">N/A</td>
+        <td ng-show="!task.commonScanpath && !task.customScanpath">N/A</td>
     </tr>
 </table>

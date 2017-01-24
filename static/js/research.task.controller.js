@@ -1,14 +1,14 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
 angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http, $stateParams) {
 	$scope.getUserScanpaths = function() {
-		$http.get('get_dataset').then(
+		$http.get('get_task_data').then(
 			function(response){
-				$scope.dataset.scanpaths = response.data.scanpaths;
-				$scope.dataset.visuals = response.data.visuals;
-				$scope.dataset.id = $stateParams.id; // TODO compare with id from DB
+				$scope.task.scanpaths = response.data.scanpaths;
+				$scope.task.visuals = response.data.visuals;
+				$scope.task.id = $stateParams.id; // TODO compare with id from DB
 			},
 			function(data){
-				console.log('Failed to get dataset content: ' + data);
+				console.log('Failed to get task data content.', data);
 			}
 		);
     };
@@ -17,9 +17,9 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     var calcAvgSimToCommon = function() {
 		var similarity = 0, total = 0;
 
-		for (var scanpath in $scope.dataset.commonScanpath.similarity) {
-			if ($scope.dataset.commonScanpath.similarity.hasOwnProperty(scanpath)) {
-				similarity += $scope.dataset.commonScanpath.similarity[scanpath];
+		for (var scanpath in $scope.task.commonScanpath.similarity) {
+			if ($scope.task.commonScanpath.similarity.hasOwnProperty(scanpath)) {
+				similarity += $scope.task.commonScanpath.similarity[scanpath];
 				// Keep track of the total number of scanpaths as there is no keys.length in dict
 				total++;
 			}
@@ -34,16 +34,16 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 		$http.get('sta').then(
 			function(response){
 				// Get the common scanpath
-				$scope.dataset.commonScanpath = response.data;
+				$scope.task.commonScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.dataset.commonScanpath.avgSimToCommon = calcAvgSimToCommon();
+				$scope.task.commonScanpath.avgSimToCommon = calcAvgSimToCommon();
 
 				// Assign each user scanpath its similarity to the common scanpath
-				var similarities = $scope.dataset.commonScanpath.similarity;
+				var similarities = $scope.task.commonScanpath.similarity;
 
-				for (var index in $scope.dataset.scanpaths) {
-					if ($scope.dataset.scanpaths.hasOwnProperty(index)) {
-						var act_scanpath = $scope.dataset.scanpaths[index];
+				for (var index in $scope.task.scanpaths) {
+					if ($scope.task.scanpaths.hasOwnProperty(index)) {
+						var act_scanpath = $scope.task.scanpaths[index];
 						act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
 					}
 					else {
@@ -52,7 +52,7 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 				}
 			},
 			function(data){
-				console.log('Failed to get common scanpath: ' + data);
+				console.log('Failed to get common scanpath.', data);
 			}
 		);
     };
@@ -61,9 +61,9 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     var calcAvgSimToCustom = function() {
 		var similarity = 0, total = 0;
 
-		for (var scanpath in $scope.dataset.customScanpath.similarity) {
-			if ($scope.dataset.customScanpath.similarity.hasOwnProperty(scanpath)) {
-				similarity += $scope.dataset.customScanpath.similarity[scanpath];
+		for (var scanpath in $scope.task.customScanpath.similarity) {
+			if ($scope.task.customScanpath.similarity.hasOwnProperty(scanpath)) {
+				similarity += $scope.task.customScanpath.similarity[scanpath];
 				// Keep track of the total number of scanpaths as there is no keys.length in dict
 				total++;
 			}
@@ -85,20 +85,22 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 		$http({
 			url: "/custom",
 			method: "POST",
-			data: {customScanpath: customScanpathStr}
+			data: {
+				customScanpath: customScanpathStr
+			}
 		}).then(
 			function(response){
 				// Get the common scanpath
-				$scope.dataset.customScanpath = response.data;
+				$scope.task.customScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.dataset.customScanpath.avgSimToCommon = calcAvgSimToCustom();
+				$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom();
 
 				// Assign each user scanpath its similarity to the common scanpath
-				var similarities = $scope.dataset.customScanpath.similarity;
+				var similarities = $scope.task.customScanpath.similarity;
 
-				for (var index in $scope.dataset.scanpaths) {
-					if ($scope.dataset.scanpaths.hasOwnProperty(index)) {
-						var act_scanpath = $scope.dataset.scanpaths[index];
+				for (var index in $scope.task.scanpaths) {
+					if ($scope.task.scanpaths.hasOwnProperty(index)) {
+						var act_scanpath = $scope.task.scanpaths[index];
 						act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
 					}
 					else {
@@ -107,7 +109,7 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 				}
 			},
 			function(data){
-				console.log('Failed to get common scanpath: ' + data);
+				console.log('Failed to get common scanpath.', data);
 			}
 		);
     };
@@ -131,7 +133,7 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 
     var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
-		$scope.dataset = {};
+		$scope.task = {};
 		$scope.getUserScanpaths();
 		$scope.scanpathSort = 'identifier';
 	};

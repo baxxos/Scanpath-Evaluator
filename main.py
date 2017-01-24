@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from sta import sta_run, custom_run, get_dataset_json
+from sta import sta_run, custom_run, get_task_data_json
 import json
 
 
@@ -41,9 +41,9 @@ def get_trending_scanpath():
     return sta_run()
 
 
-@app.route('/get_dataset')
+@app.route('/get_task_data')
 def get_dataset():
-    return get_dataset_json()
+    return get_task_data_json()
 
 
 if __name__ == '__main__':

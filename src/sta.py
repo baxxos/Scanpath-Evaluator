@@ -1,11 +1,11 @@
 from __future__ import division
-from Dataset import *
+from DatasetTask import *
 from Environment import *
 import json
 
 # Storage for all loaded data
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
-my_dataset = Dataset('template_sta', 'task1', 'http://ncc.metu.edu.tr/')
+dataset_task = DatasetTask('template_sta', 'task1', 'http://ncc.metu.edu.tr/')
 # Environment in which the eye tracking experiment was performed
 my_env = Environment(0.5, 60, 1280, 1024, 17)
 
@@ -60,7 +60,7 @@ def getNumberedSequence(Sequence):
             numberedSequence.append([Sequence[y][0], getSequenceNumber(Sequence[0:y], Sequence[y][0]), Sequence[y][1]])
 
     AoIList = getExistingAoIListForSequence(numberedSequence)
-    AoINames = my_dataset.aois
+    AoINames = dataset_task.aois
     AoINames = [w[5] for w in AoINames]
     newSequence = []
 
@@ -274,7 +274,7 @@ def getValueableAoIs(AoIList):
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences():
     my_error_rate_area = my_env.get_error_rate_area()
-    my_sequences = createSequences(my_dataset.participants, my_dataset.aois, my_error_rate_area)
+    my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
 
     keys = my_sequences.keys()
     for y in range(0, len(keys)):
@@ -288,18 +288,18 @@ def get_raw_sequences():
 
 
 # Alter the sequences from their default format to the desired format used on client-side
-def get_dataset_json():
-    formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
+def get_task_data_json():
+    formatted_sequences = dataset_task.format_sequences(get_raw_sequences())
 
     # Additional info - calculate edit distances/similarity between dataset scanpaths
-    my_dataset.get_edit_distances(formatted_sequences)
-    my_dataset.get_max_similarity(formatted_sequences)
-    my_dataset.get_min_similarity(formatted_sequences)
+    dataset_task.get_edit_distances(formatted_sequences)
+    dataset_task.get_max_similarity(formatted_sequences)
+    dataset_task.get_min_similarity(formatted_sequences)
 
     # Return necessary dataset info which will be processed and rendered on the client side
     ret_dataset = {
         'scanpaths': formatted_sequences,
-        'visuals': my_dataset.get_visuals()
+        'visuals': dataset_task.get_visuals()
     }
 
     return json.dumps(ret_dataset)
@@ -334,7 +334,7 @@ def sta_run():
     for y in range(0, len(myFinalList)):
         commonSequence.append(myFinalList[y][0])
 
-    formatted_sequences = my_dataset.format_sequences(mySequences)
+    formatted_sequences = dataset_task.format_sequences(mySequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = convert_to_strs(formatted_sequences)
@@ -350,7 +350,7 @@ def sta_run():
 
 # Reversed STA algorithm - the "common" scanpath is known from the start
 def custom_run(custom_scanpath):
-    formatted_sequences = my_dataset.format_sequences(get_raw_sequences())
+    formatted_sequences = dataset_task.format_sequences(get_raw_sequences())
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = convert_to_strs(formatted_sequences)
