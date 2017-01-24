@@ -16,6 +16,11 @@ Back-end: Python 2.7 + Flask<br />
             </a>
         </li>
         <li>
+            <a href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+                Bootstrap 3 CSS
+            </a>
+        </li>
+        <li>
             <a href="https://github.com/angular-ui/ui-router">UI-router</a> - handles navigation
             <ul>
                 <li>ui-view: location where the HTML template assigned to current state should be placed. Can be explicitly named.</li>
@@ -32,9 +37,14 @@ Back-end: Python 2.7 + Flask<br />
             </ul>
         </li>
         <li>
-            <a href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-                Bootstrap 3 CSS
+            <a href="https://github.com/nickperkinslondon/angular-bootstrap-nav-tree">
+                Bootstrap Nav Tree
             </a>
+            <ul>
+                <li>
+                    abn-tree: hierarchical tree navigation directive based on a custom-format JSON object.
+                </li>
+            </ul>
         </li>
     </ul>
 </p> 

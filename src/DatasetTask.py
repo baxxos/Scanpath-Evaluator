@@ -4,7 +4,7 @@ from stringEditAlgs import *
 
 # TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
 class DatasetTask:
-    """Common class for grouping a set of scanpaths together based on files stored on the server """
+    """ Common class for grouping a set of scanpaths together based on files stored on the server """
 
     DATASET_FOLDER = 'datasets/'
     AOIS_FILE = 'SegmentedPages.txt'

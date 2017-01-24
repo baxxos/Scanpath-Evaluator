@@ -67,7 +67,7 @@ angular.module('gazerApp')
 					},
 					ncyBreadcrumb: {
 						label: 'Task Details',
-						parent: 'research.dataset'
+						parent: 'research'
 					}
 				});
 			// Set default fallback URL
