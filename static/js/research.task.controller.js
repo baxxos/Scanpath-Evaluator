@@ -1,23 +1,24 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
 angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http, $stateParams) {
-	$scope.getUserScanpaths = function() {
+	$scope.getTaskScanpaths = function() {
+		// TODO pass task ID from url
 		$http.get('get_task_data').then(
-			function(response){
+			function(response) {
 				$scope.task.scanpaths = response.data.scanpaths;
 				$scope.task.visuals = response.data.visuals;
 				$scope.task.id = $stateParams.id; // TODO compare with id from DB
 			},
-			function(data){
+			function(data) {
 				console.log('Failed to get task data content.', data);
 			}
 		);
     };
 
     // Calculate average similarity to a custom scanpath based on previous similarity calculations
-    var calcAvgSimToCommon = function() {
+    var calcAvgSimToCommon = function(commonScanpath) {
 		var similarity = 0, total = 0;
 
-		for (var scanpath in $scope.task.commonScanpath.similarity) {
+		for (var scanpath in commonScanpath.similarity) {
 			if ($scope.task.commonScanpath.similarity.hasOwnProperty(scanpath)) {
 				similarity += $scope.task.commonScanpath.similarity[scanpath];
 				// Keep track of the total number of scanpaths as there is no keys.length in dict
@@ -32,11 +33,11 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 
 	var getCommonScanpathDetails = function() {
 		$http.get('sta').then(
-			function(response){
+			function(response) {
 				// Get the common scanpath
 				$scope.task.commonScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.task.commonScanpath.avgSimToCommon = calcAvgSimToCommon();
+				$scope.task.commonScanpath.avgSimToCommon = calcAvgSimToCommon($scope.task.commonScanpath);
 
 				// Assign each user scanpath its similarity to the common scanpath
 				var similarities = $scope.task.commonScanpath.similarity;
@@ -51,17 +52,17 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 					}
 				}
 			},
-			function(data){
+			function(data) {
 				console.log('Failed to get common scanpath.', data);
 			}
 		);
     };
 
     // Calculate average similarity to a custom scanpath based on previous similarity calculations
-    var calcAvgSimToCustom = function() {
+    var calcAvgSimToCustom = function(customScanpath) {
 		var similarity = 0, total = 0;
 
-		for (var scanpath in $scope.task.customScanpath.similarity) {
+		for (var scanpath in customScanpath.similarity) {
 			if ($scope.task.customScanpath.similarity.hasOwnProperty(scanpath)) {
 				similarity += $scope.task.customScanpath.similarity[scanpath];
 				// Keep track of the total number of scanpaths as there is no keys.length in dict
@@ -83,17 +84,17 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 		customScanpathStr = customScanpathStr.replace(/(.)\1+/g, '$1');
 
 		$http({
-			url: "/custom",
-			method: "POST",
+			url: '/custom',
+			method: 'POST',
 			data: {
 				customScanpath: customScanpathStr
 			}
 		}).then(
-			function(response){
+			function(response) {
 				// Get the common scanpath
 				$scope.task.customScanpath = response.data;
 				// Get the average similarity of user scanpath to the common scanpath
-				$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom();
+				$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom($scope.task.customScanpath);
 
 				// Assign each user scanpath its similarity to the common scanpath
 				var similarities = $scope.task.customScanpath.similarity;
@@ -108,7 +109,7 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 					}
 				}
 			},
-			function(data){
+			function(data) {
 				console.log('Failed to get common scanpath.', data);
 			}
 		);
@@ -134,7 +135,7 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {};
-		$scope.getUserScanpaths();
+		$scope.getTaskScanpaths();
 		$scope.scanpathSort = 'identifier';
 	};
 	// Perform view initialization

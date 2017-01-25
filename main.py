@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from sta import sta_run, custom_run, get_task_data_json
+from User import *
 import json
 
 
@@ -42,9 +43,31 @@ def get_trending_scanpath():
 
 
 @app.route('/get_task_data')
-def get_dataset():
+def get_task_data():
     return get_task_data_json()
 
+
+@app.route('/get_data_tree', methods=['POST'])
+def get_data_tree():
+    """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
+
+    try:
+        json_data = json.loads(request.data)
+        user_id = json_data['userId']
+    except AttributeError:
+        return {
+            'error': True,
+            'errorMsg': 'User ID is missing'
+        }
+
+    user = User(user_id)
+    try:
+        return user.get_data_tree_json()
+    except:
+        return {
+            'error': True,
+            'errorMsg': 'Failed to obtain data tree structure in get_data_tree_json()'
+        }
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost

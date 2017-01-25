@@ -6,7 +6,7 @@ from stringEditAlgs import *
 class DatasetTask:
     """ Common class for grouping a set of scanpaths together based on files stored on the server """
 
-    DATASET_FOLDER = 'datasets/'
+    DATASET_FOLDER = 'datasets'
     AOIS_FILE = 'SegmentedPages.txt'
 
     def __init__(self, dataset_name, task_name, website_name):
