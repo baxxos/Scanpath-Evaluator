@@ -135,7 +135,9 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {};
+		// Get basic scanpath data
 		$scope.getTaskScanpaths();
+		// Sort the data based on a column
 		$scope.scanpathSort = 'identifier';
 	};
 	// Perform view initialization

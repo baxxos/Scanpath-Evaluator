@@ -1,15 +1,14 @@
 import json
 from os import listdir, path
+from config import config
 
 
 class User:
-    DATASET_FOLDER = 'datasets'
-
     def __init__(self, user_id):
         self.user_id = user_id
 
     def get_data_tree_json(self):
-        datasets = listdir(path.join(self.DATASET_FOLDER))
+        datasets = listdir(path.join(config['DATASET_FOLDER']))
         data_tree = []
 
         # Simulates primary keys of datasets and their tasks
@@ -26,7 +25,7 @@ class User:
             })
 
             # Load tasks owned by current dataset
-            tasks = listdir(path.join(self.DATASET_FOLDER, dataset_folder))
+            tasks = listdir(path.join(config['DATASET_FOLDER'], dataset_folder))
 
             for task_folder in tasks:
                 seq_task += 1
