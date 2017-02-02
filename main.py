@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request
+from User import User
+from Dataset import Dataset
+from DatasetTask import DatasetTask
 from sta import sta_run, custom_run, get_task_data_json
-from User import *
-import json
+from database import session
 
+import json
 
 app = Flask(__name__)
 app.debug = True
+
 # TODO consider prefixing Angular directives with 'data-ng' prefix to ensure valid HTML and reduce IDE warnings
 
 
@@ -21,6 +25,7 @@ def get_similarity_to_custom():
     try:
         json_data = json.loads(request.data)
         custom_scanpath = json_data['customScanpath']
+        task_id = json_data['taskId']
     except AttributeError:
         return {
             'error': True,
@@ -29,7 +34,9 @@ def get_similarity_to_custom():
 
     # Verify the custom scanpath formatting - only letters describing AOIs
     if str(custom_scanpath).isalpha():
-        return custom_run(custom_scanpath)
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+        return custom_run(task, custom_scanpath)
     else:
         return {
             'error': True,
@@ -37,14 +44,34 @@ def get_similarity_to_custom():
         }
 
 
-@app.route('/sta')
+@app.route('/sta', methods=['POST'])
 def get_trending_scanpath():
-    return sta_run()
+    try:
+        json_data = json.loads(request.data)
+        task_id = json_data['taskId']
+    except AttributeError:
+        return {
+            'error': True,
+            'errorMsg': 'Task ID is missing'
+        }
+    task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+    task.load_data()
+    return sta_run(task)
 
 
-@app.route('/get_task_data')
+@app.route('/get_task_data', methods=['POST'])
 def get_task_data():
-    return get_task_data_json()
+    try:
+        json_data = json.loads(request.data)
+        task_id = json_data['taskId']
+    except AttributeError:
+        return {
+            'error': True,
+            'errorMsg': 'Task ID is missing'
+        }
+    task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+    task.load_data()
+    return get_task_data_json(task)
 
 
 @app.route('/get_data_tree', methods=['POST'])
@@ -60,7 +87,30 @@ def get_data_tree():
             'errorMsg': 'User ID is missing'
         }
 
-    user = User(user_id)
+    user = session.query(User).filter(User.id == user_id).one()
+
+    """
+    user = User(name='admin', surname='admin', username='admin', password='admin', email='admin@admin.sk')
+    dataset1 = Dataset(name='template_sta', description='description')
+    user.datasets.append(dataset1)
+    session.add(user)
+    session.commit()
+
+    task1 = DatasetTask(url='http://ncc.metu.edu.tr/', name='my_task', description='description')
+    dataset1.tasks.append(task1)
+
+    session.add(task1)
+    session.commit()
+
+    dataset2 = Dataset(name='template_other', description='description')
+    task2 = DatasetTask(url='http://ncc.metu.edu.tr/', name='other_task', description='description')
+    dataset2.tasks.append(task2)
+    user.datasets.append(dataset2)
+
+    session.add(dataset2)
+    session.commit()
+    """
+
     try:
         return user.get_data_tree_json()
     except:

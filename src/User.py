@@ -1,38 +1,58 @@
-import json
 from os import listdir, path
+from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import relationship
+from datetime import datetime
 from config import config
+from database import Base, session
+from Dataset import Dataset
+from DatasetTask import DatasetTask
+
+import json
 
 
-class User:
-    def __init__(self, user_id):
-        self.user_id = user_id
+class User(Base):
+    """ Class mirroring application users """
+
+    # Name of corresponding schema table
+    __tablename__ = 'users'
+
+    # Table columns
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    surname = Column(String)
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    date_created = Column(Date, default=datetime.now())
+
+    # Reference to the datasets owned by current user
+    datasets = relationship('Dataset', backref='user', cascade='all, delete-orphan', passive_deletes=True)
+
+    def __repr__(self):
+        return "<User(name='%s', surname='%s', username='%s', password='%s')>" % (
+            self.name, self.surname, self.username, self.password)
 
     def get_data_tree_json(self):
-        datasets = listdir(path.join(config['DATASET_FOLDER']))
+        # Load datasets owned by current user
+        my_datasets = session.query(Dataset).filter(Dataset.user_id == self.id)
         data_tree = []
 
-        # Simulates primary keys of datasets and their tasks
-        seq_dataset = 0
-        seq_task = 0
-
-        for dataset_folder in datasets:
-            seq_dataset += 1
-
+        for dataset in my_datasets:
             data_tree.append({
-                'label': dataset_folder,
-                'id': seq_dataset,
+                'label': dataset.name,
+                'id': dataset.id,
                 'children': []
             })
 
             # Load tasks owned by current dataset
-            tasks = listdir(path.join(config['DATASET_FOLDER'], dataset_folder))
+            my_tasks = session.query(DatasetTask).filter(DatasetTask.dataset_id == dataset.id)
 
-            for task_folder in tasks:
-                seq_task += 1
-
+            for task in my_tasks:
                 data_tree[len(data_tree) - 1]['children'].append({
-                    'label': task_folder,
-                    'id': seq_task
+                    'label': task.name,
+                    'id': task.id
                 })
 
         return json.dumps(data_tree)
+
+# Base.metadata.create_all(engine)

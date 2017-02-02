@@ -1,7 +1,15 @@
 # scanpath_app
 
-LANGUAGES & FRAMEWORKS USED:<br />
-Back-end: Python 2.7 + Flask<br />
+DEPENDENCIES:
+<p>
+    Back-end:<br />
+    <ul>
+        <li>Python 2.7</li>
+        <li>Flask</li>
+        <li>PostgreSQL (SQLalchemy + psycopg2)</li>
+        <li><a href="https://pythonhosted.org/passlib/install.html">Passlib</a></li>
+    </ul>
+</p>
 <p>
     Front-end:<br />
     <ul>

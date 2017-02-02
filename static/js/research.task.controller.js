@@ -1,12 +1,16 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
 angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http, $stateParams) {
 	$scope.getTaskScanpaths = function() {
-		// TODO pass task ID from url
-		$http.get('get_task_data').then(
+		$http({
+			url: 'get_task_data',
+			method: 'POST',
+			data: {
+				taskId: $scope.task.id
+			}
+		}).then(
 			function(response) {
 				$scope.task.scanpaths = response.data.scanpaths;
 				$scope.task.visuals = response.data.visuals;
-				$scope.task.id = $stateParams.id; // TODO compare with id from DB
 			},
 			function(data) {
 				console.log('Failed to get task data content.', data);
@@ -32,7 +36,13 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 	};
 
 	var getCommonScanpathDetails = function() {
-		$http.get('sta').then(
+		$http({
+			url: '/sta',
+			method: 'POST',
+			data: {
+				taskId: $scope.task.id
+			}
+		}).then(
 			function(response) {
 				// Get the common scanpath
 				$scope.task.commonScanpath = response.data;
@@ -87,7 +97,8 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
 			url: '/custom',
 			method: 'POST',
 			data: {
-				customScanpath: customScanpathStr
+				customScanpath: customScanpathStr,
+				taskId: $scope.task.id
 			}
 		}).then(
 			function(response) {
@@ -135,7 +146,9 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {};
-		// Get basic scanpath data
+		// Store the actual task ID from URL (ui-router functionality)
+		$scope.task.id = $stateParams.id;
+		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
 		// Sort the data based on a column
 		$scope.scanpathSort = 'identifier';

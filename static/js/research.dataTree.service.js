@@ -9,7 +9,7 @@ angular.module('gazerApp').service('dataTreeService', function($http) {
 			url: '/get_data_tree',
 			method: 'POST',
 			data: {
-				userId: 123
+				userId: 5
 			}
 		}).then(
 			function(response) {

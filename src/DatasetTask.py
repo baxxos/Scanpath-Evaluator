@@ -1,42 +1,75 @@
 from os import listdir, path
-from stringEditAlgs import *
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, orm
+from sqlalchemy.orm import relationship
+from database import engine, Base, session
+from Dataset import Dataset
+
+from stringEditAlgs import convert_to_strs, calc_mutual_similarity
 from config import config
 
 
 # TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
-class DatasetTask:
+class DatasetTask(Base):
     """ Common class for grouping a set of scanpaths together based on files stored on the server """
 
-    def __init__(self, dataset_name, task_name, website_name):
-        # Initialize attributes
-        self.name = dataset_name
-        self.task_name = task_name
-        self.data_file_format = '.txt'
-        self.website_name = website_name
+    # Name of corresponding schema table
+    __tablename__ = 'tasks'
 
-        # Join paths to actual data based on dataset/task names
-        self.folder_path_scanpaths = path.join(config['DATASET_FOLDER'], self.name, self.task_name, 'scanpaths', '')
-        self.file_path_aoi = path.join(config['DATASET_FOLDER'], self.name, self.task_name, 'regions', config['AOIS_FILE'])
-        self.folder_path_visuals = path.join('static', 'images', 'datasets', self.name, self.task_name, '')
+    # Table columns
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    url = Column(String)
+    dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='CASCADE'), nullable=False)
+    date_created = Column(Date, default=datetime.now())
+    date_updated = Column(Date, onupdate=datetime.now)
+
+    # Reference to the visuals/AOIs
+    # TODO
+
+    def __init__(self, **kwargs):
+        # ORM init
+        super(DatasetTask, self).__init__(**kwargs)
+
+        # Initialize attributes
+        # self.dataset_name = self.dataset.name
+        # self.data_file_format = '.txt'
 
         # Data holding objects
         self.participants = {}
         self.aois = []
+        self.visuals = {}
+
+    @orm.reconstructor
+    def __init_on_load__(self):
+        # Data holding objects
+        self.participants = {}
+        self.aois = []
+        self.visuals = {}
+
+    def load_data(self):
+        # Get parent dataset name
+        dataset = session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
+        folder_path_scanpaths = path.join(config['DATASET_FOLDER'], dataset.name, self.name, 'scanpaths', '')
+        file_path_aoi = path.join(config['DATASET_FOLDER'], dataset.name, self.name, 'regions', config['AOIS_FILE'])
+        folder_path_visuals = path.join('static', 'images', config['DATASET_FOLDER'], dataset.name, self.name, '')
 
         # Fill the data holding objects
-        self.load_participants()
-        self.load_aois()
+        self.load_participants(folder_path_scanpaths)
+        self.load_aois(file_path_aoi)
+        self.load_visuals(folder_path_visuals)
 
-    def load_participants(self):
+    def load_participants(self, folder_path_scanpaths):
         # Fetch all files in specified folder
-        files_list = listdir(self.folder_path_scanpaths)
+        files_list = listdir(folder_path_scanpaths)
 
         for filename in files_list:
-            if filename.endswith(self.data_file_format):
+            if filename.endswith(config['DATA_FORMAT']):
                 try:
-                    fo = open(self.folder_path_scanpaths + filename, 'r')
+                    fo = open(folder_path_scanpaths + filename, 'r')
                 except:
-                    print "Failed to open specified file: " + self.folder_path_scanpaths + filename
+                    print "Failed to open specified file: " + folder_path_scanpaths + filename
                     continue
                 act_file_content = fo.read()
 
@@ -47,7 +80,7 @@ class DatasetTask:
                 for y in range(1, len(act_file_lines) - 1):
                     try:
                         # If the page name argument matches the page name specified in file
-                        if act_file_lines[y].index(self.website_name) > 0:
+                        if act_file_lines[y].index(self.url) > 0:
                             # Read the data in columns by splitting via tab character
                             act_file_data.append(act_file_lines[y].split('\t'))
                     except:
@@ -58,11 +91,13 @@ class DatasetTask:
                 participant_identifier = filename.split(".txt")[0]
                 self.participants[participant_identifier] = act_file_data
 
-    def load_aois(self):
+    def load_aois(self, file_path_aoi):
         try:
-            fo = open(self.file_path_aoi, "r")
+            fo = open(file_path_aoi, "r")
         except:
             print "Failed to open directory containing areas of interest"
+            return {}
+
         aoi_file = fo.read()
         file_lines = aoi_file.split('\n')
 
@@ -71,10 +106,10 @@ class DatasetTask:
             temp = file_lines[x].split(' ')
             self.aois.append([temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]])
 
-    def get_visuals(self):
+    def load_visuals(self, folder_path_visuals):
         # Fetch all image files in specified folder (relying on extension atm)
         try:
-            files_list = listdir(self.folder_path_visuals)
+            files_list = listdir(folder_path_visuals)
         except:
             return {}
 
@@ -85,9 +120,9 @@ class DatasetTask:
         for filename in files_list:
             if filename.endswith(valid_extensions):
                 # images[main] = static/images/datasets/template_sta/main.png
-                images_list[path.splitext(filename)[0]] = self.folder_path_visuals + filename
+                images_list[path.splitext(filename)[0]] = folder_path_visuals + filename
 
-        return images_list
+        self.visuals = images_list
 
     def format_sequences(self, sequences):
         """
@@ -148,3 +183,5 @@ class DatasetTask:
         for i_first in range(0, len(scanpath_strs)):
             # Save the calculations to the original scanpaths object
             scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
+
+# Base.metadata.create_all(engine)
