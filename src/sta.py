@@ -3,6 +3,7 @@ from DatasetTask import DatasetTask
 from Environment import Environment
 from stringEditAlgs import convert_to_strs, calc_similarity_to_common
 import json
+import math
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
@@ -35,7 +36,7 @@ def createSequences(Participants, myAoIs, errorRateArea):
                             distance = []
                             for s in range(int(myAoIs[n][1]), int(myAoIs[n][1]) + int(myAoIs[n][2])):
                                 for f in range(int(myAoIs[n][3]), int(myAoIs[n][3]) + int(myAoIs[n][4])):
-                                    distance.append(sqrt(pow(float(Participants[keys[y]][z][3]) - s, 2) + pow(
+                                    distance.append(math.sqrt(pow(float(Participants[keys[y]][z][3]) - s, 2) + pow(
                                         float(Participants[keys[y]][z][4]) - f, 2)))
                             distanceList.append([myAoIs[n][5], min(distance)])
                 distanceList.sort(key=lambda x: x[1])

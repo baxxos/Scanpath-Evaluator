@@ -61,7 +61,7 @@
                 <!-- Login/user-area button -->
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-click="isNavCollapsed = true" ui-sref-active="active">
-                        <a href="#/profile" ui-sref="profile"><span class="glyphicon glyphicon-user"></span> Login</a>
+                        <a href="#/login" ui-sref="login"><span class="glyphicon glyphicon-user"></span> Login</a>
                     </li>
                 </ul>
             </div>
@@ -69,9 +69,9 @@
     </nav>
 
     <!-- Breadcrumbs panel -->
-    <div class="container" ncy-breadcrumb ng-hide="$state.includes('profile')"></div>
+    <section class="container" ncy-breadcrumb ng-hide="isCurrStateExcluded()"></section>
     <!-- Main content view -->
-    <div ui-view></div>
+    <section ui-view></section>
     <!-- Common footer area -->
     <footer ng-include="'static/partials/common.footer.html'"></footer>
 </body>
@@ -90,7 +90,7 @@
     <script type="text/javascript" src="static/js/app.js"></script>
     <script type="text/javascript" src="static/js/app.config.js"></script>
     <!-- Angular services -->
-    <script type="text/javascript" src="static/js/research.dataTree.service.js"></script>
+    <script type="text/javascript" src="static/js/research.sidebar.service.js"></script>
     <!-- Angular controllers -->
     <script type="text/javascript" src="static/js/app.default.controller.js"></script>
     <script type="text/javascript" src="static/js/research.task.controller.js"></script>

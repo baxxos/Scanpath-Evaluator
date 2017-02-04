@@ -18,6 +18,21 @@ def redirect_index():
     return render_template('index.html')
 
 
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    try:
+        json_data = json.loads(request.data)
+        user = User(password=json_data['password'], email=json_data['email'],
+                    name=json_data['name'], surname=json_data['surname'])
+    except AttributeError:
+        return {
+            'error': True,
+            'errorMsg': 'Required user attributes missing'
+        }
+
+    session.add(user)
+    session.commit()
+
 @app.route('/custom', methods=['GET', 'POST'])
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]
@@ -90,7 +105,7 @@ def get_data_tree():
     user = session.query(User).filter(User.id == user_id).one()
 
     """
-    user = User(name='admin', surname='admin', username='admin', password='admin', email='admin@admin.sk')
+    user = User(name='admin', surname='admin', password='admin', email='admin@admin.sk')
     dataset1 = Dataset(name='template_sta', description='description')
     user.datasets.append(dataset1)
     session.add(user)

@@ -6,18 +6,29 @@
     text-decoration: underline;
 }
 
-
 #login_panel_main .input-group {
     width: 100%;
 }
 
 #login_panel_main button {
-    width: 100%;
+    min-width: 35%;
+}
+
+#login_panel_register {
+    margin-top: 15px;
+}
+
+form label {
+    font-weight: normal;
+}
+
+form label .input_required {
+    color: #a00;
 }
 
 select, optgroup {
     font-size: 14px;
-    font-weight: 400;
+    font-weight: bold;
     border: 1px solid rgb(204, 204, 204);
     border-radius: 4px;
 }

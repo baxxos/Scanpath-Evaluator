@@ -20,7 +20,6 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     surname = Column(String)
-    username = Column(String, nullable=False)
     password = Column(String, nullable=False)
     email = Column(String, nullable=False)
     date_created = Column(Date, default=datetime.now())

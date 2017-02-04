@@ -13,12 +13,21 @@ angular.module('gazerApp')
 						label: 'Home'
 					}
 				})
-				.state('profile', {
-					url: '/profile',
+				.state('login', {
+					url: '/login',
 					controller: 'defaultCtrl',
-					templateUrl: 'static/partials/profile.html',
+					templateUrl: 'static/partials/login.html',
 					ncyBreadcrumb: {
-						label: 'Profile',
+						label: 'Login',
+						parent: 'index'
+					}
+				})
+				.state('register', {
+					url: '/register',
+					controller: 'defaultCtrl',
+					templateUrl: 'static/partials/register.html',
+					ncyBreadcrumb: {
+						label: 'Register',
 						parent: 'index'
 					}
 				})
@@ -32,10 +41,10 @@ angular.module('gazerApp')
 						},
 						'left@research' : {
 							controller: 'researchSidebarCtrl',
-							templateUrl: 'static/partials/research.main.sidebar.html'
+							templateUrl: 'static/partials/research.sidebar.html'
 						},
 						'right@research' : {
-							templateUrl: 'static/partials/research.main.static.html'
+							templateUrl: 'static/partials/research.static.html'
 						}
 					},
 					ncyBreadcrumb: {
@@ -48,7 +57,7 @@ angular.module('gazerApp')
 					url: '/dataset/:id',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research.main.dataset.html'
+							templateUrl: 'static/partials/research.dataset.html'
 						}
 					},
 					ncyBreadcrumb: {
@@ -61,7 +70,7 @@ angular.module('gazerApp')
 					url: '/task/:id',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research.main.task.html',
+							templateUrl: 'static/partials/research.task.html',
 							controller: 'taskCtrl'
 						}
 					},
