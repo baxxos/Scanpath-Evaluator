@@ -9,7 +9,6 @@ angular.module('gazerApp').controller("defaultCtrl", function($scope, $state, $a
 				return true;
 			}
 		}
-
 		return false;
 	};
 

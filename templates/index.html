@@ -51,17 +51,13 @@
                         </ul>
                     </li>
                 </ul>
-                <!-- Search bar area -->
-                <form class="navbar-form navbar-right">
-                    <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
                 <!-- Login/user-area button -->
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-click="isNavCollapsed = true" ui-sref-active="active">
-                        <a href="#/login" ui-sref="login"><span class="glyphicon glyphicon-user"></span> Login</a>
+                        <a href="#/login" ui-sref="login"><span class="glyphicon glyphicon-user"></span> Log in</a>
+                    </li>
+                    <li ng-click="isNavCollapsed = true" ui-sref-active="active">
+                        <a href="#/login" ui-sref="register"><span class="glyphicon glyphicon-ok"></span> Register</a>
                     </li>
                 </ul>
             </div>
@@ -84,7 +80,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
     <!-- Angular-Breadcrumbs for UI-router -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-breadcrumb/0.4.1/angular-breadcrumb.min.js"></script>
-    <!-- Angular bootstrap nav tree -->
+    <!-- Libraries -->
     <script type="text/javascript" src="static/lib/abn_tree.min.js"></script>
     <!-- Angular App -->
     <script type="text/javascript" src="static/js/app.js"></script>
@@ -93,6 +89,7 @@
     <script type="text/javascript" src="static/js/research.sidebar.service.js"></script>
     <!-- Angular controllers -->
     <script type="text/javascript" src="static/js/app.default.controller.js"></script>
+    <script type="text/javascript" src="static/js/register.controller.js"></script>
     <script type="text/javascript" src="static/js/research.task.controller.js"></script>
     <script type="text/javascript" src="static/js/research.sidebar.controller.js"></script>
 </html>

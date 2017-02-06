@@ -24,7 +24,7 @@ angular.module('gazerApp')
 				})
 				.state('register', {
 					url: '/register',
-					controller: 'defaultCtrl',
+					controller: 'registerCtrl',
 					templateUrl: 'static/partials/register.html',
 					ncyBreadcrumb: {
 						label: 'Register',

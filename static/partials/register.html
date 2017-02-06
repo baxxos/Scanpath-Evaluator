@@ -1,4 +1,48 @@
 <div class="container">
+    <!-- Success message -->
+    <div ng-show="user.success" class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Success:</h4>
+                </div>
+                <div class="panel-body">
+                    <p>Your account was created successfully.You will be redirected to the login page automatically
+                        in 5 seconds.</p>
+                    <p>If you want to continue now <a href="#/login">click here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form error -->
+    <div ng-show="user.errors.length" class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Please review following errors:</h4>
+                </div>
+                <div class="panel-body">
+                    <p ng-repeat="error in user.errors">{{ error }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning message -->
+    <div ng-show="user.warnings.length" class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Your request could not be performed:</h4>
+                </div>
+                <div class="panel-body">
+                    <p ng-repeat="warning in user.warnings">{{ warning }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-primary text-left" id="login_panel_main">
@@ -8,14 +52,14 @@
 
                 <div class="panel-body text-left">
                     <h4>Required info</h4>
-                    <form>
+                    <form ng-submit="submitUser()">
                         <div class="form-group">
                             <div class="input-group">
                                 <label for="reg_form_email">
                                     E-mail:<span class="input_required">*</span>
                                 </label>
                                 <input type="email" class="form-control" placeholder="example@gmail.com"
-                                   id="reg_form_email" maxlength="100" required>
+                                   id="reg_form_email" maxlength="100" ng-model="user.email" required>
                             </div>
                         </div>
 
@@ -24,9 +68,12 @@
                                 <label for="reg_form_pwd">
                                     Password:<span class="input_required">*</span>
                                 </label>
-                                <input type="password" class="form-control" id="reg_form_pwd"
-                                       maxlength="100" placeholder="Enter at least 8 characters" required>
+                                <input type="password" class="form-control" id="reg_form_pwd" maxlength="100"
+                                       placeholder="Enter at least 8 characters" ng-model="user.password" required>
                             </div>
+                            <span class="label label-danger" ng-show="user.password.length < 8">
+                                Password too short - enter at least 8 characters!
+                            </span>
                         </div>
 
                         <div class="form-group">
@@ -34,9 +81,13 @@
                                 <label for="reg_form_verify_pwd">
                                     Verify password:<span class="input_required">*</span>
                                 </label>
-                                <input type="password" class="form-control" id="reg_form_verify_pwd"
-                                       maxlength="100" required placeholder="Re-type your password">
+                                <input type="password" class="form-control" id="reg_form_verify_pwd" maxlength="100"
+                                       placeholder="Re-type your password" ng-model="user.repeatPassword" required>
                             </div>
+                            <span class="label label-danger"
+                                  ng-show="user.repeatPassword && user.password != user.repeatPassword">
+                                Passwords do not match!
+                            </span>
                         </div>
 
                         <hr />
@@ -44,16 +95,16 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <label for="reg_form_verify_pwd">Name:</label>
-                                <input type="text" class="form-control" id="reg_form_verify_pwd"
-                                       maxlength="100" placeholder="Your name (optional)" required>
+                                <input type="text" class="form-control" id="reg_form_verify_pwd" maxlength="100"
+                                       placeholder="Your name (optional)" ng-model="user.name">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="input-group">
                                 <label for="reg_form_verify_pwd">Surname:</label>
-                                <input type="text" class="form-control" id="reg_form_verify_pwd"
-                                       maxlength="100" placeholder="Your surname (optional)" required>
+                                <input type="text" class="form-control" id="reg_form_verify_pwd" maxlength="100"
+                                       placeholder="Your surname (optional)" ng-model="user.surname">
                             </div>
                         </div>
 

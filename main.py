@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request
+from passlib.hash import sha256_crypt
 from User import User
-from Dataset import Dataset
 from DatasetTask import DatasetTask
 from sta import sta_run, custom_run, get_task_data_json
-from database import session
+from database import session, exc
 
 import json
 
@@ -22,16 +22,42 @@ def redirect_index():
 def add_user():
     try:
         json_data = json.loads(request.data)
-        user = User(password=json_data['password'], email=json_data['email'],
-                    name=json_data['name'], surname=json_data['surname'])
-    except AttributeError:
-        return {
-            'error': True,
-            'errorMsg': 'Required user attributes missing'
-        }
 
-    session.add(user)
-    session.commit()
+        # Back-end password validation
+        if len(json_data['password']) < 8:
+            return json.dumps({
+                'success': False,
+                'message': 'Password too short - enter at least 8 characters.'
+            })
+
+        user = User(password=sha256_crypt.hash(json_data['password']), email=json_data['email'],
+                    name=json_data['name'], surname=json_data['surname'])
+    except KeyError:
+        return json.dumps({
+            'success': False,
+            'message': 'Required user attributes are missing'
+        })
+
+    try:
+        session.add(user)
+        session.commit()
+    except exc.IntegrityError:
+        session.rollback()
+        return json.dumps({
+            'success': False,
+            'message': 'Integrity error: e-mail address is already taken.'
+        })
+    except:
+        session.rollback()
+        return json.dumps({
+            'success': False,
+            'message': 'Internal database error.'
+        })
+
+    return json.dumps({
+        'success': True
+    })
+
 
 @app.route('/custom', methods=['GET', 'POST'])
 def get_similarity_to_custom():
@@ -41,11 +67,11 @@ def get_similarity_to_custom():
         json_data = json.loads(request.data)
         custom_scanpath = json_data['customScanpath']
         task_id = json_data['taskId']
-    except AttributeError:
-        return {
-            'error': True,
-            'errorMsg': 'Custom scanpath attribute is missing'
-        }
+    except KeyError:
+        return json.dumps({
+            'success': False,
+            'message': 'Custom scanpath attribute is missing.'
+        })
 
     # Verify the custom scanpath formatting - only letters describing AOIs
     if str(custom_scanpath).isalpha():
@@ -53,10 +79,10 @@ def get_similarity_to_custom():
         task.load_data()
         return custom_run(task, custom_scanpath)
     else:
-        return {
-            'error': True,
-            'errorMsg': 'Wrong custom scanpath format - alpha characters only'
-        }
+        return json.dumps({
+            'success': False,
+            'message': 'Wrong custom scanpath format - alpha characters only.'
+        })
 
 
 @app.route('/sta', methods=['POST'])
@@ -64,11 +90,12 @@ def get_trending_scanpath():
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
-    except AttributeError:
-        return {
-            'error': True,
-            'errorMsg': 'Task ID is missing'
-        }
+    except KeyError:
+        return json.dumps({
+            'success': False,
+            'message': 'Task ID is missing'
+        })
+
     task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
     task.load_data()
     return sta_run(task)
@@ -79,11 +106,11 @@ def get_task_data():
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
-    except AttributeError:
-        return {
-            'error': True,
-            'errorMsg': 'Task ID is missing'
-        }
+    except KeyError:
+        return json.dumps({
+            'success': False,
+            'message': 'Task ID is missing'
+        })
     task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
     task.load_data()
     return get_task_data_json(task)
@@ -96,11 +123,11 @@ def get_data_tree():
     try:
         json_data = json.loads(request.data)
         user_id = json_data['userId']
-    except AttributeError:
-        return {
-            'error': True,
-            'errorMsg': 'User ID is missing'
-        }
+    except KeyError:
+        return json.dumps({
+            'success': False,
+            'message': 'User ID is missing'
+        })
 
     user = session.query(User).filter(User.id == user_id).one()
 
@@ -129,10 +156,10 @@ def get_data_tree():
     try:
         return user.get_data_tree_json()
     except:
-        return {
-            'error': True,
-            'errorMsg': 'Failed to obtain data tree structure in get_data_tree_json()'
-        }
+        return json.dumps({
+            'success': False,
+            'message': 'Failed to obtain data tree structure in get_data_tree_json()'
+        })
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost

@@ -51,8 +51,14 @@ class DatasetTask(Base):
     def load_data(self):
         # Get parent dataset name
         dataset = session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
-        folder_path_scanpaths = path.join(config['DATASET_FOLDER'], dataset.name, self.name, 'scanpaths', '')
-        file_path_aoi = path.join(config['DATASET_FOLDER'], dataset.name, self.name, 'regions', config['AOIS_FILE'])
+
+        # Construct path to scanpath data based on config file - e.g. 'datasets/d1/t1/scanpaths/'
+        folder_path_scanpaths = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
+                                          config['TASK_PREFIX'] + str(self.id), 'scanpaths', '')
+        # Construct path to scanpath AOI data based on config file - e.g. 'datasets/d1/t1/regions/aoiFile.txt'
+        file_path_aoi = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
+                                  config['TASK_PREFIX'] + str(self.id), 'regions', config['AOIS_FILE'])
+        # Construct path to images based on config file - e.g. 'static/images/d1/t1/'
         folder_path_visuals = path.join('static', 'images', config['DATASET_FOLDER'], dataset.name, self.name, '')
 
         # Fill the data holding objects

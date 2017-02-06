@@ -1,8 +1,6 @@
-from os import listdir, path
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from config import config
 from database import Base, session
 from Dataset import Dataset
 from DatasetTask import DatasetTask
@@ -21,7 +19,7 @@ class User(Base):
     name = Column(String)
     surname = Column(String)
     password = Column(String, nullable=False)
-    email = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
     date_created = Column(Date, default=datetime.now())
 
     # Reference to the datasets owned by current user
