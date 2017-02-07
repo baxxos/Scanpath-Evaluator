@@ -7,3 +7,4 @@ config = {
     'AOIS_FILE': 'SegmentedPages.txt',
     'MIN_PASSWORD_LEN': 8
 }
+
