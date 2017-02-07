@@ -7,7 +7,7 @@ angular.module('gazerApp')
 			$stateProvider
 				.state("index", {
 					url: "/",
-					controller: 'defaultCtrl',
+					controller: 'DefaultCtrl',
 					templateUrl: 'static/partials/landing.html',
 					ncyBreadcrumb: {
 						label: 'Home'
@@ -15,7 +15,7 @@ angular.module('gazerApp')
 				})
 				.state('login', {
 					url: '/login',
-					controller: 'defaultCtrl',
+					controller: 'LoginCtrl',
 					templateUrl: 'static/partials/login.html',
 					ncyBreadcrumb: {
 						label: 'Login',
@@ -24,7 +24,7 @@ angular.module('gazerApp')
 				})
 				.state('register', {
 					url: '/register',
-					controller: 'registerCtrl',
+					controller: 'RegisterCtrl',
 					templateUrl: 'static/partials/register.html',
 					ncyBreadcrumb: {
 						label: 'Register',
@@ -36,11 +36,11 @@ angular.module('gazerApp')
 					url: '/research',
 					views: {
 						'@': {
-							controller: 'defaultCtrl',
+							controller: 'DefaultCtrl',
 							templateUrl: 'static/partials/research.layout.html'
 						},
 						'left@research' : {
-							controller: 'researchSidebarCtrl',
+							controller: 'ResearchSidebarCtrl',
 							templateUrl: 'static/partials/research.sidebar.html'
 						},
 						'right@research' : {
@@ -65,13 +65,25 @@ angular.module('gazerApp')
 						parent: 'research'
 					}
 				})
+				.state('research.datasetNew', {
+					url: '/dataset-new',
+					views: {
+						'right@research': {
+							templateUrl: 'static/partials/research.datasetNew.html'
+						}
+					},
+					ncyBreadcrumb: {
+						label: 'New dataset',
+						parent: 'research'
+					}
+				})
 				// State which allows to choose a task (sub-dataset) from the previously selected dataset
 				.state('research.task', {
 					url: '/task/:id',
 					views: {
 						'right@research': {
 							templateUrl: 'static/partials/research.task.html',
-							controller: 'taskCtrl'
+							controller: 'ResearchTaskCtrl'
 						}
 					},
 					ncyBreadcrumb: {

@@ -13,7 +13,7 @@
       crossorigin="anonymous">
     <link rel="stylesheet" href="static/css/abn_tree.css">
 </head>
-<body ng-controller="defaultCtrl">
+<body ng-controller="DefaultCtrl">
     <!-- Common top navigation & breadcrumbs area -->
     <nav class="navbar navbar-inverse navbar-static-top">
         <div class="container">
@@ -39,25 +39,20 @@
                     <li ui-sref-active="active">
                         <a href="#/research" ng-click="isNavCollapsed = true" ui-sref="research">Research</a>
                     </li>
-                    <li uib-dropdown is-open="false">
-                        <a href="" id="single-button" uib-dropdown-toggle>
-                            Button dropdown <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                            <li role="menuitem"><a href="#">Action</a></li>
-                            <li role="menuitem"><a href="#">Another action</a></li>
-                            <li class="divider"></li>
-                            <li role="menuitem"><a href="#">Separated link</a></li>
-                        </ul>
-                    </li>
                 </ul>
                 <!-- Login/user-area button -->
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-click="isNavCollapsed = true" ui-sref-active="active">
-                        <a href="#/login" ui-sref="login"><span class="glyphicon glyphicon-user"></span> Log in</a>
+                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
+                        <a href="#/login" ui-sref="login">Log in</a>
                     </li>
-                    <li ng-click="isNavCollapsed = true" ui-sref-active="active">
-                        <a href="#/login" ui-sref="register"><span class="glyphicon glyphicon-ok"></span> Register</a>
+                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
+                        <a href="#/register" ui-sref="register">Register</a>
+                    </li>
+                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="$root.globals.currentUser">
+                        <a href="#/profile" ui-sref="profile"><span class="glyphicon glyphicon-user"></span> Profile</a>
+                    </li>
+                    <li ng-click="isNavCollapsed = true; logout()" ng-show="$root.globals.currentUser">
+                        <a href="#">Log out</a>
                     </li>
                 </ul>
             </div>
@@ -65,30 +60,35 @@
     </nav>
 
     <!-- Breadcrumbs panel -->
-    <section class="container" ncy-breadcrumb ng-hide="isCurrStateExcluded()"></section>
+    <section class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></section>
     <!-- Main content view -->
     <section ui-view></section>
     <!-- Common footer area -->
     <footer ng-include="'static/partials/common.footer.html'"></footer>
 </body>
-    <!-- AngularJS 1.5.8 -->
+    <!-- AngularJS 1.5.8 and its components -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-animate.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-touch/1.5.8/angular-touch.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.min.js"></script>
-    <!-- Angular UI-router JS -->
+
+    <!-- External components -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
-    <!-- Angular-Breadcrumbs for UI-router -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-breadcrumb/0.4.1/angular-breadcrumb.min.js"></script>
-    <!-- Libraries -->
     <script type="text/javascript" src="static/lib/abn_tree.min.js"></script>
+
     <!-- Angular App -->
     <script type="text/javascript" src="static/js/app.js"></script>
     <script type="text/javascript" src="static/js/app.config.js"></script>
+
     <!-- Angular services -->
     <script type="text/javascript" src="static/js/research.sidebar.service.js"></script>
+    <script type="text/javascript" src="static/js/login.auth.service.js"></script>
+
     <!-- Angular controllers -->
     <script type="text/javascript" src="static/js/app.default.controller.js"></script>
+    <script type="text/javascript" src="static/js/login.controller.js"></script>
     <script type="text/javascript" src="static/js/register.controller.js"></script>
     <script type="text/javascript" src="static/js/research.task.controller.js"></script>
     <script type="text/javascript" src="static/js/research.sidebar.controller.js"></script>

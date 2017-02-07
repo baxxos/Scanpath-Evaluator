@@ -21,4 +21,3 @@ class Dataset(Base):
     # Reference to the dataset tasks owned by this dataset
     tasks = relationship('DatasetTask', backref='dataset', cascade='all, delete-orphan', passive_deletes=True)
 
-# Base.metadata.create_all(engine)

@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('registerCtrl', function($scope, $http, $state, $timeout) {
+angular.module('gazerApp').controller('RegisterCtrl', function($scope, $http, $state, $timeout) {
     var isFormValid = function() {
         return ($scope.user.password == $scope.user.repeatPassword) &&
                ($scope.user.password.length >= 8) &&
@@ -53,15 +53,19 @@ angular.module('gazerApp').controller('registerCtrl', function($scope, $http, $s
                     $scope.user.warnings.push(response.data.message);
                 }
 			},
-			function(data){
-				console.log('Failed call to load user data tree.', data);
+			function(response){
+				console.log('Failed call to load user data tree.', response);
 			}
         );
     };
 
-    $scope.user = {
-        errors: [],
-        warnings: [],
-        success: false
+    var initController = function() {
+        $scope.user = {
+            errors: [],
+            warnings: [],
+            success: false
+        };
     };
+
+    initController();
 });

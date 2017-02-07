@@ -26,8 +26,8 @@ class User(Base):
     datasets = relationship('Dataset', backref='user', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
-        return "<User(name='%s', surname='%s', username='%s', password='%s')>" % (
-            self.name, self.surname, self.username, self.password)
+        return "<User(name='%s', surname='%s', email='%s', password='%s')>" % (
+            self.name, self.surname, self.email, self.password)
 
     def get_data_tree_json(self):
         # Load datasets owned by current user
@@ -52,4 +52,5 @@ class User(Base):
 
         return json.dumps(data_tree)
 
-# Base.metadata.create_all(engine)
+from database import engine
+Base.metadata.create_all(engine)

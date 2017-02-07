@@ -1,6 +1,6 @@
-angular.module('gazerApp').service('dataTreeService', function($http) {
+angular.module('gazerApp').service('DataTreeService', function($http, $rootScope) {
     // For self-reference in callbacks
-    var dataTreeService = this;
+    var DataTreeService = this;
     // Data tree object watched by dependent controllers
     this.dataTree = {};
 
@@ -9,11 +9,11 @@ angular.module('gazerApp').service('dataTreeService', function($http) {
 			url: '/get_data_tree',
 			method: 'POST',
 			data: {
-				userId: 5
+				email: $rootScope.globals.currentUser.email
 			}
 		}).then(
 			function(response) {
-                dataTreeService.dataTree = response.data;
+                DataTreeService.dataTree = response.data;
 			},
 			function(data){
 				console.log('Failed call to load user data tree.', data);

@@ -1,0 +1,55 @@
+<div class="row">
+    <section class="col-md-6">
+        <h4>Adding new datasets</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci alias amet assumenda
+        consectetur dignissimos eaque facere maiores necessitatibus rerum, vero! Consectetur consequatur
+        earum eveniet ipsum libero maxime nobis rem vitae!</p>
+    </section>
+
+    <section class="col-md-6">
+        <div class="panel panel-primary text-left" id="new_dataset_panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">New dataset - basic information</h3>
+            </div>
+
+            <div class="panel-body text-left">
+                <form ng-submit="submitDataset()">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="reg_form_email">
+                                Name:<span class="input_required">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="datasetNamedWhatever"
+                               id="reg_form_email" maxlength="100" ng-model="user.email" required>
+                        </div>
+                        <span class="label label-danger" ng-show="user.password.length < 8">
+                            Password too short - enter at least 8 characters!
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="reg_form_pwd">
+                                Description:
+                            </label>
+                            <input type="text" class="form-control" id="reg_form_pwd" maxlength="100"
+                                   placeholder="Short description of the new dataset" ng-model="user.password" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="" checked> Redirect me to the dataset overview afterwards
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-primary" type="submit">Add dataset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>

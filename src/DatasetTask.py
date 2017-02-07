@@ -190,4 +190,3 @@ class DatasetTask(Base):
             # Save the calculations to the original scanpaths object
             scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
 
-# Base.metadata.create_all(engine)

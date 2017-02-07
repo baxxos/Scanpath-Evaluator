@@ -1,16 +1,16 @@
 // Handles all sidebar related actions
-angular.module('gazerApp').controller('researchSidebarCtrl', function($scope, dataTreeService) {
+angular.module('gazerApp').controller('ResearchSidebarCtrl', function($scope, DataTreeService) {
     var init = function() {
         $scope.navTreeData = [];
 
         // Watch variable and do something if its value changes
         $scope.$watch(
             // Watched variable
-            function () {
-                return dataTreeService.dataTree;
+            function() {
+                return DataTreeService.dataTree;
             },
-            // Value change callback
-            function (data) {
+            // Value change callback - e.g. when a new data tree is acquired through ajax call
+            function(data) {
                 $scope.navTreeData = [];
                 for(var dataset_iter = 0; dataset_iter < data.length; dataset_iter++) {
                     // Compose dataset object in the format suitable for nav tree
@@ -35,7 +35,7 @@ angular.module('gazerApp').controller('researchSidebarCtrl', function($scope, da
         );
 
         // Update navigation view with user owned datasets
-        dataTreeService.updateNavTreeData();
+        DataTreeService.updateNavTreeData();
     };
 
     init();

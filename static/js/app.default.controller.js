@@ -1,7 +1,7 @@
 // Default controller is defined as ng-controller on the body element of index.html
-angular.module('gazerApp').controller("defaultCtrl", function($scope, $state, $animate){
+angular.module('gazerApp').controller('DefaultCtrl', function($scope, $rootScope, $state, AuthenticationService){
 	// Used for excluding breadcrumbs in particular states
-	$scope.isCurrStateExcluded = function() {
+	$scope.isBreadcrumbAreaDisplayed = function() {
 		var excluded_states = ['login', 'register'];
 
 		for (var i = 0; i < excluded_states.length; i++) {
@@ -12,9 +12,16 @@ angular.module('gazerApp').controller("defaultCtrl", function($scope, $state, $a
 		return false;
 	};
 
-    var initDefault = function() {
-		$scope.isNavCollapsed = true;
+	// Consider moving to a separate controller
+	$scope.logout = function() {
+		AuthenticationService.ClearCredentials();
+	};
+
+    var initController = function() {
+		$scope.isNavCollapsed = true
 	};
 	// Perform view initialization
-	initDefault();
+	initController();
 });
+
+// TODO https://github.com/mgechev/angularjs-style-guide#controllers upratat

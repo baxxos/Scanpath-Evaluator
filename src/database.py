@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine
 from config import config
 
 # Shared ORM base class supporting CRUD operations

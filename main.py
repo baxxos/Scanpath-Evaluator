@@ -1,16 +1,30 @@
 from flask import Flask, render_template, request
-from passlib.hash import sha256_crypt
 from User import User
 from DatasetTask import DatasetTask
 from sta import sta_run, custom_run, get_task_data_json
-from database import session, exc
+from database import session
+from sqlalchemy import exc, orm
+from passlib.hash import sha256_crypt
 
 import json
 
 app = Flask(__name__)
 app.debug = True
 
+
 # TODO consider prefixing Angular directives with 'data-ng' prefix to ensure valid HTML and reduce IDE warnings
+def handle_error(message):
+    return json.dumps({
+        'success': False,
+        'message': message
+    })
+
+
+def handle_success(load):
+    return json.dumps({
+        'success': True,
+        'load': json.dumps(load)
+    })
 
 
 @app.route('/')
@@ -18,6 +32,30 @@ def redirect_index():
     return render_template('index.html')
 
 
+@app.route('/api/auth',  methods=['POST'])
+def authenticate():
+    # Process the request - verify required info
+    try:
+        json_data = json.loads(request.data)
+        email = json_data['email']
+        password = json_data['password']
+    except KeyError:
+        return handle_error('User auth data invalid.')
+
+    # Query the database for an user matching the info from the request
+    try:
+        user = session.query(User).filter(User.email == email).one()
+        if sha256_crypt.verify(password, user.password):
+            return handle_success({})
+        else:
+            return handle_error('Invalid user credentials - try again.')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try again.')
+    except Exception as e:
+        return handle_error('Internal database error - try again later.')
+
+
+# TODO move to separate api.py file
 @app.route('/add_user', methods=['POST'])
 def add_user():
     try:
@@ -25,34 +63,22 @@ def add_user():
 
         # Back-end password validation
         if len(json_data['password']) < 8:
-            return json.dumps({
-                'success': False,
-                'message': 'Password too short - enter at least 8 characters.'
-            })
+            return handle_error('Password too short - enter at least 8 characters.')
 
         user = User(password=sha256_crypt.hash(json_data['password']), email=json_data['email'],
                     name=json_data['name'], surname=json_data['surname'])
     except KeyError:
-        return json.dumps({
-            'success': False,
-            'message': 'Required user attributes are missing'
-        })
+        return handle_error('Required user attributes are missing')
 
     try:
         session.add(user)
         session.commit()
     except exc.IntegrityError:
         session.rollback()
-        return json.dumps({
-            'success': False,
-            'message': 'Integrity error: e-mail address is already taken.'
-        })
+        return handle_error('Integrity error: e-mail address is already taken.')
     except:
         session.rollback()
-        return json.dumps({
-            'success': False,
-            'message': 'Internal database error.'
-        })
+        return handle_error('Internal database error.')
 
     return json.dumps({
         'success': True
@@ -68,10 +94,7 @@ def get_similarity_to_custom():
         custom_scanpath = json_data['customScanpath']
         task_id = json_data['taskId']
     except KeyError:
-        return json.dumps({
-            'success': False,
-            'message': 'Custom scanpath attribute is missing.'
-        })
+        return handle_error('Custom scanpath attribute is missing.')
 
     # Verify the custom scanpath formatting - only letters describing AOIs
     if str(custom_scanpath).isalpha():
@@ -79,87 +102,55 @@ def get_similarity_to_custom():
         task.load_data()
         return custom_run(task, custom_scanpath)
     else:
-        return json.dumps({
-            'success': False,
-            'message': 'Wrong custom scanpath format - alpha characters only.'
-        })
+        return handle_error('Wrong custom scanpath format - alpha characters only.')
 
 
 @app.route('/sta', methods=['POST'])
+# TODO GET method
 def get_trending_scanpath():
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
     except KeyError:
-        return json.dumps({
-            'success': False,
-            'message': 'Task ID is missing'
-        })
+        return handle_error('Task ID is missing')
 
     task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
     task.load_data()
+
     return sta_run(task)
 
 
 @app.route('/get_task_data', methods=['POST'])
+# TODO GET method
 def get_task_data():
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
     except KeyError:
-        return json.dumps({
-            'success': False,
-            'message': 'Task ID is missing'
-        })
+        return handle_error('Task ID is missing')
+
     task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
     task.load_data()
     return get_task_data_json(task)
 
 
 @app.route('/get_data_tree', methods=['POST'])
+# TODO GET method
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
 
     try:
         json_data = json.loads(request.data)
-        user_id = json_data['userId']
+        user_email = json_data['email']
     except KeyError:
-        return json.dumps({
-            'success': False,
-            'message': 'User ID is missing'
-        })
+        return handle_error('User ID is missing')
 
-    user = session.query(User).filter(User.id == user_id).one()
-
-    """
-    user = User(name='admin', surname='admin', password='admin', email='admin@admin.sk')
-    dataset1 = Dataset(name='template_sta', description='description')
-    user.datasets.append(dataset1)
-    session.add(user)
-    session.commit()
-
-    task1 = DatasetTask(url='http://ncc.metu.edu.tr/', name='my_task', description='description')
-    dataset1.tasks.append(task1)
-
-    session.add(task1)
-    session.commit()
-
-    dataset2 = Dataset(name='template_other', description='description')
-    task2 = DatasetTask(url='http://ncc.metu.edu.tr/', name='other_task', description='description')
-    dataset2.tasks.append(task2)
-    user.datasets.append(dataset2)
-
-    session.add(dataset2)
-    session.commit()
-    """
+    user = session.query(User).filter(User.email == user_email).one()
 
     try:
         return user.get_data_tree_json()
     except:
-        return json.dumps({
-            'success': False,
-            'message': 'Failed to obtain data tree structure in get_data_tree_json()'
-        })
+        return handle_error('Failed to obtain user data tree structure')
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost

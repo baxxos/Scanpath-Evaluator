@@ -1,5 +1,5 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http, $stateParams) {
+angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $state, $http, $stateParams) {
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',
@@ -127,31 +127,33 @@ angular.module('gazerApp').controller('taskCtrl', function($scope, $state, $http
     };
 
 	$scope.fillTableDetails = function() {
-		if ($scope.customScanpath) {
-			getCustomScanpathDetails($('#customScanpathText').value);
+		if ($scope.customScanpath && $scope.customScanpathText) {
+			getCustomScanpathDetails($scope.customScanpathText);
 		}
 		else {
 			getCommonScanpathDetails();
 		}
 	};
 
-    $scope.setSort = function(sortVariable, newValue) {
-		if($scope[sortVariable] == newValue) {
-			$scope[sortVariable] = '-' + $scope[sortVariable];
+	// Function changes sorting base or inverts it when it's the same
+    $scope.setSort = function(value) {
+		if($scope.task.sortBy == value) {
+			$scope.task.sortBy = '-' + $scope.task.sortBy;
 		} else {
-			$scope[sortVariable] = newValue;
+			$scope.task.sortBy = value;
 		}
 	};
 
     var init = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
-		$scope.task = {};
-		// Store the actual task ID from URL (ui-router functionality)
-		$scope.task.id = $stateParams.id;
+		$scope.task = {
+			// Store the actual task ID from URL (ui-router functionality)
+			id: $stateParams.id,
+			// Sort the data based on a default column
+			sortBy: 'identifier'
+		};
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
-		// Sort the data based on a column
-		$scope.scanpathSort = 'identifier';
 	};
 	// Perform view initialization
 	init();
