@@ -1,0 +1,57 @@
+#login_panel_main, #new_dataset_panel {
+	// Not sure where this comes from, too afraid to delete
+	.input-group {
+		min-width: 0;
+		width: 100%;
+	}
+
+	.panel-heading {
+		a {
+			text-decoration: underline;
+		}
+	}
+
+	button {
+		width: 50%;
+	}
+
+	#register_prompt {
+		margin-top: 15px;
+	}
+}
+
+form {
+	label {
+		font-weight: normal;
+
+		.input-required {
+			color: #a00;
+		}
+	}
+}
+
+select, optgroup {
+	font-size: 14px;
+    font-weight: bold;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 4px;
+}
+
+optgroup {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+#scanpathTable th:not(:nth-child(2)):hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+// Hard coded link to add a new dataset under dataset tree navigation
+#addTreeData {
+    padding: 0 10px;
+
+	.glyphicon-plus {
+    	padding: 0 2px;
+	}
+}

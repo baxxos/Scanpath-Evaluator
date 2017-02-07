@@ -3,6 +3,7 @@ from User import User
 from DatasetTask import DatasetTask
 from sta import sta_run, custom_run, get_task_data_json
 from database import session
+from config import config
 from sqlalchemy import exc, orm
 from passlib.hash import sha256_crypt
 
@@ -52,6 +53,7 @@ def authenticate():
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try again.')
     except Exception as e:
+        print e.message
         return handle_error('Internal database error - try again later.')
 
 
@@ -62,7 +64,7 @@ def add_user():
         json_data = json.loads(request.data)
 
         # Back-end password validation
-        if len(json_data['password']) < 8:
+        if len(json_data['password']) < config['MIN_PASSWORD_LEN']:
             return handle_error('Password too short - enter at least 8 characters.')
 
         user = User(password=sha256_crypt.hash(json_data['password']), email=json_data['email'],

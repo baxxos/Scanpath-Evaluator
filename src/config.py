@@ -4,5 +4,6 @@ config = {
     'DATASET_PREFIX': 'dataset',
     'TASK_PREFIX': 'task',
     'DATA_FORMAT': '.txt',
-    'AOIS_FILE': 'SegmentedPages.txt'
+    'AOIS_FILE': 'SegmentedPages.txt',
+    'MIN_PASSWORD_LEN': 8
 }

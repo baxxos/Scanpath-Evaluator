@@ -1,54 +1,35 @@
-#login_panel_main .input-group-addon{
-    min-width: 0;
-}
-
-#login_panel_main .panel-heading a, #new_dataset_panel .panel-heading a {
-    text-decoration: underline;
-}
-
 #login_panel_main .input-group, #new_dataset_panel .input-group {
-    width: 100%;
-}
-
+  min-width: 0;
+  width: 100%; }
+#login_panel_main .panel-heading a, #new_dataset_panel .panel-heading a {
+  text-decoration: underline; }
 #login_panel_main button, #new_dataset_panel button {
-    width: 50%;
-}
-
-#login_panel_register_prompt {
-    margin-top: 15px;
-}
-
+  width: 50%; }
+#login_panel_main #register_prompt, #new_dataset_panel #register_prompt {
+  margin-top: 15px; }
 
 form label {
-    font-weight: normal;
-}
-
-form label .input_required {
-    color: #a00;
-}
+  font-weight: normal; }
+  form label .input-required {
+    color: #a00; }
 
 select, optgroup {
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid rgb(204, 204, 204);
-    border-radius: 4px;
-}
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid #cccccc;
+  border-radius: 4px; }
 
 optgroup {
-    padding-top: 6px;
-    padding-bottom: 6px;
-}
+  padding-top: 6px;
+  padding-bottom: 6px; }
 
 #scanpathTable th:not(:nth-child(2)):hover {
-    cursor: pointer;
-    text-decoration: underline;
-}
+  cursor: pointer;
+  text-decoration: underline; }
 
-/* Hard coded link to add a new dataset under dataset tree navigation */
 #addTreeData {
-    padding: 0 10px;
-}
+  padding: 0 10px; }
+  #addTreeData .glyphicon-plus {
+    padding: 0 2px; }
 
-#addTreeData .glyphicon-plus {
-    padding: 0 2px;
-}
+/*# sourceMappingURL=style.css.map */
