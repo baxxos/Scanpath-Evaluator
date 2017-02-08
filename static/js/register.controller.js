@@ -32,7 +32,7 @@ angular.module('gazerApp').controller('RegisterCtrl', function($scope, $http, $s
         }
 
         $http({
-			url: '/add_user',
+			url: '/api/user/add',
 			method: 'POST',
 			data: {
 				email: $scope.user.email,

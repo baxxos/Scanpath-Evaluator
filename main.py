@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from User import User
+from Dataset import Dataset
 from DatasetTask import DatasetTask
 from sta import sta_run, custom_run, get_task_data_json
 from database import session
@@ -7,6 +8,7 @@ from config import config
 from sqlalchemy import exc, orm
 from passlib.hash import sha256_crypt
 
+import os
 import json
 
 app = Flask(__name__)
@@ -24,7 +26,7 @@ def handle_error(message):
 def handle_success(load):
     return json.dumps({
         'success': True,
-        'load': json.dumps(load)
+        'load': load
     })
 
 
@@ -33,7 +35,7 @@ def redirect_index():
     return render_template('index.html')
 
 
-@app.route('/api/auth',  methods=['POST'])
+@app.route('/api/user/auth',  methods=['POST'])
 def authenticate():
     # Process the request - verify required info
     try:
@@ -58,14 +60,14 @@ def authenticate():
 
 
 # TODO move to separate api.py file
-@app.route('/add_user', methods=['POST'])
+@app.route('/api/user/add', methods=['POST'])
 def add_user():
     try:
         json_data = json.loads(request.data)
 
         # Back-end password validation
         if len(json_data['password']) < config['MIN_PASSWORD_LEN']:
-            return handle_error('Password too short - enter at least 8 characters.')
+            return handle_error('Password too short - enter at least ' + config['MIN_PASSWORD_LEN'] + ' characters.')
 
         user = User(password=sha256_crypt.hash(json_data['password']), email=json_data['email'],
                     name=json_data['name'], surname=json_data['surname'])
@@ -76,15 +78,43 @@ def add_user():
         session.add(user)
         session.commit()
     except exc.IntegrityError:
-        session.rollback()
         return handle_error('Integrity error: e-mail address is already taken.')
     except:
+        return handle_error('Internal database error - try again later.')
+    finally:
         session.rollback()
-        return handle_error('Internal database error.')
 
     return json.dumps({
         'success': True
     })
+
+
+@app.route('/api/dataset/add', methods=['POST'])
+def add_dataset():
+    try:
+        json_data = json.loads(request.data)
+
+        user = session.query(User).filter(User.email == json_data['userEmail']).one()
+        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=user.id)
+
+        user.datasets.append(dataset)
+
+        session.commit()
+
+        # Reflect the changes on the server side - create a new folder named after dataset PK
+        os.makedirs(os.path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id)))
+
+        return handle_success({
+            'id': dataset.id
+        })
+    except KeyError:
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try logging in again.')
+    except:
+        return handle_error('Internal database error - try again later.')
+    finally:
+        session.rollback()
 
 
 @app.route('/custom', methods=['GET', 'POST'])

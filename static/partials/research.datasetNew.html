@@ -1,12 +1,49 @@
 <div class="row">
     <section class="col-md-6">
-        <h4>Adding new datasets</h4>
+        <h3>Adding new datasets</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci alias amet assumenda
         consectetur dignissimos eaque facere maiores necessitatibus rerum, vero! Consectetur consequatur
         earum eveniet ipsum libero maxime nobis rem vitae!</p>
     </section>
 
     <section class="col-md-6">
+        <!-- Success message -->
+        <div class="panel panel-success" ng-show="datasetNew.success">
+            <div class="panel-heading">
+                <h4 class="panel-title">Success:</h4>
+            </div>
+            <div class="panel-body">
+                <p>Your dataset was created successfully.
+                    <span ng-show="datasetNew.redirect">You will be redirected to the login page automatically
+                    in 5 seconds.</span>
+                </p>
+                <p ng-show="datasetNew.redirect">If you want to continue now
+                    <a ng-href="#/research/dataset/{{ datasetNew.id }}">click here</a>.
+                </p>
+            </div>
+        </div>
+
+        <!-- Form error -->
+        <div class="panel panel-danger" ng-show="datasetNew.errors.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Please review following errors:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="error in datasetNew.errors">{{ error }}</p>
+            </div>
+        </div>
+
+        <!-- Warning message -->
+        <div class="panel panel-warning" ng-show="datasetNew.warnings.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Your request could not be performed:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="warning in datasetNew.warnings">{{ warning }}</p>
+            </div>
+        </div>
+
+        <!-- Form area -->
         <div class="panel panel-primary text-left" id="new_dataset_panel">
             <div class="panel-heading">
                 <h3 class="panel-title">New dataset - basic information</h3>
@@ -16,31 +53,29 @@
                 <form ng-submit="submitDataset()">
                     <div class="form-group">
                         <div class="input-group">
-                            <label for="reg_form_email">
+                            <label for="dataset_name">
                                 Name:<span class="input_required">*</span>
                             </label>
                             <input type="text" class="form-control" placeholder="datasetNamedWhatever"
-                               id="reg_form_email" maxlength="100" ng-model="user.email" required>
+                               id="dataset_name" maxlength="100" ng-model="datasetNew.name" required>
                         </div>
-                        <span class="label label-danger" ng-show="user.password.length < 8">
-                            Password too short - enter at least 8 characters!
-                        </span>
                     </div>
 
                     <div class="form-group">
                         <div class="input-group">
-                            <label for="reg_form_pwd">
+                            <label for="dataset_desc">
                                 Description:
                             </label>
-                            <input type="text" class="form-control" id="reg_form_pwd" maxlength="100"
-                                   placeholder="Short description of the new dataset" ng-model="user.password" required>
+                            <input type="text" class="form-control" id="dataset_desc" maxlength="100"
+                                   placeholder="Short description of the new dataset" ng-model="datasetNew.description">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" value="" checked> Redirect me to the dataset overview afterwards
+                                <input type="checkbox" ng-model="datasetNew.redirect">
+                                Redirect me to the dataset overview afterwards
                             </label>
                         </div>
                     </div>

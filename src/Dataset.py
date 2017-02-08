@@ -16,7 +16,7 @@ class Dataset(Base):
     description = Column(String)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     date_created = Column(Date, default=datetime.now())
-    date_updated = Column(Date, onupdate=datetime.now)
+    date_updated = Column(Date, onupdate=datetime.now())
 
     # Reference to the dataset tasks owned by this dataset
     tasks = relationship('DatasetTask', backref='dataset', cascade='all, delete-orphan', passive_deletes=True)

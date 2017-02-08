@@ -10,7 +10,7 @@
 
 form label {
   font-weight: normal; }
-  form label .input-required {
+  form label .input_required {
     color: #a00; }
 
 select, optgroup {
@@ -28,7 +28,10 @@ optgroup {
   text-decoration: underline; }
 
 #addTreeData {
-  padding: 0 10px; }
+  padding: 3px 10px;
+  border-radius: 4px; }
+  #addTreeData:hover {
+    background-color: #eee; }
   #addTreeData .glyphicon-plus {
     padding: 0 2px; }
 

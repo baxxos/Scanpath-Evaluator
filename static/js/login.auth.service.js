@@ -14,7 +14,7 @@ function AuthenticationService($http, $rootScope, $cookies) {
 	function Login(email, password, callback_success, callback_failed) {
 		$http({
 			method: 'POST',
-			url: 'api/auth',
+			url: 'api/user/auth',
 			data: {
 				email: email,
 				password: password
@@ -29,7 +29,7 @@ function AuthenticationService($http, $rootScope, $cookies) {
 				}
 			},
 			function(response) {
-				console.err('Server error: no response to the authorization request.')
+				console.error('Server error: no response to the authorization request.')
 			}
 		);
 	}

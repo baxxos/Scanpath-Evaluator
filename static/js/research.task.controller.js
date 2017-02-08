@@ -1,5 +1,5 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $state, $http, $stateParams) {
+angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $state, $http, $state) {
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',
@@ -148,7 +148,7 @@ angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $stat
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {
 			// Store the actual task ID from URL (ui-router functionality)
-			id: $stateParams.id,
+			id: $state.params.id,
 			// Sort the data based on a default column
 			sortBy: 'identifier'
 		};

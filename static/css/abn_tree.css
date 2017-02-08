@@ -83,6 +83,9 @@ ul.abn-tree i.indented {
 .abn-tree {
   cursor: pointer;
 }
+.abn-tree li:hover{
+  text-decoration: underline;
+}
 ul.nav.abn-tree .level-1 .indented {
   position: relative;
   left: 0px;

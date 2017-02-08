@@ -12,6 +12,7 @@ angular.module('gazerApp').controller('ResearchSidebarCtrl', function($scope, Da
             // Value change callback - e.g. when a new data tree is acquired through ajax call
             function(data) {
                 $scope.navTreeData = [];
+
                 for(var dataset_iter = 0; dataset_iter < data.length; dataset_iter++) {
                     // Compose dataset object in the format suitable for nav tree
                     var formatted_dataset = {
