@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService) {
+angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, $animate) {
     var isFormValid = function() {
         return true;
     };
@@ -24,9 +24,10 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
             url: 'api/dataset/add',
             method: 'POST',
             data: {
-               name: $scope.datasetNew.name,
-               description: $scope.datasetNew.description,
-               userEmail: $rootScope.globals.currentUser.email
+                name: $scope.datasetNew.name,
+                userEmail: $rootScope.globals.currentUser.email,
+                // Optional attributes, replace 'undefined' by 'null' to ensure valid JSON object
+                description: ($scope.datasetNew.description ? $scope.datasetNew.description : null)
             }
         }).then(
             function(response) {
@@ -36,7 +37,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
                     $scope.datasetNew.id = response.data.load.id;
 
                     // Update navigation view with user owned datasets
-                    DataTreeService.updateNavTreeData();
+                    DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
 
                     // If the user wishes to be redirected afterwards
                     if($scope.datasetNew.redirect == true) {
@@ -53,9 +54,43 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
                 }
             },
             function(response) {
-
+                console.error('There was no response from the server to the new dataset request .');
             }
         );
+   };
+
+   var loadDataset = function(datasetId) {
+       $http({
+           method: 'GET',
+           url: '/api/dataset',
+           params: {
+               id: datasetId
+           }
+       }).then(
+           function(response) {
+               if(response.data.success == true && response.data.load) {
+                   $scope.dataset = response.data.load;
+               }
+               else {
+                   console.error(response.data.message);
+               }
+           },
+           function(response) {
+               console.error('There was no response to from the server to the dataset load request.');
+           }
+       );
+   };
+
+   // Fix for required field missing message appearing when form was hidden without submitting
+   $scope.toggleTaskForm = function() {
+       if($scope.taskNew.showForm == true) {
+           $scope.taskNew.name = ' ';
+       }
+       else {
+           $scope.taskNew.name = null;
+       }
+
+       $scope.taskNew.showForm = !$scope.taskNew.showForm;
    };
 
     var initController = function() {
@@ -64,6 +99,13 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
             redirect: true,
             errors: [],
             warnings: []
+        };
+
+        // Get basic dataset information and set $scope.dataset
+        loadDataset($state.params.id);
+
+        $scope.taskNew = {
+            showForm: false
         };
     };
 

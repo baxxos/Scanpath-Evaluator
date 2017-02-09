@@ -89,6 +89,19 @@ def add_user():
     })
 
 
+@app.route('/api/dataset', methods=['GET'])
+def get_dataset():
+    try:
+        dataset = session.query(Dataset).filter(Dataset.id == request.args.get('id')).one()
+        print dataset.to_json()
+        return handle_success(dataset.to_json())
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid dataset ID.')
+    except Exception as e:
+        print e.message
+        return handle_error('Internal database error - try again later.')
+
+
 @app.route('/api/dataset/add', methods=['POST'])
 def add_dataset():
     try:

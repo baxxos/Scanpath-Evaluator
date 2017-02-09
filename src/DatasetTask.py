@@ -1,15 +1,12 @@
 from os import listdir, path
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, orm
-from sqlalchemy.orm import relationship
-from database import engine, Base, session
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
+from database import Base, session
 from Dataset import Dataset
-
 from stringEditAlgs import convert_to_strs, calc_mutual_similarity
 from config import config
 
 
-# TODO class should store all the sequences/scanpaths instead of receiving them via function arguments
 class DatasetTask(Base):
     """ Common class for grouping a set of scanpaths together based on files stored on the server """
 
@@ -22,8 +19,8 @@ class DatasetTask(Base):
     description = Column(String)
     url = Column(String)
     dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='CASCADE'), nullable=False)
-    date_created = Column(Date, default=datetime.now())
-    date_updated = Column(Date, onupdate=datetime.now)
+    date_created = Column(DateTime, default=datetime.now())
+    date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
 
     # Reference to the visuals/AOIs
     # TODO
@@ -31,10 +28,6 @@ class DatasetTask(Base):
     def __init__(self, **kwargs):
         # ORM init
         super(DatasetTask, self).__init__(**kwargs)
-
-        # Initialize attributes
-        # self.dataset_name = self.dataset.name
-        # self.data_file_format = '.txt'
 
         # Data holding objects
         self.participants = {}
@@ -47,6 +40,15 @@ class DatasetTask(Base):
         self.participants = {}
         self.aois = []
         self.visuals = {}
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'date_created': str(self.date_created),
+            'date_updated': str(self.date_updated)
+        }
 
     def load_data(self):
         # Get parent dataset name

@@ -8,10 +8,10 @@
 #login_panel_main #register_prompt, #new_dataset_panel #register_prompt {
   margin-top: 15px; }
 
+form .input_required {
+  color: #a00; }
 form label {
   font-weight: normal; }
-  form label .input_required {
-    color: #a00; }
 
 select, optgroup {
   font-size: 14px;
@@ -26,6 +26,15 @@ optgroup {
 #scanpathTable th:not(:nth-child(2)):hover {
   cursor: pointer;
   text-decoration: underline; }
+
+#dataset_name {
+  font-weight: bold; }
+
+#new_task_panel .input-group {
+  width: 100%; }
+
+.fake_label {
+  margin: 0 0 5px 0; }
 
 #addTreeData {
   padding: 3px 10px;
