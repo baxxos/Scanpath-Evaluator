@@ -1,6 +1,6 @@
 angular.module('gazerApp').factory('AuthenticationService', AuthenticationService);
 
-function AuthenticationService($http, $rootScope, $cookies) {
+function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 	// Public interface
 	var service = {};
 
@@ -42,19 +42,22 @@ function AuthenticationService($http, $rootScope, $cookies) {
 			authdata: authdata
 		};
 
-		// set default auth header for http requests
+		// Set default auth header for http requests
 		$http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
 
-		// store user details in globals cookie that keeps user logged in for 1 day (or until they logout)
+		// Store user details in globals cookie that keeps user logged in for 1 day (or until they logout)
 		var cookieExp = new Date();
 		cookieExp.setDate(cookieExp.getDate() + 1);
 		$cookies.putObject('globals', $rootScope.globals, { expires: cookieExp });
 	}
 
 	function ClearCredentials() {
+		// Invalidate global user objects and remove cookies
 		$rootScope.globals.currentUser = false;
 		$cookies.remove('globals');
 		$http.defaults.headers.common.Authorization = 'Basic';
+		// Clear the navigation data tree after logout
+		DataTreeService.clearNavTreeData();
 	}
 }
 

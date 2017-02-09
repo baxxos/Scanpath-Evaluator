@@ -1,6 +1,6 @@
 // Handles all sidebar related actions
-angular.module('gazerApp').controller('ResearchSidebarCtrl', function($scope, DataTreeService) {
-    var init = function() {
+angular.module('gazerApp').controller('ResearchSidebarCtrl', function($scope, $rootScope, DataTreeService) {
+    var initController = function() {
         $scope.navTreeData = [];
 
         // Watch variable and do something if its value changes
@@ -35,9 +35,11 @@ angular.module('gazerApp').controller('ResearchSidebarCtrl', function($scope, Da
             }
         );
 
-        // Update navigation view with user owned datasets
-        DataTreeService.updateNavTreeData();
+        // Update navigation view with user owned datasets (if the current user is set)
+        if($rootScope.globals.currentUser) {
+            DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+        }
     };
 
-    init();
+    initController();
 });
