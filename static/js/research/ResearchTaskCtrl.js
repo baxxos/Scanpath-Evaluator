@@ -49,17 +49,12 @@ angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $stat
 
 				// Assign each user scanpath its similarity to the common scanpath
 				for (var index in $scope.task.scanpaths) {
-					if ($scope.task.scanpaths.hasOwnProperty(index)) {
-						var act_scanpath = $scope.task.scanpaths[index];
-						act_scanpath.simToCommon = similarities[act_scanpath.identifier]; // TODO try-catch of some sort
-					}
-					else {
-						console.error('Missing property ' + index + ' in scanpaths object');
-					}
+					var act_scanpath = $scope.task.scanpaths[index];
+					act_scanpath.simToCommon = similarities[act_scanpath.identifier];
 				}
 			},
 			function(data) {
-				console.log('Failed to get common scanpath.', data);
+				console.error('Failed to get common scanpath response from the server.', data);
 			}
 		);
     };
@@ -103,17 +98,12 @@ angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $stat
 
 				// Assign each user scanpath its similarity to the common scanpath
 				for (var index in $scope.task.scanpaths) {
-					if ($scope.task.scanpaths.hasOwnProperty(index)) {
-						var act_scanpath = $scope.task.scanpaths[index];
-						act_scanpath.simToCommon = similarities[act_scanpath.identifier];
-					}
-					else {
-						console.error('Missing property ' + index + ' in scanpath object');
-					}
+					var act_scanpath = $scope.task.scanpaths[index];
+					act_scanpath.simToCommon = similarities[act_scanpath.identifier];
 				}
 			},
 			function(data) {
-				console.log('Failed to get common scanpath.', data);
+				console.error('Failed to get common scanpath response from the server.', data);
 			}
 		);
     };
@@ -144,6 +134,7 @@ angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $stat
 			// Sort the data based on a default column
 			sortBy: 'identifier'
 		};
+
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
 	};

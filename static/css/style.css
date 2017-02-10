@@ -27,7 +27,7 @@ optgroup {
   cursor: pointer;
   text-decoration: underline; }
 
-#dataset_name {
+#dataset_name_heading {
   font-weight: bold; }
 
 #new_task_panel .input-group {

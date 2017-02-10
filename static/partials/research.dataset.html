@@ -1,4 +1,4 @@
-<h3>Dataset: <span id="dataset_name">{{ dataset.name }}</span></h3>
+<h3>Dataset: <span id="dataset_name_heading">{{ dataset.name }}</span></h3>
 <h4>{{ dataset.description }}</h4>
 <p>Created at: {{ dataset.date_created }}</p>
 <p>Updated at: {{ dataset.date_updated }}</p>
@@ -6,85 +6,89 @@
 <hr />
 
 <h4>Dataset tasks:</h4>
-<table class="table table-hover table-responsive" id="tasksTable">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th class="col-md-1">Controls</th>
+<section>
+    <table class="table table-hover table-responsive" id="tasksTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="col-md-1">Controls</th>
+            </tr>
+        </thead>
+        <tr ng-repeat="task in dataset.tasks">
+            <td>{{ task.name }}</td>
+            <td>{{ task.description }}</td>
+            <td><span class="label label-danger">Delete</span></td>
         </tr>
-    </thead>
-    <tr ng-repeat="task in dataset.tasks">
-        <td>{{ task.name }}</td>
-        <td>{{ task.description }}</td>
-        <td><span class="label label-danger">Delete</span></td>
-    </tr>
-</table>
+    </table>
+</section>
 
-<div class="row" >
-    <form class="col-md-12"ng-show="taskNew.showForm">
-        <div class="panel panel-primary text-left" id="new_task_panel">
-            <div class="panel-heading">
-                Add a new task to the dataset
-            </div>
-
-            <div class="panel-body text-left">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <label for="dataset_name">
-                                Name:<span class="input_required">*</span>
-                            </label>
-                            <input type="text" class="form-control" placeholder="taskNamedWhatever"
-                               id="task_name" maxlength="100" ng-model="taskNew.name" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group">
-                            <label for="dataset_desc">
-                                Description:
-                            </label>
-                            <input type="text" class="form-control" id="dataset_desc" maxlength="100"
-                                   placeholder="Short description of the new dataset" ng-model="datasetNew.description">
-                        </div>
-                    </div>
-
-                    <div class="">
-                        <button class="btn btn-success" type="submit">Submit</button>
-                        <button class="btn btn-default" ng-click="toggleTaskForm()">Cancel</button>
-                    </div>
+<section ng-controller="ResearchTaskFormCtrl">
+    <div class="row">
+        <form class="col-md-12"ng-show="taskNew.showForm">
+            <div class="panel panel-primary text-left" id="new_task_panel">
+                <div class="panel-heading">
+                    Add a new task to the dataset
                 </div>
 
+                <div class="panel-body text-left">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="dataset_name">
+                                    Name:<span class="input_required">*</span>
+                                </label>
+                                <input type="text" class="form-control" placeholder="taskNamedWhatever"
+                                   id="task_name" maxlength="100" ng-model="taskNew.name" required>
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <p class="fake_label">
-                                Select a text file containing scanpath data:<span class="input_required">*</span>
-                            </p>
-                            <label class="btn btn-default btn-file">
-                                Browse..
-                                <input type="file" accept=".txt" style="display: none;" ng-model="taskNew.file">
-                            </label>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="dataset_desc">
+                                    Description:
+                                </label>
+                                <input type="text" class="form-control" id="dataset_desc" maxlength="100"
+                                       placeholder="Short description of the new dataset" ng-model="datasetNew.description">
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <button class="btn btn-success" type="submit">Submit</button>
+                            <button class="btn btn-default" ng-click="toggleTaskForm()">Cancel</button>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="input-group">
-                            <p class="fake_label">Selected file:</p>
-                            <p>{{ taskNew.file }}</p>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake_label">
+                                    Select a text file containing scanpath data:<span class="input_required">*</span>
+                                </p>
+                                <label class="btn btn-default btn-file">
+                                    Browse..
+                                    <input type="file" accept=".txt" style="display: none;" ng-model="taskNew.file">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake_label">Selected file:</p>
+                                <p>{{ taskNew.file }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-</div>
-
-<div class="row" ng-show="!taskNew.showForm">
-    <div class="col-md-12">
-        <button class="btn btn-primary" ng-click="toggleTaskForm()">New task</button>
-        <button class="btn btn-danger">Delete all</button>
+        </form>
     </div>
-</div>
+
+    <div class="row" ng-show="!taskNew.showForm">
+        <div class="col-md-12">
+            <button class="btn btn-primary" ng-click="toggleTaskForm()">New task</button>
+            <button class="btn btn-danger">Delete all</button>
+        </div>
+    </div>
+</section>

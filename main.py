@@ -130,6 +130,38 @@ def add_dataset():
         session.rollback()
 
 
+@app.route('/api/task/add', methods=['POST'])
+def add_dataset_task():
+    try:
+        json_data = json.loads(request.data)
+
+        dataset = session.query(Dataset).filter(Dataset.id == json_data['datasetId'])
+        task = DatasetTask(name=json_data['name'], description=json_data['description'], dataset_id=dataset.id)
+
+        dataset.append(task)
+
+        session.commit()
+
+        # Reflect the changes on the server side - create a new folder named after dataset PK
+        os.makedirs(os.path.join(
+            config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(dataset.id),
+            config['TASK_PREFIX'] + str(task.id))
+        )
+
+        return handle_success({
+            'id': dataset.id
+        })
+    except KeyError:
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try logging in again.')
+    except:
+        return handle_error('Internal database error - try again later.')
+    finally:
+        session.rollback()
+
+
 @app.route('/custom', methods=['GET', 'POST'])
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]

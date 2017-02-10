@@ -58,7 +58,7 @@ angular.module('gazerApp')
 					views: {
 						'right@research': {
 							templateUrl: 'static/partials/research.dataset.html',
-							controller: 'DatasetCtrl'
+							controller: 'ResearchDatasetCtrl'
 						}
 					},
 					ncyBreadcrumb: {
@@ -71,7 +71,7 @@ angular.module('gazerApp')
 					views: {
 						'right@research': {
 							templateUrl: 'static/partials/research.datasetNew.html',
-							controller: 'DatasetCtrl'
+							controller: 'ResearchDatasetCtrl'
 						}
 					},
 					ncyBreadcrumb: {
@@ -89,7 +89,7 @@ angular.module('gazerApp')
 						}
 					},
 					ncyBreadcrumb: {
-						label: 'Task Details',
+						label: 'Task details',
 						parent: 'research'
 					}
 				});

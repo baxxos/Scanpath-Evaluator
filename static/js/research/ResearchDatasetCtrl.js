@@ -1,6 +1,7 @@
-angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, $animate) {
+angular.module('gazerApp').controller('ResearchDatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService) {
     var isFormValid = function() {
-        return true;
+        // Check required inputs, no other requirements
+        return $scope.datasetNew.name;
     };
 
     var showUserErrors = function() {
@@ -81,32 +82,18 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
        );
    };
 
-   // Fix for required field missing message appearing when form was hidden without submitting
-   $scope.toggleTaskForm = function() {
-       if($scope.taskNew.showForm == true) {
-           $scope.taskNew.name = ' ';
+   var initController = function() {
+       $scope.datasetNew = {
+           success: false,
+           redirect: true,
+           errors: [],
+           warnings: []
+       };
+
+       // Get basic dataset information and set $scope.dataset
+       if($state.params.id) {
+           loadDataset($state.params.id);
        }
-       else {
-           $scope.taskNew.name = null;
-       }
-
-       $scope.taskNew.showForm = !$scope.taskNew.showForm;
-   };
-
-    var initController = function() {
-        $scope.datasetNew = {
-            success: false,
-            redirect: true,
-            errors: [],
-            warnings: []
-        };
-
-        // Get basic dataset information and set $scope.dataset
-        loadDataset($state.params.id);
-
-        $scope.taskNew = {
-            showForm: false
-        };
     };
 
     initController();
