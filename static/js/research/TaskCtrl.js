@@ -1,5 +1,5 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('gazerApp').controller('ResearchTaskCtrl', function($scope, $state, $http) {
+angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http) {
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',

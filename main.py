@@ -93,12 +93,10 @@ def add_user():
 def get_dataset():
     try:
         dataset = session.query(Dataset).filter(Dataset.id == request.args.get('id')).one()
-        print dataset.to_json()
         return handle_success(dataset.to_json())
     except orm.exc.NoResultFound:
         return handle_error('Invalid dataset ID.')
-    except Exception as e:
-        print e.message
+    except:
         return handle_error('Internal database error - try again later.')
 
 
@@ -135,10 +133,10 @@ def add_dataset_task():
     try:
         json_data = json.loads(request.data)
 
-        dataset = session.query(Dataset).filter(Dataset.id == json_data['datasetId'])
+        dataset = session.query(Dataset).filter(Dataset.id == json_data['datasetId']).one()
         task = DatasetTask(name=json_data['name'], description=json_data['description'], dataset_id=dataset.id)
 
-        dataset.append(task)
+        dataset.tasks.append(task)
 
         session.commit()
 
@@ -150,7 +148,7 @@ def add_dataset_task():
         )
 
         return handle_success({
-            'id': dataset.id
+            'id': task.id
         })
     except KeyError:
         return handle_error('Required attributes are missing')
@@ -211,7 +209,7 @@ def get_task_data():
     return get_task_data_json(task)
 
 
-@app.route('/get_data_tree', methods=['POST'])
+@app.route('/api/user/get_data_tree', methods=['POST'])
 # TODO GET method
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """

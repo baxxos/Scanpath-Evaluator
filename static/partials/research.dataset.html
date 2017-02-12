@@ -16,16 +16,57 @@
             </tr>
         </thead>
         <tr ng-repeat="task in dataset.tasks">
-            <td>{{ task.name }}</td>
+            <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
             <td>{{ task.description }}</td>
             <td><span class="label label-danger">Delete</span></td>
         </tr>
     </table>
 </section>
 
-<section ng-controller="ResearchTaskFormCtrl">
+<!-- New dataset task form area -->
+<section>
     <div class="row">
-        <form class="col-md-12"ng-show="taskNew.showForm">
+        <div class="col-md-12">
+            <!-- Success message -->
+            <div class="panel panel-success" ng-show="taskNew.success">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Success:</h4>
+                </div>
+                <div class="panel-body">
+                    <p>Your task was created successfully.
+                        <span ng-show="taskNew.redirect">You will be redirected to the new task overview automatically
+                        in 5 seconds.</span>
+                    </p>
+                    <p ng-show="taskNew.redirect">If you want to continue now
+                        <a ng-href="#/research/task/{{ taskNew.id }}">click here</a>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Form error -->
+            <div class="panel panel-danger" ng-show="taskNew.errors.length">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Please review following errors:</h4>
+                </div>
+                <div class="panel-body">
+                    <p ng-repeat="error in taskNew.errors">{{ error }}</p>
+                </div>
+            </div>
+
+            <!-- Warning message -->
+            <div class="panel panel-warning" ng-show="taskNew.warnings.length">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Your request could not be performed:</h4>
+                </div>
+                <div class="panel-body">
+                    <p ng-repeat="warning in taskNew.warnings">{{ warning }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <form class="col-md-12" name="taskForm" ng-show="showTaskForm" ng-submit="submitTask()">
             <div class="panel panel-primary text-left" id="new_task_panel">
                 <div class="panel-heading">
                     Add a new task to the dataset
@@ -49,11 +90,11 @@
                                     Description:
                                 </label>
                                 <input type="text" class="form-control" id="dataset_desc" maxlength="100"
-                                       placeholder="Short description of the new dataset" ng-model="datasetNew.description">
+                                       placeholder="Short description of the new dataset" ng-model="taskNew.description">
                             </div>
                         </div>
 
-                        <div class="">
+                        <div>
                             <button class="btn btn-success" type="submit">Submit</button>
                             <button class="btn btn-default" ng-click="toggleTaskForm()">Cancel</button>
                         </div>
@@ -85,7 +126,7 @@
         </form>
     </div>
 
-    <div class="row" ng-show="!taskNew.showForm">
+    <div class="row" ng-show="!showTaskForm">
         <div class="col-md-12">
             <button class="btn btn-primary" ng-click="toggleTaskForm()">New task</button>
             <button class="btn btn-danger">Delete all</button>

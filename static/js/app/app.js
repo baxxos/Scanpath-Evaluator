@@ -21,18 +21,18 @@ angular.module('gazerApp').run(function($rootScope, $cookies, $state, $http) {
 
 	$rootScope.$on('$stateChangeSuccess', function (event, next, current) {
 		// Redirect to login page if not logged in and trying to access a restricted page
-		var restricted_states = [];
-		var restrictedPage = false;
+		var allowed_states = ['login', 'register'];
+		var allowedPage = false;
 
-		for (var i = 0; i < restricted_states.length; i++) {
-			if ($state.includes(restricted_states[i])) {
-				restrictedPage = true;
+		for (var i = 0; i < allowed_states.length; i++) {
+			if ($state.includes(allowed_states[i])) {
+				allowedPage = true;
 			}
 		}
 
 		// Redirect when an anonymous user is attempting to access private pages
 		var loggedIn = $rootScope.globals.currentUser;
-		if (restrictedPage && !loggedIn) {
+		if (!allowedPage && !loggedIn) {
 			$state.go('login');
 		}
 	});

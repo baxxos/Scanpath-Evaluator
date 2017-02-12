@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('ResearchDatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService) {
+angular.module('gazerApp').controller('DatasetFormCtrl', function($scope, $rootScope, $state, $http, $timeout, DataTreeService) {
     var isFormValid = function() {
         // Check required inputs, no other requirements
         return $scope.datasetNew.name;
@@ -37,12 +37,12 @@ angular.module('gazerApp').controller('ResearchDatasetCtrl', function($scope, $r
                     $scope.datasetNew.success = true;
                     $scope.datasetNew.id = response.data.load.id;
 
-                    // Update navigation view with user owned datasets
+                    // Update navigation view
                     DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
 
                     // If the user wishes to be redirected afterwards
                     if($scope.datasetNew.redirect == true) {
-                        $timeout(function () {
+                        $timeout(function() {
                             $state.go(
                                 'research.dataset',
                                 { id: $scope.datasetNew.id }
@@ -60,40 +60,13 @@ angular.module('gazerApp').controller('ResearchDatasetCtrl', function($scope, $r
         );
    };
 
-   var loadDataset = function(datasetId) {
-       $http({
-           method: 'GET',
-           url: '/api/dataset',
-           params: {
-               id: datasetId
-           }
-       }).then(
-           function(response) {
-               if(response.data.success == true && response.data.load) {
-                   $scope.dataset = response.data.load;
-               }
-               else {
-                   console.error(response.data.message);
-               }
-           },
-           function(response) {
-               console.error('There was no response to from the server to the dataset load request.');
-           }
-       );
-   };
-
-   var initController = function() {
-       $scope.datasetNew = {
-           success: false,
-           redirect: true,
-           errors: [],
-           warnings: []
-       };
-
-       // Get basic dataset information and set $scope.dataset
-       if($state.params.id) {
-           loadDataset($state.params.id);
-       }
+    var initController = function() {
+        $scope.datasetNew = {
+            success: false,
+            redirect: true,
+            errors: [],
+            warnings: []
+        };
     };
 
     initController();
