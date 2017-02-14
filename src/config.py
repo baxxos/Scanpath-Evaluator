@@ -5,6 +5,7 @@ config = {
     'TASK_PREFIX': 'task',
     'DATA_FORMAT': '.txt',
     'AOIS_FILE': 'SegmentedPages.txt',
+    'SCANPATHS_FILE': 'Scanpaths.txt',
     'MIN_PASSWORD_LEN': 8
 }
 

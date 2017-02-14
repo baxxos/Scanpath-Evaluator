@@ -15,6 +15,7 @@ angular.module('gazerApp').controller('DatasetFormCtrl', function($scope, $rootS
     $scope.submitDataset = function() {
         if(!isFormValid()) {
             showUserErrors();
+            return;
         }
         else {
             $scope.datasetNew.errors = [];

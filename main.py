@@ -10,6 +10,7 @@ from passlib.hash import sha256_crypt
 
 import os
 import json
+import traceback
 
 app = Flask(__name__)
 app.debug = True
@@ -131,13 +132,18 @@ def add_dataset():
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
     try:
-        json_data = json.loads(request.data)
+        # Parse the non-file form data (user inputs)
+        json_data = request.form.to_dict()
 
-        dataset = session.query(Dataset).filter(Dataset.id == json_data['datasetId']).one()
+        # Multipart forms don't support nested objects - therefore the retarded key names
+        file_scanpaths = request.files['files[fileScanpaths]']
+        file_regions = request.files['files[fileRegions]']
+
+        # Create new task instance and save to the DB
+        dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
         task = DatasetTask(name=json_data['name'], description=json_data['description'], dataset_id=dataset.id)
 
         dataset.tasks.append(task)
-
         session.commit()
 
         # Reflect the changes on the server side - create a new folder named after dataset PK
@@ -147,16 +153,35 @@ def add_dataset_task():
             config['TASK_PREFIX'] + str(task.id))
         )
 
+        # Save the scanpath data file in the directory created above
+        file_scanpaths.save(os.path.join(
+            config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(dataset.id),
+            config['TASK_PREFIX'] + str(task.id),
+            config['AOIS_FILE'])
+        )
+
+        # Save the regions of interest file in the directory created above
+        file_regions.save(os.path.join(
+            config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(dataset.id),
+            config['TASK_PREFIX'] + str(task.id),
+            config['SCANPATHS_FILE'])
+        )
+
         return handle_success({
             'id': task.id
         })
     except KeyError:
+        traceback.print_exc()
         return handle_error('Required attributes are missing')
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try logging in again.')
     except:
+        traceback.print_exc()
         return handle_error('Internal database error - try again later.')
     finally:
+        # TODO delete any created dirs/files
         session.rollback()
 
 

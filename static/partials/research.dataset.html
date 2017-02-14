@@ -1,4 +1,5 @@
-<h3>Dataset: <span id="dataset_name_heading">{{ dataset.name }}</span></h3>
+<h3 xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+    xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">Dataset: <span id="dataset_name_heading">{{ dataset.name }}</span></h3>
 <h4>{{ dataset.description }}</h4>
 <p>Created at: {{ dataset.date_created }}</p>
 <p>Updated at: {{ dataset.date_updated }}</p>
@@ -94,22 +95,27 @@
                             </div>
                         </div>
 
-                        <div>
-                            <button class="btn btn-success" type="submit">Submit</button>
-                            <button class="btn btn-default" ng-click="toggleTaskForm()">Cancel</button>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
+                                Submit
+                            </button>
+                            <button class="btn btn-default" ng-click="toggleTaskForm()"
+                                    ng-disabled="taskNew.uploading">
+                                Cancel
+                            </button>
                         </div>
                     </div>
 
-
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <div class="input-group">
                                 <p class="fake_label">
-                                    Select a text file containing scanpath data:<span class="input_required">*</span>
+                                    File containing scanpath data:<span class="input_required">*</span>
                                 </p>
-                                <label class="btn btn-default btn-file">
-                                    Browse..
-                                    <input type="file" accept=".txt" style="display: none;" ng-model="taskNew.file">
+                                <label class="btn btn-default">
+                                    Select File
+                                    <input type="file" accept=".txt" ng-model="taskNew.fileScanpaths" ngf-select=""
+                                           ngf-model-invalid="taskNew.errFileScanpaths" ngf-max-size="50MB" required>
                                 </label>
                             </div>
                         </div>
@@ -117,7 +123,54 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <p class="fake_label">Selected file:</p>
-                                <p>{{ taskNew.file }}</p>
+                                <p>
+                                    {{ taskNew.fileScanpaths.name }}
+                                    {{ taskNew.errFileScanpaths.name }}
+                                    <span class="label label-danger">{{concatFileErrors(taskNew.errFileScanpaths)}}</span>
+
+                                    <span class="label label-warning" ng-show="isUploading()">
+                                        Uploading..
+                                    </span>
+                                    <span class="label label-success" ng-show="taskNew.fileScanpaths.progress == 100">
+                                        Done
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake_label">
+                                    File containing AOI data:<span class="input_required">*</span>
+                                </p>
+                                <label class="btn btn-default">
+                                    Select File
+                                    <input type="file" accept=".txt" ng-model="taskNew.fileRegions" ngf-select=""
+                                           ngf-model-invalid="taskNew.errFileRegions" ngf-max-size="10MB" required>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake_label">Selected file:</p>
+                                <p>
+                                    {{ taskNew.fileRegions.name }}
+                                    {{ taskNew.errFileRegions.name }}
+                                    <span class="label label-danger">{{concatFileErrors(taskNew.errFileRegions)}}</span>
+
+                                    <span class="label label-warning" ng-show="isUploading()">
+                                        Uploading..
+                                    </span>
+                                    <span class="label label-success" ng-show="taskNew.fileRegions.progress == 100">
+                                        Done
+                                    </span>
+                                    <span class="label label-danger" ng-show="errorMsg">
+                                        {{ errorMsg }}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>

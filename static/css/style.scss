@@ -63,8 +63,19 @@ optgroup {
 	}
 }
 
+// Dataset - new task form
 .fake_label {
 	margin: 0 0 5px 0;
+}
+
+label {
+	// For wrapping the file input in a way that it looks like BootStrap button
+	// Cannot be replaced by display:none as the "Please fill this field" displays in the wrong position
+	input[type="file"] {
+		visibility: hidden;
+		width: 0;
+		height: 0;
+	}
 }
 
 // Dataset sidebar screen

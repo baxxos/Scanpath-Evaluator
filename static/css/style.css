@@ -36,6 +36,11 @@ optgroup {
 .fake_label {
   margin: 0 0 5px 0; }
 
+label input[type="file"] {
+  visibility: hidden;
+  width: 0;
+  height: 0; }
+
 #addTreeData {
   padding: 3px 10px;
   border-radius: 4px; }
