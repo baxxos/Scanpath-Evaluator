@@ -139,9 +139,11 @@ def add_dataset_task():
         file_scanpaths = request.files['files[fileScanpaths]']
         file_regions = request.files['files[fileRegions]']
 
-        # Create new task instance and save to the DB
+        # Find parent dataset and create new task instance + commit to the DB
         dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
-        task = DatasetTask(name=json_data['name'], description=json_data['description'], dataset_id=dataset.id)
+
+        task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
+                           dataset_id=dataset.id)
 
         dataset.tasks.append(task)
         session.commit()
@@ -158,7 +160,7 @@ def add_dataset_task():
             config['DATASET_FOLDER'],
             config['DATASET_PREFIX'] + str(dataset.id),
             config['TASK_PREFIX'] + str(task.id),
-            config['AOIS_FILE'])
+            config['SCANPATHS_FILE'])
         )
 
         # Save the regions of interest file in the directory created above
@@ -166,7 +168,7 @@ def add_dataset_task():
             config['DATASET_FOLDER'],
             config['DATASET_PREFIX'] + str(dataset.id),
             config['TASK_PREFIX'] + str(task.id),
-            config['SCANPATHS_FILE'])
+            config['AOIS_FILE'])
         )
 
         return handle_success({

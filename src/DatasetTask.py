@@ -17,7 +17,7 @@ class DatasetTask(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String)
-    url = Column(String)
+    url = Column(String, nullable=False)
     dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='CASCADE'), nullable=False)
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
@@ -55,49 +55,53 @@ class DatasetTask(Base):
         dataset = session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
 
         # Construct path to scanpath data based on config file - e.g. 'datasets/d1/t1/scanpaths/'
-        folder_path_scanpaths = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
-                                          config['TASK_PREFIX'] + str(self.id), 'scanpaths', '')
+        file_path_scanpaths = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
+                                        config['TASK_PREFIX'] + str(self.id), config['SCANPATHS_FILE'])
+
         # Construct path to scanpath AOI data based on config file - e.g. 'datasets/d1/t1/regions/aoiFile.txt'
         file_path_aoi = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
-                                  config['TASK_PREFIX'] + str(self.id), 'regions', config['AOIS_FILE'])
+                                  config['TASK_PREFIX'] + str(self.id), config['AOIS_FILE'])
+
         # Construct path to images based on config file - e.g. 'static/images/d1/t1/'
-        folder_path_visuals = path.join('static', 'images', config['DATASET_FOLDER'], dataset.name, self.name, '')
+        folder_path_visuals = path.join('static', 'images', config['DATASET_FOLDER'], config['DATASET_PREFIX'] +
+                                        str(dataset.id), config['TASK_PREFIX'] + str(self.id), '')
 
         # Fill the data holding objects
-        self.load_participants(folder_path_scanpaths)
+        self.load_participants(file_path_scanpaths)
         self.load_aois(file_path_aoi)
         self.load_visuals(folder_path_visuals)
 
-    def load_participants(self, folder_path_scanpaths):
-        # Fetch all files in specified folder
-        files_list = listdir(folder_path_scanpaths)
-
-        for filename in files_list:
-            if filename.endswith(config['DATA_FORMAT']):
-                try:
-                    fo = open(folder_path_scanpaths + filename, 'r')
-                except:
-                    print "Failed to open specified file: " + folder_path_scanpaths + filename
-                    continue
-                act_file_content = fo.read()
-
-                act_file_lines = act_file_content.split('\n')
-                act_file_data = []
-
-                # Read the file by lines (skip the first one with description)
-                for y in range(1, len(act_file_lines) - 1):
+    def load_participants(self, file_path_scanpaths):
+        try:
+            with open(file_path_scanpaths, 'r') as fr:
+                file_data = []
+                # Skip the first line of scanpath file (table header)
+                next(fr)
+                # Read the rest of the file by lines
+                for act_line in fr:
                     try:
                         # If the page name argument matches the page name specified in file
-                        if act_file_lines[y].index(self.url) > 0:
-                            # Read the data in columns by splitting via tab character
-                            act_file_data.append(act_file_lines[y].split('\t'))
+                        if act_line.index(str(self.url)) > 0:
+                            # Remove trailing newline and split the line into columns
+                            act_line = act_line.rstrip()
+                            line_cols = act_line.split('\t')
+
+                            # Subtract the user identifier from the act line
+                            participant_identifier = line_cols[0]
+
+                            if participant_identifier not in self.participants:
+                                self.participants[participant_identifier] = []
+
+                            # Write the the line data into the data object (under user ID key)
+                            self.participants[participant_identifier].append(line_cols[1:])
+
+                            # Read the rest of the data in columns by splitting it by tab character
+                            file_data.append(act_line.split('\t'))
                     except:
                         print "Invalid data format - line will be skipped"
                         continue
-
-                # Return object containing array of fixations (each fixation is also an array)
-                participant_identifier = filename.split(".txt")[0]
-                self.participants[participant_identifier] = act_file_data
+        except:
+            print "Failed to open specified file: " + file_path_scanpaths
 
     def load_aois(self, file_path_aoi):
         try:

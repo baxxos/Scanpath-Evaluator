@@ -1,0 +1,16 @@
+UserID	Index	Time	Dur	XPoint	YPoint	PageName
+01	0	0	150	557	40	http://ncc.metu.edu.tr/
+01	1	150	250	478	159	http://ncc.metu.edu.tr/
+01	2	401	817	499	500	http://ncc.metu.edu.tr/
+01	3	1219	250	478	300	http://ncc.metu.edu.tr/
+01	4	1470	250	478	159	http://ncc.metu.edu.tr/
+01	5	1721	350	499	300	http://ncc.metu.edu.tr/
+02	0	0	150	557	40	http://ncc.metu.edu.tr/
+02	1	150	750	478	159	http://ncc.metu.edu.tr/
+02	2	901	300	499	300	http://ncc.metu.edu.tr/
+03	1	0	200	557	40	http://ncc.metu.edu.tr/
+03	2	201	100	499	300	http://ncc.metu.edu.tr/
+04	0	0	150	557	40	http://ncc.metu.edu.tr/
+04	1	150	250	478	159	http://ncc.metu.edu.tr/
+04	2	401	817	499	500	http://ncc.metu.edu.tr/
+04	3	1219	350	499	300	http://ncc.metu.edu.tr/

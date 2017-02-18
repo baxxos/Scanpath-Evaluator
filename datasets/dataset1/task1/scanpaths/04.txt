@@ -1,5 +1,0 @@
-Index	Time	Dur	XPoint	YPoint	PageName
-0	0	150	557	40	http://ncc.metu.edu.tr/
-1	150	250	478	159	http://ncc.metu.edu.tr/
-2	401	817	499	500	http://ncc.metu.edu.tr/
-3	1219	350	499	300	http://ncc.metu.edu.tr/

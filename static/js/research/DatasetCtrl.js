@@ -2,7 +2,12 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 	// New task form related methods
 	var isTaskFormValid = function() {
 		// Check required inputs
-		return ($scope.taskNew.name && $scope.taskNew.fileScanpaths && $scope.taskNew.fileRegions);
+		return (
+			$scope.taskNew.name &&
+			$scope.taskNew.url &&
+			$scope.taskNew.fileScanpaths &&
+			$scope.taskNew.fileRegions
+		);
 	};
 
 	var resetTaskForm = function() {
@@ -30,14 +35,14 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 	var showUserErrors = function() {
 		$scope.taskNew.errors = [];
 
-		if(!$scope.taskNew.name) {
+		if(!$scope.taskNew.name || !$scope.taskNew.url) {
 			$scope.taskNew.errors.push('A required field is missing!');
 		}
 		if(!$scope.taskNew.fileScanpaths) {
 			$scope.taskNew.errors.push('Scanpaths file is missing!');
 		}
 		if(!$scope.taskNew.fileRegions) {
-			$scope.taskNew.errors.push('Areas of interest file is missing!');
+			$scope.taskNew.errors.push('AOI file is missing!');
 		}
 	};
 
@@ -58,43 +63,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		}
 	};
 
-	// Handles the uploading of scanpath data and its AOI definition file
-	$scope.uploadFiles = function() {
-		// Assign file to the scope
-		file = $scope.taskNew.fileScanpaths;
-
-		// Send it to the backend
-        if(file) {
-			file.progress = 0;
-            file.upload = Upload.http({
-				method: 'POST',
-				headers: {
-					'Content-Type': file.type
-				},
-                url: 'https://angular-file-upload-cors-srv.appspot.com/upload',
-                data: {
-					file: file
-				}
-            });
-
-            file.upload.then(
-				function (response) {
-					$timeout(function () {
-						file.result = response.data;
-					});
-				},
-				function(response) {
-					if(response.status > 0) {
-						$scope.errorMsg = response.status + ': ' + response.data;
-					}
-				},
-				function(evt) {
-					file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-				}
-            );
-        }
-	};
-
+	// Handles the uploading of the new task form and its uploaded data
 	$scope.submitTask = function() {
 		if(!isTaskFormValid()) {
 			showUserErrors();
@@ -119,6 +88,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 			data: {
 				datasetId: $state.params.id,
 				name: $scope.taskNew.name,
+				url: $scope.taskNew.url,
 				// Optional attributes, replace 'undefined' by empty string as undefined value is not a valid JSON
 				// value and null value would be changed into 'null' string value on the backend due to multipart form
 				description: ($scope.taskNew.description ? $scope.taskNew.description : ''),

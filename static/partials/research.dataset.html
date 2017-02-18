@@ -75,23 +75,36 @@
 
                 <div class="panel-body text-left">
                     <div class="col-md-6">
+                        <!-- Task name -->
                         <div class="form-group">
                             <div class="input-group">
                                 <label for="dataset_name">
                                     Name:<span class="input_required">*</span>
                                 </label>
-                                <input type="text" class="form-control" placeholder="taskNamedWhatever"
+                                <input type="text" class="form-control" placeholder="myTask"
                                    id="task_name" maxlength="100" ng-model="taskNew.name" required>
                             </div>
                         </div>
 
+                        <!-- Task URL -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="dataset_url">
+                                    Task URL:<span class="input_required">*</span>
+                                </label>
+                                <input type="url" class="form-control" id="dataset_url" maxlength="100" required
+                                       placeholder="http://myurl.com" ng-model="taskNew.url">
+                            </div>
+                        </div>
+
+                        <!-- Task description (opt) -->
                         <div class="form-group">
                             <div class="input-group">
                                 <label for="dataset_desc">
                                     Description:
                                 </label>
                                 <input type="text" class="form-control" id="dataset_desc" maxlength="100"
-                                       placeholder="Short description of the new dataset" ng-model="taskNew.description">
+                                       placeholder="Short description of the new task" ng-model="taskNew.description">
                             </div>
                         </div>
 
