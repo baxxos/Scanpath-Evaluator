@@ -7,13 +7,17 @@ import math
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
-my_env = Environment(0.5, 60, 1280, 1024, 17)
+my_env = Environment(0.5, 60, 1920, 1080, 17)
+
 
 def createSequences(Participants, myAoIs, errorRateArea):
     Sequences = {}
     keys = Participants.keys()
     for y in range(0, len(keys)):
         sequence = ""
+        prev_aoi = ''
+        prev_duration = 0
+        prev_total_duration = 0
         for z in range(0, len(Participants[keys[y]])):
             tempAoI = ""
             tempDuration = 0
@@ -29,6 +33,7 @@ def createSequences(Participants, myAoIs, errorRateArea):
 
             distanceList = []
             if len(tempAoI) > 1:
+                continue
                 tempAoI = "(" + tempAoI + ")"
                 for m in range(0, len(tempAoI)):
                     for n in range(0, len(myAoIs)):
@@ -43,7 +48,18 @@ def createSequences(Participants, myAoIs, errorRateArea):
                 tempAoI = distanceList[0][0]
 
             if len(tempAoI) != 0:
-                sequence = sequence + tempAoI + "-" + str(tempDuration) + "."
+                if prev_aoi != tempAoI:
+                    sequence = sequence + tempAoI + "-" + str(tempDuration) + "."
+                    prev_total_duration = tempDuration
+                else:
+                    new_len = prev_total_duration + tempDuration
+
+                    sequence = sequence[0:(len(sequence) - len(str(prev_total_duration)) - 1)] + str(new_len) + '.'
+
+                    prev_total_duration += tempDuration
+
+                prev_aoi = tempAoI
+                prev_duration = tempDuration
 
         Sequences[keys[y]] = sequence
     return Sequences
@@ -155,7 +171,7 @@ def getNumberDurationOfAoIs(Sequences):
                 duration = duration + sum([int(w[2]) for w in Sequences[keys[y]] if w[0:2] == AoIs[x]])
                 flagCounter = flagCounter + 1
 
-        if flagCounter == len(keys):
+        if flagCounter >= len(keys) / 2:
             AoIcount.append([AoIs[x], counter, duration, True])
         else:
             AoIcount.append([AoIs[x], counter, duration, False])
