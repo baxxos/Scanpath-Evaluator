@@ -3,8 +3,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',
-			method: 'POST',
-			data: {
+			method: 'GET',
+			params: {
 				taskId: $scope.task.id
 			}
 		}).then(
@@ -34,8 +34,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	var getCommonScanpathDetails = function() {
 		$http({
 			url: '/sta',
-			method: 'POST',
-			data: {
+			method: 'GET',
+			params: {
 				taskId: $scope.task.id
 			}
 		}).then(

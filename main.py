@@ -9,6 +9,7 @@ from sqlalchemy import exc, orm
 from passlib.hash import sha256_crypt
 
 import os
+import shutil
 import json
 import traceback
 import fileFormat
@@ -61,7 +62,6 @@ def authenticate():
         return handle_error('Internal database error - try again later.')
 
 
-# TODO move to separate api.py file
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     try:
@@ -132,6 +132,10 @@ def add_dataset():
 
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
+    # For cleaning up purposes (see 'finally' block)
+    task = None
+    dataset = None
+
     try:
         # Parse the non-file form data (user inputs)
         json_data = request.form.to_dict()
@@ -149,45 +153,8 @@ def add_dataset_task():
         dataset.tasks.append(task)
         session.commit()
 
-        # TODO move files handling into a separate function
         # Reflect the changes on the server side - create a new folder named after dataset PK
-        os.makedirs(os.path.join(
-            config['DATASET_FOLDER'],
-            config['DATASET_PREFIX'] + str(dataset.id),
-            config['TASK_PREFIX'] + str(task.id))
-        )
-
-        # Save the unformatted scanpath data file (to be deleted after formatting) in the directory created above
-        path_file_scanpaths = os.path.join(
-            config['DATASET_FOLDER'],
-            config['DATASET_PREFIX'] + str(dataset.id),
-            config['TASK_PREFIX'] + str(task.id)
-        )
-
-        file_scanpaths.save(os.path.join(
-            path_file_scanpaths,
-            config['SCANPATHS_FILE_RAW'])
-        )
-
-        # Format the newly created file and remove the original one
-        keep = ['ParticipantName', 'FixationIndex', 'GazeEventDuration', 'GazeEventDuration', 'FixationPointX (MCSpx)',
-                'FixationPointY (MCSpx)', 'MediaName']
-        fileFormat.format_scanpaths(keep, path_file_scanpaths)
-
-        # Save the unformatted AOIs file (to be deleted after formatting)
-        path_file_regions = os.path.join(
-            config['DATASET_FOLDER'],
-            config['DATASET_PREFIX'] + str(dataset.id),
-            config['TASK_PREFIX'] + str(task.id)
-        )
-
-        file_regions.save(os.path.join(
-            path_file_regions,
-            config['AOIS_FILE_RAW'])
-        )
-
-        # Format the newly created file and remove the original one
-        fileFormat.format_aois(path_file_regions)
+        fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
 
         return handle_success({
             'id': task.id
@@ -195,14 +162,24 @@ def add_dataset_task():
     except KeyError:
         traceback.print_exc()
         return handle_error('Required attributes are missing')
+    except ValueError:
+        traceback.print_exc()
+        return handle_error('Failed to parse the submitted data')
     except orm.exc.NoResultFound:
+        traceback.print_exc()
         return handle_error('Invalid user credentials - try logging in again.')
     except:
         traceback.print_exc()
         return handle_error('Internal database error - try again later.')
     finally:
-        # TODO delete any created dirs/files
         session.rollback()
+        # Try to delete any dirs/files created in unsuccessful method call
+        if task is not None and dataset is not None:
+            shutil.rmtree(os.path.join(
+                config['DATASET_FOLDER'],
+                config['DATASET_PREFIX'] + str(dataset.id),
+                config['TASK_PREFIX'] + str(task.id))
+            )
 
 
 @app.route('/custom', methods=['GET', 'POST'])
@@ -222,40 +199,51 @@ def get_similarity_to_custom():
         task.load_data()
         return custom_run(task, custom_scanpath)
     else:
-        return handle_error('Wrong custom scanpath format - alpha characters only.')
+        return handle_error('Wrong custom scanpath format - alphabet characters only.')
 
 
-@app.route('/sta', methods=['POST'])
-# TODO GET method
+@app.route('/sta', methods=['GET'])
 def get_trending_scanpath():
+    # Look for the task identifier in request URL
     try:
-        json_data = json.loads(request.data)
-        task_id = json_data['taskId']
-    except KeyError:
+        task_id = request.args.get('taskId')
+    except:
         return handle_error('Task ID is missing')
 
-    task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-    task.load_data()
+    # Load additional required data and perform sta_run
+    try:
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
 
-    return sta_run(task)
+        return sta_run(task)
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        return handle_error('Internal database error - try again later.')
 
 
-@app.route('/get_task_data', methods=['POST'])
-# TODO GET method
+@app.route('/get_task_data', methods=['GET'])
 def get_task_data():
+    # Look for the task identifier in request URL
     try:
-        json_data = json.loads(request.data)
-        task_id = json_data['taskId']
-    except KeyError:
+        task_id = request.args.get('taskId')
+    except:
+        traceback.print_exc()
         return handle_error('Task ID is missing')
 
-    task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-    task.load_data()
-    return get_task_data_json(task)
+    # Load additional required data and return task info
+    try:
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+
+        return get_task_data_json(task)
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        return handle_error('Internal database error - try again later.')
 
 
 @app.route('/api/user/get_data_tree', methods=['POST'])
-# TODO GET method
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
 
