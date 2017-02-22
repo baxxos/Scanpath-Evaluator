@@ -11,6 +11,8 @@ my_env = Environment(0.5, 60, 1920, 1080, 17)
 
 
 def createSequences(Participants, myAoIs, errorRateArea):
+    # LEGACY CODE downloaded from the STA research paper
+    # TODO this lacks refactoring more than I lack money.. and I'm pretty poor right now
     Sequences = {}
     keys = Participants.keys()
     for y in range(0, len(keys)):
@@ -19,7 +21,7 @@ def createSequences(Participants, myAoIs, errorRateArea):
         prev_duration = 0
         prev_total_duration = 0
         for z in range(0, len(Participants[keys[y]])):
-            tempAoI = ""
+            tempAoI = []
             tempDuration = 0
             for k in range(0, len(myAoIs)):
                 if float(Participants[keys[y]][z][3]) >= (float(myAoIs[k][1]) - errorRateArea) and float(
@@ -28,16 +30,21 @@ def createSequences(Participants, myAoIs, errorRateArea):
                         Participants[keys[y]][z][4]) >= (float(myAoIs[k][3]) - errorRateArea) and float(
                         Participants[keys[y]][z][4]) < (
                 ((float(myAoIs[k][3]) - errorRateArea) + (float(myAoIs[k][4]) + 2 * errorRateArea))):
-                    tempAoI = tempAoI + myAoIs[k][5]
+                    # tempAoI.append(myAoIs[k][5])
+                    # Workaround due to the shitty legacy code - we need to know total area for each tempAoI
+                    # ['header', '0', '1864', '0', '90', 'Aa'] -> ['Aa', 1864 * 90]
+                    tempAoI.append([myAoIs[k][5], int(myAoIs[k][4]) * int(myAoIs[k][2])])
                     tempDuration = int(Participants[keys[y]][z][2])
 
             distanceList = []
+
             if len(tempAoI) > 1:
-                continue
-                tempAoI = "(" + tempAoI + ")"
-                for m in range(0, len(tempAoI)):
+                tempAoI.sort(key=lambda x: x[1])
+                tempAoI = tempAoI[0][0]
+                """
+                for m in tempAoI:
                     for n in range(0, len(myAoIs)):
-                        if tempAoI[m] == myAoIs[n][5]:
+                        if m == myAoIs[n][5]:
                             distance = []
                             for s in range(int(myAoIs[n][1]), int(myAoIs[n][1]) + int(myAoIs[n][2])):
                                 for f in range(int(myAoIs[n][3]), int(myAoIs[n][3]) + int(myAoIs[n][4])):
@@ -46,10 +53,10 @@ def createSequences(Participants, myAoIs, errorRateArea):
                             distanceList.append([myAoIs[n][5], min(distance)])
                 distanceList.sort(key=lambda x: x[1])
                 tempAoI = distanceList[0][0]
-
-            if len(tempAoI) != 0:
-                if prev_aoi != tempAoI:
-                    sequence = sequence + tempAoI + "-" + str(tempDuration) + "."
+                """
+            if len(tempAoI) == 1:
+                if prev_aoi != tempAoI[0][0]:
+                    sequence = sequence + tempAoI[0][0] + "-" + str(tempDuration) + "."
                     prev_total_duration = tempDuration
                 else:
                     new_len = prev_total_duration + tempDuration
@@ -58,10 +65,11 @@ def createSequences(Participants, myAoIs, errorRateArea):
 
                     prev_total_duration += tempDuration
 
-                prev_aoi = tempAoI
+                prev_aoi = tempAoI[0][0]
                 prev_duration = tempDuration
 
         Sequences[keys[y]] = sequence
+
     return Sequences
 
 
@@ -116,10 +124,10 @@ def getSequenceNumber(Sequence, Item):
 
 
 def getAbstractedSequence(Sequence):
-    myAbstractedSequence = [Sequence[0][0]]
+    myAbstractedSequence = [Sequence[0]]
     for y in range(1, len(Sequence)):
         if myAbstractedSequence[len(myAbstractedSequence) - 1] != Sequence[y][0]:
-            myAbstractedSequence.append(Sequence[y][0])
+            myAbstractedSequence.append([Sequence[y][0], Sequence[y][1]])
     return myAbstractedSequence
 
 
@@ -260,7 +268,7 @@ def calculateTotalNumberDurationofFixationsandNSV(AoIList, Sequences):
                     duration += Sequences[keys[y]][k][3]
                     totalNSV += Sequences[keys[y]][k][4]
                     flag += 1
-        if flag == len(Sequences):
+        if flag >= len(Sequences) / 2:
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [True]
         else:
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [False]
@@ -348,8 +356,9 @@ def sta_run(dataset_task):
     myFinalList.reverse()
 
     commonSequence = []
+
     for y in range(0, len(myFinalList)):
-        commonSequence.append(myFinalList[y][0])
+        commonSequence.append([myFinalList[y][0], int(myFinalList[y][3] / myFinalList[y][2])])
 
     formatted_sequences = dataset_task.format_sequences(mySequences)
 
@@ -357,9 +366,15 @@ def sta_run(dataset_task):
     scanpath_strs = convert_to_strs(formatted_sequences)
 
     common_scanpath = getAbstractedSequence(commonSequence)
+    common_scanpath_str = ''
+
+    # For determining levenshtein distance we need a prue string of common scanpath ('ABC')
+    for fixation in common_scanpath:
+        common_scanpath_str += fixation[0]
+
     res_data = {
         'fixations': common_scanpath,
-        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath)
+        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
 
     return json.dumps(res_data)
@@ -375,11 +390,11 @@ def custom_run(dataset_task, custom_scanpath):
 
     custom_scanpath_arr = []
     for i in range(0, len(custom_scanpath)):
-        custom_scanpath_arr.append(custom_scanpath[i])
+        custom_scanpath_arr.append([custom_scanpath[i], 0])
 
     res_data = {
         'fixations': custom_scanpath_arr,
-        'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath_arr)
+        'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath)
     }
 
     return json.dumps(res_data)

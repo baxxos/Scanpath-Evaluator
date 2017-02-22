@@ -56,8 +56,8 @@
                 <h3>Common scanpath:</h3>
                 <p>
                     <span ng-hide="task.commonScanpath">Not available</span>
-                    <span ng-repeat="region in task.commonScanpath.fixations track by $index">
-                        {{ region }}
+                    <span ng-repeat="fixation in task.commonScanpath.fixations track by $index">
+                        {{ fixation[0] }} <sup>{{ fixation[1] }}</sup>
                     </span>
                 </p>
 
@@ -76,8 +76,8 @@
                 <h3>Custom scanpath:</h3>
                 <p>
                     <span ng-hide="task.customScanpath">Not available</span>
-                    <span ng-repeat="region in task.customScanpath.fixations track by $index">
-                        {{ region }}
+                    <span ng-repeat="fixation in task.customScanpath.fixations track by $index">
+                        {{ fixation[0] }}
                     </span>
                 </p>
 
@@ -98,36 +98,39 @@
 </div>
 <hr />
 
-<!-- Results overview -->
-<table class="table table-hover table-responsive" id="scanpathTable">
-    <thead>
-        <tr>
-            <th ng-click="setSort('identifier')">ID</th>
-            <th class="col-md-4">Eye fixations (ms)</th>
-            <th ng-click="setSort('fixations.length')">Scanpath length</th>
-            <th ng-click="setSort('maxSimilarity.identifier')">Most similar to (ID)</th>
-            <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
-            <th ng-click="setSort('minSimilarity.identifier')">Least similar to (ID)</th>
-            <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
-            <th ng-click="setSort('simToCommon')">Similarity to common</th>
+<div class="row">
+    <!-- Results overview -->
+    <table class="table table-hover table-responsive" id="scanpathTable">
+        <thead>
+            <tr>
+                <th ng-click="setSort('identifier')">ID</th>
+                <th>Eye fixations (ms)</th>
+                <th ng-click="setSort('fixations.length')">Scanpath length</th>
+                <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
+                <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
+                <th ng-click="setSort('minSimilarity.identifier')">Least similar to</th>
+                <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
+                <th ng-click="setSort('simToCommon')">Similarity to common</th>
+            </tr>
+        </thead>
+        <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']">
+            <td>{{ scanpath.identifier }}</td>
+            <td class="colFixations col-md-4">
+                <span ng-repeat="fixation in scanpath.fixations track by $index">
+                    {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup>
+                </span>
+                <br />
+                <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
+            </td>
+            <td>{{ scanpath.fixations.length }}</td>
+            <td>{{ scanpath.maxSimilarity.identifier }}</td>
+            <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+            <td>{{ scanpath.minSimilarity.identifier }}</td>
+            <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
+            <td ng-show="task.commonScanpath || task.customScanpath">
+                {{ scanpath.simToCommon | number: 2 }}%
+            </td>
+            <td ng-show="!task.commonScanpath && !task.customScanpath">N/A</td>
         </tr>
-    </thead>
-    <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']">
-        <td>{{ scanpath.identifier }}</td>
-        <td>
-            <span ng-repeat="fixation in scanpath.fixations track by $index" class="text-nowrap">
-                {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup> -
-            </span>
-            <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
-        </td>
-        <td>{{ scanpath.fixations.length }}</td>
-        <td>{{ scanpath.maxSimilarity.identifier }}</td>
-        <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
-        <td>{{ scanpath.minSimilarity.identifier }}</td>
-        <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-        <td ng-show="task.commonScanpath || task.customScanpath">
-            {{ scanpath.simToCommon | number: 2 }}%
-        </td>
-        <td ng-show="!task.commonScanpath && !task.customScanpath">N/A</td>
-    </tr>
-</table>
+    </table>
+</div>

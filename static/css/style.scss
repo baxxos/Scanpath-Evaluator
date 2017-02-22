@@ -47,9 +47,15 @@ optgroup {
 }
 
 // Task related screens
-#scanpathTable th:not(:nth-child(2)):hover {
-    cursor: pointer;
-    text-decoration: underline;
+#scanpathTable {
+	th:not(:nth-child(2)):hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	.colFixations {
+		text-align: justify;
+	}
 }
 
 // Dataset related screens

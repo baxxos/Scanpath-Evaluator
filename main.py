@@ -11,6 +11,7 @@ from passlib.hash import sha256_crypt
 import os
 import json
 import traceback
+import fileFormat
 
 app = Flask(__name__)
 app.debug = True
@@ -148,6 +149,7 @@ def add_dataset_task():
         dataset.tasks.append(task)
         session.commit()
 
+        # TODO move files handling into a separate function
         # Reflect the changes on the server side - create a new folder named after dataset PK
         os.makedirs(os.path.join(
             config['DATASET_FOLDER'],
@@ -155,21 +157,37 @@ def add_dataset_task():
             config['TASK_PREFIX'] + str(task.id))
         )
 
-        # Save the scanpath data file in the directory created above
-        file_scanpaths.save(os.path.join(
+        # Save the unformatted scanpath data file (to be deleted after formatting) in the directory created above
+        path_file_scanpaths = os.path.join(
             config['DATASET_FOLDER'],
             config['DATASET_PREFIX'] + str(dataset.id),
-            config['TASK_PREFIX'] + str(task.id),
-            config['SCANPATHS_FILE'])
+            config['TASK_PREFIX'] + str(task.id)
         )
 
-        # Save the regions of interest file in the directory created above
-        file_regions.save(os.path.join(
+        file_scanpaths.save(os.path.join(
+            path_file_scanpaths,
+            config['SCANPATHS_FILE_RAW'])
+        )
+
+        # Format the newly created file and remove the original one
+        keep = ['ParticipantName', 'FixationIndex', 'GazeEventDuration', 'GazeEventDuration', 'FixationPointX (MCSpx)',
+                'FixationPointY (MCSpx)', 'MediaName']
+        fileFormat.format_scanpaths(keep, path_file_scanpaths)
+
+        # Save the unformatted AOIs file (to be deleted after formatting)
+        path_file_regions = os.path.join(
             config['DATASET_FOLDER'],
             config['DATASET_PREFIX'] + str(dataset.id),
-            config['TASK_PREFIX'] + str(task.id),
-            config['AOIS_FILE'])
+            config['TASK_PREFIX'] + str(task.id)
         )
+
+        file_regions.save(os.path.join(
+            path_file_regions,
+            config['AOIS_FILE_RAW'])
+        )
+
+        # Format the newly created file and remove the original one
+        fileFormat.format_aois(path_file_regions)
 
         return handle_success({
             'id': task.id

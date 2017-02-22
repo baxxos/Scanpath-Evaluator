@@ -1,92 +1,142 @@
 from config import config
-from os import path
+from os import path, remove
 import pandas as pd
 import traceback
 import string
 
 
-# TODO arguments filepath and filename
-def extract_cols(keep_cols, file_path):
+def silent_remove(file_full_path):
     try:
-        fr = pd.read_csv(file_path, sep='\t')
-
-        # Filter the relevant rows from the CSV file
-        fr = fr[fr.GazeEventType != 'Unclassified']
-        fr = fr[fr.GazeEventType != 'Saccade']
-        fr = fr[fr.GazeEventDuration > 100]
-        fr = fr[fr['GazePointX (MCSpx)'] > 0]
-
-        # Filter the relevant columns from the CSV file
-        fw = fr[keep_cols]
-
-        fw.to_csv('D:\\FIIT\\Ostatne\\BP\\DOD2016_Dataset\\Scanpaths.txt', index=False, sep='\t')
-    except Exception as e:
+        remove(file_full_path)
+    except OSError as e:  # this would be "except OSError, e:" before Python 2.6
+        print 'Failed to clean up after unsuccessful data parsing'
         traceback.print_exc()
 
 
-def format_aois(filepath, filename):
+def format_scanpaths(keep_cols, file_path):
+    try:
+        fr = pd.read_csv(path.join(file_path, config['SCANPATHS_FILE_RAW']), sep='\t')
+
+        # Drop the duplicate fixation values from the CSV file
+        fr = fr.drop_duplicates(subset=['ParticipantName', 'FixationIndex'])
+
+        # Keep only fixations lasting longer than X ms
+        fr = fr[fr.GazeEventType != 'Unclassified']
+        fr = fr[fr.GazeEventType != 'Saccade']
+        fr = fr[fr.GazeEventDuration > 100]
+
+        # Drop fixations with negative point coordinates
+        fr = fr[fr['FixationPointX (MCSpx)'] > 0]
+        fr = fr[fr['FixationPointY (MCSpx)'] > 0]
+        # fr = fr.sort_values(['ParticipantName', 'FixationIndex'])
+
+        # Keep only relevant columns
+        fr = fr[keep_cols]
+
+        fr.to_csv(path.join(file_path, config['SCANPATHS_FILE']), index=False, sep='\t')
+    except:
+        silent_remove(path.join(file_path, config['SCANPATHS_FILE']))
+        traceback.print_exc()
+
+
+def format_aois(file_path):
     file_header = ['FullName', 'XFrom', 'XSize', 'YFrom', 'YSize', 'ShortName']
     sep = '\t'
 
-    with open(path.join(filepath, filename + '_formatted.txt'), 'w') as fw:
+    with open(path.join(file_path, config['AOIS_FILE']), 'w') as fw:
         # Write table headers divided by separator (except for the last one)
         for index, column in enumerate(file_header):
-            fw.write((column + sep).rstrip() if index == (len(file_header) - 1) else column + sep)
+            fw.write(column if index == (len(file_header) - 1) else column + sep)
+
         fw.write('\n')
 
-        with open(path.join(filepath, filename + '.txt'), 'r') as fr:
+        # TODO split into separate methods and throw exceptions instead of return
+        with open(path.join(file_path, config['AOIS_FILE_RAW']), 'r') as fr:
+            name_it = 0
 
-            my_iter = 0
+            try:
+                for line in fr:
+                    line_data = line.strip().split(':')
 
-            for line in fr:
-                if my_iter > len(string.uppercase) - 1:
-                    break
+                    # Handle blank lines
+                    if not line.strip():
+                        continue
+                    # Handle AOI names
+                    elif line_data[0].lower().startswith('aoi'):
+                        act_aoi = {
+                            'name': line_data[1],
+                            'vertices': 0,
+                            'shortName': '',
+                            'expectCoords': 0
+                        }
+                    # Handle number of vertices
+                    elif 'vertices' in line_data[0].lower():
+                        if int(line_data[1]) == 4:
+                            act_aoi['vertices'] = 4
+                        else:
+                            print 'All areas of interest must have exactly 4 vertices'
+                            return
+                    # Check for line marking coords: 'X\tY'
+                    elif line_data[0].startswith('X') and line_data[0].endswith('Y') and act_aoi['vertices'] == 4:
+                        act_aoi['expectCoords'] = 1
+                    # Parse coords in expected format
+                    elif act_aoi['expectCoords'] == 1:
+                        # Parse the initial coords and calculate the width/height of the AOI
+                        act_aoi['expectCoords'] = 0
+                        coords_from = line.split()
 
-                # AOI full name
-                fw.write((line.split(':')[1]).strip() + sep)
+                        # '222,55' -> 222.55 -> 222
+                        x_from = int(float(coords_from[0].replace(',', '.')))
+                        y_from = int(float(coords_from[1].replace(',', '.')))
 
-                # TODO handle aois without 4 vertices
-                # TODO remove blank lines on load
+                        # Normalize negative values
+                        x_from = x_from if x_from > 0 else 0
+                        y_from = y_from if y_from > 0 else 0
 
-                # Skip irrelevant data
-                for i in xrange(10):
-                    line = next(fr)
+                        line = next(fr)
+                        x_size = int(float(line.split()[0].replace(',', '.'))) - x_from
+                        x_size = abs(x_size)
 
-                # Handle vertices and compute their lengths
-                coords_from = line.split('\t')
+                        line = next(fr)
+                        y_size = int(float(line.split()[1].replace(',', '.'))) - y_from
+                        y_size = abs(y_size)
 
-                # '222,55' -> 222.55 -> 222
-                x_from = int(float(coords_from[0].replace(',', '.')))
-                y_from = int(float(coords_from[1].replace(',', '.')))
+                        if name_it < len(string.uppercase):
+                            act_aoi['shortName'] = string.uppercase[name_it]
+                        elif name_it < (len(string.uppercase) + len(string.lowercase)):
+                            act_aoi['shortName'] = string.lowercase[name_it - len(string.lowercase)]
+                        else:
+                            print 'Maximum number of AOIs (52) reached'
+                            return
 
-                # Normalize negative values
-                x_from = x_from if x_from > 0 else 0
-                y_from = y_from if y_from > 0 else 0
+                        fw.write(
+                            act_aoi['name'] + sep +
+                            str(x_from) + sep +
+                            str(x_size) + sep +
+                            str(y_from) + sep +
+                            str(y_size) + sep +
+                            act_aoi['shortName'] + '\n')
 
-                line = next(fr)
-                x_size = int(float(line.split('\t')[0].replace(',', '.'))) - x_from
+                        # Two-character AOIs turned out to be a trouble later
+                        # string.uppercase[name_it % len(string.uppercase)] +
+                        # string.lowercase[name_it / len(string.lowercase)] + '\n'
 
-                line = next(fr)
-                y_size = int(float(line.split('\t')[1].replace(',', '.'))) - y_from
+                        name_it += 1
 
-                fw.write(
-                    str(x_from) + sep +
-                    str(x_size) + sep +
-                    str(y_from) + sep +
-                    str(y_size) + sep +
-                    string.uppercase[my_iter] + '\n')
+                        # Skip last vertex (unnecessary) and move to the next AOI
+                        line = next(fr)
+                        line = next(fr)
+                    # Skip empty or unknown formatted lines
+                    else:
+                        continue
+            # Delete the incomplete file on any exception
+            except:
+                print 'Unexpected file format'
+                silent_remove(path.join(file_path, config['AOIS_FILE']))
+                traceback.print_exc()
 
-                for i in xrange(3):
-                    line = next(fr)
 
-                my_iter += 1
+# keep = ['ParticipantName', 'FixationIndex', 'GazeEventDuration', 'GazeEventDuration', 'FixationPointX (MCSpx)', 'FixationPointY (MCSpx)', 'MediaName']
 
-
-# keep = ['RecordingDate', 'StudioProjectName', 'StudioTestName', 'ParticipantName', 'MediaName', 'GazeEventType',
-#        'GazeEventDuration', 'GazePointX (MCSpx)', 'GazePointY (MCSpx)']
-
-keep = ['ParticipantName', 'GazeEventDuration', 'GazeEventDuration', 'GazeEventDuration', 'GazePointX (MCSpx)',
-        'GazePointY (MCSpx)', 'MediaName']
-
-extract_cols(keep, 'D:\\FIIT\\Ostatne\\BP\\DOD2016_Dataset\\DOD2016.txt')
-# format_aois('D:\\FIIT\\Ostatne\\BP\\DOD2016_Dataset', 'aois')
+# format_scanpaths(keep, 'D:\\FIIT\\Ostatne\\BP\\DOD2016_Dataset', 'Scanpaths', '.txt')
+# format_aois('D:\\FIIT\\Ostatne\\BP\\DOD2016_Dataset', 'aois', '.txt')
