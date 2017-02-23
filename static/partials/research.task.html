@@ -113,13 +113,14 @@
                 <th ng-click="setSort('simToCommon')">Similarity to common</th>
             </tr>
         </thead>
-        <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']">
-            <td>{{ scanpath.identifier }}</td>
+        <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']" ng-class="{'row-excluded': scanpath.excluded}">
+            <td>{{ scanpath.identifier }} <br />
+                <span class="glyphicon glyphicon-ok control-include" ng-click="toggleScanpathExcluded(scanpath)" ng-show="!scanpath.excluded"></span>
+                <span class="glyphicon glyphicon-remove control-exclude" ng-click="toggleScanpathExcluded(scanpath)" ng-show="scanpath.excluded"></span></td>
             <td class="colFixations col-md-4">
                 <span ng-repeat="fixation in scanpath.fixations track by $index">
                     {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup>
                 </span>
-                <br />
                 <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
             </td>
             <td>{{ scanpath.fixations.length }}</td>

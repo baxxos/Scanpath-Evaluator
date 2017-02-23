@@ -126,6 +126,11 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
+	// Excludes (or includes) the scanpaths from the future dataset computations
+	$scope.toggleScanpathExcluded = function(scanpath) {
+		scanpath.excluded = !scanpath.excluded;
+	};
+
     var initController = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {

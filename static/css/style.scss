@@ -1,8 +1,9 @@
 // Colors
 $dark-red: #a00;
+$dark-green: #006400;
 
 // Forms
-#login_panel_main, #new_dataset_panel {
+#login-panel-main, #new-dataset-panel {
 	// Not sure where this comes from, too afraid to delete
 	.input-group {
 		min-width: 0;
@@ -19,13 +20,13 @@ $dark-red: #a00;
 		width: 50%;
 	}
 
-	#register_prompt {
+	#register-prompt {
 		margin-top: 15px;
 	}
 }
 
 form {
-	.input_required {
+	.input-required {
 			color: $dark-red;
 	}
 
@@ -48,6 +49,10 @@ optgroup {
 
 // Task related screens
 #scanpathTable {
+	td, th {
+		text-align: center;
+	}
+
 	th:not(:nth-child(2)):hover {
 		cursor: pointer;
 		text-decoration: underline;
@@ -56,27 +61,63 @@ optgroup {
 	.colFixations {
 		text-align: justify;
 	}
+
+	.row-excluded {
+		background-color: rgba($dark-red, 0.05);
+
+		td:not(:nth-child(1)) {
+			opacity: 0.25;
+		}
+	}
+
+	.control-include {
+		&:focus, &:active, &:hover {
+			opacity: 1;
+		}
+
+		cursor: pointer;
+		margin: 8px 4px;
+		opacity: 0.25;
+		color: white;
+		background-color: $dark-green;
+		padding: 2px;
+		border-radius: 4px
+	}
+
+	.control-exclude {
+		&:focus, &:active, &:hover {
+			opacity: 1;
+		}
+
+		cursor: pointer;
+		margin: 8px 4px;
+		opacity: 0.25;
+		color: white;
+		background-color: $dark-red;
+		padding: 2px;
+		border-radius: 4px
+	}
 }
 
 // Dataset related screens
-#dataset_name_heading {
+#dataset-name-heading {
 	font-weight: bold;
 }
 
-#new_task_panel {
+#new-task-panel {
 	.input-group {
 		width: 100%;
 	}
 }
 
 // Dataset - new task form
-.fake_label {
+.fake-label {
 	margin: 0 0 5px 0;
 }
 
 label {
 	// For wrapping the file input in a way that it looks like BootStrap button
-	// Cannot be replaced by display:none as the "Please fill this field" displays in the wrong position
+	// Cannot be replaced by display:none as the "Please fill this field" displays in the wrong position then
 	input[type="file"] {
 		visibility: hidden;
 		width: 0;

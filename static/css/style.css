@@ -1,14 +1,14 @@
-#login_panel_main .input-group, #new_dataset_panel .input-group {
+#login-panel-main .input-group, #new-dataset-panel .input-group {
   min-width: 0;
   width: 100%; }
-#login_panel_main .panel-heading a, #new_dataset_panel .panel-heading a {
+#login-panel-main .panel-heading a, #new-dataset-panel .panel-heading a {
   text-decoration: underline; }
-#login_panel_main button, #new_dataset_panel button {
+#login-panel-main button, #new-dataset-panel button {
   width: 50%; }
-#login_panel_main #register_prompt, #new_dataset_panel #register_prompt {
+#login-panel-main #register-prompt, #new-dataset-panel #register-prompt {
   margin-top: 15px; }
 
-form .input_required {
+form .input-required {
   color: #a00; }
 form label {
   font-weight: normal; }
@@ -23,19 +23,45 @@ optgroup {
   padding-top: 6px;
   padding-bottom: 6px; }
 
+#scanpathTable td, #scanpathTable th {
+  text-align: center; }
 #scanpathTable th:not(:nth-child(2)):hover {
   cursor: pointer;
   text-decoration: underline; }
 #scanpathTable .colFixations {
   text-align: justify; }
+#scanpathTable .row-excluded {
+  background-color: rgba(170, 0, 0, 0.05); }
+  #scanpathTable .row-excluded td:not(:nth-child(1)) {
+    opacity: 0.25; }
+#scanpathTable .control-include {
+  cursor: pointer;
+  margin: 8px 4px;
+  opacity: 0.25;
+  color: white;
+  background-color: #006400;
+  padding: 2px;
+  border-radius: 4px; }
+  #scanpathTable .control-include:focus, #scanpathTable .control-include:active, #scanpathTable .control-include:hover {
+    opacity: 1; }
+#scanpathTable .control-exclude {
+  cursor: pointer;
+  margin: 8px 4px;
+  opacity: 0.25;
+  color: white;
+  background-color: #a00;
+  padding: 2px;
+  border-radius: 4px; }
+  #scanpathTable .control-exclude:focus, #scanpathTable .control-exclude:active, #scanpathTable .control-exclude:hover {
+    opacity: 1; }
 
-#dataset_name_heading {
+#dataset-name-heading {
   font-weight: bold; }
 
-#new_task_panel .input-group {
+#new-task-panel .input-group {
   width: 100%; }
 
-.fake_label {
+.fake-label {
   margin: 0 0 5px 0; }
 
 label input[type="file"] {
