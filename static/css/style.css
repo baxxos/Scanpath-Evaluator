@@ -23,13 +23,20 @@ optgroup {
   padding-top: 6px;
   padding-bottom: 6px; }
 
-#scanpathTable td, #scanpathTable th {
+#scanpathTableWrapper {
+  max-height: 500px;
+  overflow: auto;
+  margin-bottom: 20px; }
+
+#scanpathTable td, #scanpathTable th:not(:nth-child(2)) {
   text-align: center; }
 #scanpathTable th:not(:nth-child(2)):hover {
   cursor: pointer;
   text-decoration: underline; }
 #scanpathTable .colFixations {
   text-align: justify; }
+#scanpathTable .hidden {
+  visibility: hidden; }
 #scanpathTable .row-excluded {
   background-color: rgba(170, 0, 0, 0.05); }
   #scanpathTable .row-excluded td:not(:nth-child(1)) {

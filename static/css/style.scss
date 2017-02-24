@@ -48,8 +48,14 @@ optgroup {
 }
 
 // Task related screens
+#scanpathTableWrapper {
+	max-height: 500px;
+	overflow: auto;
+	margin-bottom: 20px;
+}
+
 #scanpathTable {
-	td, th {
+	td, th:not(:nth-child(2)) {
 		text-align: center;
 	}
 
@@ -60,6 +66,10 @@ optgroup {
 
 	.colFixations {
 		text-align: justify;
+	}
+
+	.hidden {
+		visibility: hidden;
 	}
 
 	.row-excluded {

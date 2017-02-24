@@ -34,9 +34,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	var getCommonScanpathDetails = function() {
 		$http({
 			url: '/sta',
-			method: 'GET',
-			params: {
-				taskId: $scope.task.id
+			method: 'POST',
+			data: {
+				taskId: $scope.task.id,
+				excludedScanpaths: $scope.task.excludedScanpaths
 			}
 		}).then(
 			function(response) {
@@ -85,7 +86,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			method: 'POST',
 			data: {
 				customScanpath: customScanpathStr,
-				taskId: $scope.task.id
+				taskId: $scope.task.id,
+				excludedScanpaths: $scope.task.excludedScanpaths
 			}
 		}).then(
 			function(response) {
@@ -129,6 +131,26 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	// Excludes (or includes) the scanpaths from the future dataset computations
 	$scope.toggleScanpathExcluded = function(scanpath) {
 		scanpath.excluded = !scanpath.excluded;
+
+		if(scanpath.excluded) {
+			$scope.task.excludedScanpaths.push(scanpath.identifier)
+		}
+		else {
+			// Remove all ocurrencies of the given scanpath in the array of excluded ones
+			for(var i = 0; i < $scope.task.excludedScanpaths.length; i++) {
+				if($scope.task.excludedScanpaths[i] == scanpath.identifier) {
+					$scope.task.excludedScanpaths.splice(i, 1);
+				}
+			}
+		}
+	};
+
+	// Removes excluded flag from all available scanpaths
+	$scope.enableAllScanpaths = function() {
+		$scope.task.excludedScanpaths = [];
+		$scope.task.scanpaths.forEach(function(scanpath) {
+			scanpath.excluded = false;
+		});
 	};
 
     var initController = function() {
@@ -136,6 +158,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.task = {
 			// Store the actual task ID from URL (ui-router functionality)
 			id: $state.params.id,
+			scanpaths: [],
+			// Scanpaths temporarily excluded from all computations
+			excludedScanpaths: [],
 			// Sort the data based on a default column
 			sortBy: 'identifier'
 		};

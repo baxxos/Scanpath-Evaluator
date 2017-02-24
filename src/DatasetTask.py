@@ -71,6 +71,14 @@ class DatasetTask(Base):
         self.load_aois(file_path_aoi)
         self.load_visuals(folder_path_visuals)
 
+    def exclude_participants(self, excluded):
+        """ Exclude all given ids from the participants dict """
+        try:
+            for identifier in excluded:
+                self.participants.pop(identifier, None)
+        except KeyError as e:
+            print 'Participant ID to be excluded not found: ' + e.args[0]
+
     def load_participants(self, file_path_scanpaths):
         try:
             with open(file_path_scanpaths, 'r') as fr:

@@ -19,7 +19,7 @@ app.debug = True
 
 
 # TODO consider prefixing Angular directives with 'data-ng' prefix to ensure valid HTML and reduce IDE warnings
-def handle_error(message):
+def handle_error(message='Internal database error - try again later.'):
     return json.dumps({
         'success': False,
         'message': message
@@ -59,7 +59,7 @@ def authenticate():
         return handle_error('Invalid user credentials - try again.')
     except Exception as e:
         print e.message
-        return handle_error('Internal database error - try again later.')
+        return handle_error()
 
 
 @app.route('/api/user/add', methods=['POST'])
@@ -82,7 +82,7 @@ def add_user():
     except exc.IntegrityError:
         return handle_error('Integrity error: e-mail address is already taken.')
     except:
-        return handle_error('Internal database error - try again later.')
+        return handle_error()
     finally:
         session.rollback()
 
@@ -99,7 +99,7 @@ def get_dataset():
     except orm.exc.NoResultFound:
         return handle_error('Invalid dataset ID.')
     except:
-        return handle_error('Internal database error - try again later.')
+        return handle_error()
 
 
 @app.route('/api/dataset/add', methods=['POST'])
@@ -125,7 +125,7 @@ def add_dataset():
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try logging in again.')
     except:
-        return handle_error('Internal database error - try again later.')
+        return handle_error()
     finally:
         session.rollback()
 
@@ -137,49 +137,51 @@ def add_dataset_task():
     dataset = None
 
     try:
-        # Parse the non-file form data (user inputs)
-        json_data = request.form.to_dict()
+        # Handle request data
+        try:
+            # Parse the non-file form data (user inputs)
+            json_data = request.form.to_dict()
 
-        # Multipart forms don't support nested objects - therefore the retarded key names
-        file_scanpaths = request.files['files[fileScanpaths]']
-        file_regions = request.files['files[fileRegions]']
+            # Multipart forms don't support nested objects - therefore the retarded key names
+            file_scanpaths = request.files['files[fileScanpaths]']
+            file_regions = request.files['files[fileRegions]']
 
-        # Find parent dataset and create new task instance + commit to the DB
-        dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
+            # Find parent dataset and create new task instance
+            dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
+            task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
+                               dataset_id=dataset.id)
 
-        task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
-                           dataset_id=dataset.id)
+            dataset.tasks.append(task)
+        except KeyError:
+            traceback.print_exc()
+            return handle_error('Required attributes are missing')
+        except orm.exc.NoResultFound:
+            return handle_error('Parent dataset ID not found - please create one first')
 
-        dataset.tasks.append(task)
-        session.commit()
+        # Reflect the changes on the server side - commit & create a new folder named after dataset PK
+        try:
+            fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
+            session.commit()
 
-        # Reflect the changes on the server side - create a new folder named after dataset PK
-        fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
+            return handle_success({
+                'id': task.id
+            })
+        except ValueError:
+            session.rollback()
 
-        return handle_success({
-            'id': task.id
-        })
-    except KeyError:
-        traceback.print_exc()
-        return handle_error('Required attributes are missing')
-    except ValueError:
-        traceback.print_exc()
-        return handle_error('Failed to parse the submitted data')
-    except orm.exc.NoResultFound:
-        traceback.print_exc()
-        return handle_error('Invalid user credentials - try logging in again.')
+            # Try to delete any dirs/files previously created
+            if task is not None and dataset is not None:
+                shutil.rmtree(os.path.join(
+                    config['DATASET_FOLDER'],
+                    config['DATASET_PREFIX'] + str(dataset.id),
+                    config['TASK_PREFIX'] + str(task.id))
+                )
+
+            traceback.print_exc()
+            return handle_error('Failed to parse the submitted data')
     except:
         traceback.print_exc()
-        return handle_error('Internal database error - try again later.')
-    finally:
-        session.rollback()
-        # Try to delete any dirs/files created in unsuccessful method call
-        if task is not None and dataset is not None:
-            shutil.rmtree(os.path.join(
-                config['DATASET_FOLDER'],
-                config['DATASET_PREFIX'] + str(dataset.id),
-                config['TASK_PREFIX'] + str(task.id))
-            )
+        return handle_error()
 
 
 @app.route('/custom', methods=['GET', 'POST'])
@@ -190,36 +192,45 @@ def get_similarity_to_custom():
         json_data = json.loads(request.data)
         custom_scanpath = json_data['customScanpath']
         task_id = json_data['taskId']
+
+        # Verify the custom scanpath formatting - only letters describing AOIs
+        if str(custom_scanpath).isalpha():
+            task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+            task.load_data()
+            task.exclude_participants(json_data['excludedScanpaths'])
+
+            return custom_run(task, custom_scanpath)
+        else:
+            return handle_error('Wrong custom scanpath format - alphabet characters only.')
     except KeyError:
-        return handle_error('Custom scanpath attribute is missing.')
-
-    # Verify the custom scanpath formatting - only letters describing AOIs
-    if str(custom_scanpath).isalpha():
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
-        return custom_run(task, custom_scanpath)
-    else:
-        return handle_error('Wrong custom scanpath format - alphabet characters only.')
-
-
-@app.route('/sta', methods=['GET'])
-def get_trending_scanpath():
-    # Look for the task identifier in request URL
-    try:
-        task_id = request.args.get('taskId')
-    except:
-        return handle_error('Task ID is missing')
-
-    # Load additional required data and perform sta_run
-    try:
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
-
-        return sta_run(task)
+        return handle_error('Custom scanpath attributes are missing.')
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
-        return handle_error('Internal database error - try again later.')
+        traceback.print_exc()
+        return handle_error()
+
+
+@app.route('/sta', methods=['POST'])
+def get_trending_scanpath():
+    # Look for the task identifier in request URL
+    try:
+        json_data = json.loads(request.data)
+        task_id = json_data['taskId']
+
+        # Load additional required data and perform sta_run
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+        task.exclude_participants(json_data['excludedScanpaths'])
+
+        return sta_run(task)
+    except KeyError:
+        return handle_error('Task ID is missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        traceback.print_exc()
+        return handle_error()
 
 
 @app.route('/get_task_data', methods=['GET'])
@@ -240,7 +251,7 @@ def get_task_data():
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
-        return handle_error('Internal database error - try again later.')
+        return handle_error()
 
 
 @app.route('/api/user/get_data_tree', methods=['POST'])

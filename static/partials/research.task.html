@@ -4,7 +4,6 @@
 <hr />
 
 <!-- Input calculation parameters -->
-<h2>Actions</h2>
 <h3>Common scanpath</h3>
 <p>
     In order to reengineer web pages based on eyetracking, we first need to aggregate, analyse and understand how
@@ -99,39 +98,46 @@
 <hr />
 
 <div class="row">
-    <!-- Results overview -->
-    <table class="table table-hover table-responsive" id="scanpathTable">
-        <thead>
-            <tr>
-                <th ng-click="setSort('identifier')">ID</th>
-                <th>Eye fixations (ms)</th>
-                <th ng-click="setSort('fixations.length')">Scanpath length</th>
-                <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
-                <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
-                <th ng-click="setSort('minSimilarity.identifier')">Least similar to</th>
-                <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
-                <th ng-click="setSort('simToCommon')">Similarity to common</th>
+    <div id="scanpathTableWrapper">
+        <!-- Results overview -->
+        <table class="table table-hover table-responsive" id="scanpathTable">
+            <thead>
+                <tr>
+                    <th ng-click="setSort('identifier')">ID</th>
+                    <th>Eye fixations (ms)</th>
+                    <th ng-click="setSort('fixations.length')">Scanpath length</th>
+                    <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
+                    <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
+                    <th ng-click="setSort('minSimilarity.identifier')">Least similar to</th>
+                    <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
+                    <th ng-click="setSort('simToCommon')">Similarity to common</th>
+                </tr>
+            </thead>
+            <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']"
+                ng-class="{'row-excluded': scanpath.excluded}">
+                <td>{{ scanpath.identifier }} <br />
+                    <span class="glyphicon glyphicon-ok control-include"
+                          ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}"></span>
+                    <span class="glyphicon glyphicon-remove control-exclude"
+                          ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}"></span>
+                </td>
+                <td class="colFixations col-md-4">
+                    <span ng-repeat="fixation in scanpath.fixations track by $index">
+                        {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup>
+                    </span>
+                    <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
+                </td>
+                <td>{{ scanpath.fixations.length }}</td>
+                <td>{{ scanpath.maxSimilarity.identifier }}</td>
+                <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+                <td>{{ scanpath.minSimilarity.identifier }}</td>
+                <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
+                <td ng-show="scanpath.simToCommon >= 0">
+                    {{ scanpath.simToCommon | number: 2 }}%
+                </td>
+                <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
             </tr>
-        </thead>
-        <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier']" ng-class="{'row-excluded': scanpath.excluded}">
-            <td>{{ scanpath.identifier }} <br />
-                <span class="glyphicon glyphicon-ok control-include" ng-click="toggleScanpathExcluded(scanpath)" ng-show="!scanpath.excluded"></span>
-                <span class="glyphicon glyphicon-remove control-exclude" ng-click="toggleScanpathExcluded(scanpath)" ng-show="scanpath.excluded"></span></td>
-            <td class="colFixations col-md-4">
-                <span ng-repeat="fixation in scanpath.fixations track by $index">
-                    {{ fixation[0]}} <sup>{{ fixation[1]  }}</sup>
-                </span>
-                <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
-            </td>
-            <td>{{ scanpath.fixations.length }}</td>
-            <td>{{ scanpath.maxSimilarity.identifier }}</td>
-            <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
-            <td>{{ scanpath.minSimilarity.identifier }}</td>
-            <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-            <td ng-show="task.commonScanpath || task.customScanpath">
-                {{ scanpath.simToCommon | number: 2 }}%
-            </td>
-            <td ng-show="!task.commonScanpath && !task.customScanpath">N/A</td>
-        </tr>
-    </table>
+        </table>
+    </div>
+    <button class="btn btn-default btn-sm" ng-click="enableAllScanpaths()">Re-enable all participants</button>
 </div>
