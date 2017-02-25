@@ -1,11 +1,11 @@
-#login-panel-main .input-group, #new-dataset-panel .input-group {
+#login-panel-main .input-group, #new-dataset-panel .input-group, #register_panel .input-group {
   min-width: 0;
   width: 100%; }
-#login-panel-main .panel-heading a, #new-dataset-panel .panel-heading a {
+#login-panel-main .panel-heading a, #new-dataset-panel .panel-heading a, #register_panel .panel-heading a {
   text-decoration: underline; }
-#login-panel-main button, #new-dataset-panel button {
+#login-panel-main button, #new-dataset-panel button, #register_panel button {
   width: 50%; }
-#login-panel-main #register-prompt, #new-dataset-panel #register-prompt {
+#login-panel-main #register-prompt, #new-dataset-panel #register-prompt, #register_panel #register-prompt {
   margin-top: 15px; }
 
 form .input-required {

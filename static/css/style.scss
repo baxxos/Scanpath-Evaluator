@@ -3,8 +3,8 @@ $dark-red: #a00;
 $dark-green: #006400;
 
 // Forms
-#login-panel-main, #new-dataset-panel {
-	// Not sure where this comes from, too afraid to delete
+#login-panel-main, #new-dataset-panel, #register_panel {
+	// User inputs with the same width
 	.input-group {
 		min-width: 0;
 		width: 100%;

@@ -3,12 +3,21 @@ import pandas as pd
 import os
 import traceback
 import string
+import shutil
 
 
-def silent_remove(file_full_path):
+def silent_dir_remove(path):
     try:
-        os.remove(file_full_path)
-    except OSError as e:
+        shutil.rmtree(path)
+    except OSError:
+        print 'Incomplete clean up after dataset delete'
+        traceback.print_exc()
+
+
+def silent_file_remove(path):
+    try:
+        os.remove(path)
+    except OSError:
         print 'Incomplete clean up after unsuccessful data parsing'
         traceback.print_exc()
 
@@ -75,8 +84,9 @@ def format_scanpaths(keep_cols, file_path):
 
         fr.to_csv(os.path.join(file_path, config['SCANPATHS_FILE']), index=False, sep='\t')
     except:
-        silent_remove(os.path.join(file_path, config['SCANPATHS_FILE']))
+        silent_file_remove(os.path.join(file_path, config['SCANPATHS_FILE_RAW']))
         traceback.print_exc()
+        raise ValueError('Failed to parse scanpath data file')
 
 
 def format_aois(file_path):
@@ -112,7 +122,7 @@ def format_aois(file_path):
                     if int(line_data[1]) == 4:
                         act_aoi['vertices'] = 4
                     else:
-                        silent_remove(os.path.join(file_path, config['AOIS_FILE']))
+                        silent_file_remove(os.path.join(file_path, config['AOIS_FILE']))
                         raise ValueError('All areas of interest must have exactly 4 vertices')
                 # Check for line marking coords: 'X\tY'
                 elif line_data[0].startswith('X') and line_data[0].endswith('Y') and act_aoi['vertices'] == 4:
@@ -144,7 +154,7 @@ def format_aois(file_path):
                     elif name_it < (len(string.uppercase) + len(string.lowercase)):
                         act_aoi['shortName'] = string.lowercase[name_it - len(string.lowercase)]
                     else:
-                        silent_remove(os.path.join(file_path, config['AOIS_FILE']))
+                        silent_file_remove(os.path.join(file_path, config['AOIS_FILE']))
                         raise ValueError('Maximum number of AOIs (52) reached')
 
                     fw.write(
@@ -158,7 +168,6 @@ def format_aois(file_path):
                     # Two-character AOIs turned out to be a trouble later
                     # string.uppercase[name_it % len(string.uppercase)] +
                     # string.lowercase[name_it / len(string.lowercase)] + '\n'
-
                     name_it += 1
 
                     # Skip last vertex (unnecessary) and move to the next AOI

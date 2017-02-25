@@ -1,5 +1,7 @@
 angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, Upload) {
-	// New task form related methods
+	/*
+	 * NEW TASK (FORM) RELATED METHODS
+	 */
 	var isTaskFormValid = function() {
 		// Check required inputs
 		return (
@@ -15,7 +17,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 			errors: [],
 			warnings: [],
 			success: false,
-			uploading: false
+			uploadState: 0 // System feedback to user: -1: failure, 0: default, 1: uploading, 2: success
 		};
 
 		$scope.taskForm.$setPristine();
@@ -46,17 +48,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		}
 	};
 
-	// Utility methods to de-bloat the html
-	$scope.isUploading = function() {
-		if($scope.taskNew.fileScanpaths) {
-			var progress = $scope.taskNew.fileScanpaths.progress;
-			return (progress >= 0 && progress < 100);
-		}
-		else {
-			return false;
-		}
-	};
-
+	// Utility method to de-bloat the html
 	$scope.concatFileErrors = function(file){
 		if(file) {
 			return file.$error + ': ' + file.$errorParam;
@@ -80,8 +72,8 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		fileScanpaths.progress = 0;
 		fileRegions.progress = 0;
 
-		// Disable control buttons during the upload
-		$scope.taskNew.uploading = true;
+		// Disable control buttons during the upload and notify the user about uploading start
+		$scope.taskNew.uploadState = 1;
 
 		Upload.upload({
 			url: '/api/task/add',
@@ -109,7 +101,10 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 					// Update current screen
 					loadDataset($scope.dataset.id);
 
-					// If the user wishes to be redirected afterwards
+					// Feedback to user & re-enable control buttons
+					$scope.taskNew.uploadState = 2;
+
+					// TODO If the user wishes to be redirected afterwards
 					if($scope.taskNew.redirect == true) {
 						$timeout(function() {
 							$state.go(
@@ -121,24 +116,51 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 				}
 				else {
 					$scope.taskNew.warnings.push(response.data.message);
+					// Feedback to user & re-enable control buttons
+					$scope.taskNew.uploadState = -1;
 				}
-				// Re-enable control buttons
-				$scope.taskNew.uploading = false;
 			},
 			function(response) {
 				console.error('There was no response from the server to the new task request .');
-				// Re-enable control buttons
-				$scope.taskNew.uploading = false;
+				// Feedback to user & re-enable control buttons
+				$scope.taskNew.uploadState = -1;
 			},
 			function(evt) {
-				// Update progress bar (both files get uploaded at the same time)
-				fileRegions.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-				fileScanpaths.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+				// Update progress bar (both files get uploaded at the same time) - OPTIONAL
+				// fileRegions.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+				// fileScanpaths.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
 			}
 		);
 	};
 
-	// Current dataset related methods
+	$scope.deleteTask = function(task) {
+		var confirmed = confirm('Are you sure you want to delete task named "' + task.name + '"?');
+
+		if(confirmed == true) {
+			$http({
+				method: 'DELETE',
+				url: 'api/task',
+				data: {
+					taskId: task.id
+				}
+			}).then(
+				function(response) {
+					// Update navigation view
+					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+					// Update current screen
+					loadDataset($scope.dataset.id);
+				},
+				function(response) {
+					alert('No response from the server');
+					console.error('There was no response to from the server to the task delete request.');
+				}
+			)
+		}
+	};
+
+	/*
+	 * ACT DATASET RELATED METHODS
+	 */
 	var loadDataset = function(datasetId) {
 		$http({
 			method: 'GET',
@@ -167,7 +189,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 			errors: [],
 			warnings: [],
 			success: false,
-			uploading: false
+			uploadState: 0 // System feedback to user: -1: failure, 0: default, 1: uploading, 2: success
 		};
 
 		$scope.showTaskForm = false;

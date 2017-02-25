@@ -12,13 +12,16 @@
             <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th class="col-md-1">Controls</th>
+                <th>Controls</th>
             </tr>
         </thead>
         <tr ng-repeat="task in dataset.tasks">
             <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
             <td>{{ task.description }}</td>
-            <td><span class="label label-danger">Delete</span></td>
+            <td>
+                <button class="btn btn-primary btn-xs">Edit</button>
+                <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">Delete</button>
+            </td>
         </tr>
     </table>
 </section>
@@ -111,8 +114,7 @@
                             <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
                                 Submit
                             </button>
-                            <button class="btn btn-default" ng-click="toggleTaskForm()"
-                                    ng-disabled="taskNew.uploading">
+                            <button class="btn btn-default" ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
                                 Cancel
                             </button>
                         </div>
@@ -138,13 +140,20 @@
                                 <p>
                                     {{ taskNew.fileScanpaths.name }}
                                     {{ taskNew.errFileScanpaths.name }}
-                                    <span class="label label-danger">{{concatFileErrors(taskNew.errFileScanpaths)}}</span>
+                                </p>
+                                <p>
+                                    <span class="label label-danger" ng-show="taskNew.errFileScanpaths">
+                                        {{ concatFileErrors(taskNew.errFileScanpaths) }}
+                                    </span>
 
-                                    <span class="label label-warning" ng-show="isUploading()">
+                                    <span class="label label-warning" ng-show="taskNew.uploadState == 1">
                                         Uploading..
                                     </span>
-                                    <span class="label label-success" ng-show="taskNew.fileScanpaths.progress == 100">
+                                    <span class="label label-success" ng-show="taskNew.uploadState == 2">
                                         Done
+                                    </span>
+                                    <span class="label label-danger" ng-show="taskNew.uploadState == -1">
+                                        Failed
                                     </span>
                                 </p>
                             </div>
@@ -171,16 +180,19 @@
                                 <p>
                                     {{ taskNew.fileRegions.name }}
                                     {{ taskNew.errFileRegions.name }}
-                                    <span class="label label-danger">{{concatFileErrors(taskNew.errFileRegions)}}</span>
-
-                                    <span class="label label-warning" ng-show="isUploading()">
+                                </p>
+                                <p>
+                                    <span class="label label-danger" ng-show="taskNew.errFileRegions">
+                                        {{ concatFileErrors(taskNew.errFileRegions) }}
+                                    </span>
+                                    <span class="label label-warning" ng-show="taskNew.uploadState == 1">
                                         Uploading..
                                     </span>
-                                    <span class="label label-success" ng-show="taskNew.fileRegions.progress == 100">
+                                    <span class="label label-success" ng-show="taskNew.uploadState == 2">
                                         Done
                                     </span>
-                                    <span class="label label-danger" ng-show="errorMsg">
-                                        {{ errorMsg }}
+                                    <span class="label label-danger" ng-show="taskNew.uploadState == -1">
+                                        Failed
                                     </span>
                                 </p>
                             </div>

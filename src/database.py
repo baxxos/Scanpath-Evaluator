@@ -6,7 +6,7 @@ from config import config
 # Shared ORM base class supporting CRUD operations
 Base = declarative_base()
 
-engine = create_engine(config['SQLALCHEMY_DATABASE_URI'], echo=True)
+engine = create_engine(config['SQLALCHEMY_DATABASE_URI'], echo=False)
 
 # Create missing tables etc:
 # Import missing class into main.py and add the following line after the class declaration

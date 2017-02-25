@@ -26,10 +26,10 @@ def handle_error(message='Internal database error - try again later.'):
     })
 
 
-def handle_success(load):
+def handle_success(load=None):
     return json.dumps({
         'success': True,
-        'load': load
+        'load': load if load is not None else ''
     })
 
 
@@ -52,7 +52,7 @@ def authenticate():
     try:
         user = session.query(User).filter(User.email == email).one()
         if sha256_crypt.verify(password, user.password):
-            return handle_success({})
+            return handle_success()
         else:
             return handle_error('Invalid user credentials - try again.')
     except orm.exc.NoResultFound:
@@ -77,18 +77,17 @@ def add_user():
         return handle_error('Required user attributes are missing')
 
     try:
+        # Commit DB changes
         session.add(user)
         session.commit()
+
+        return handle_success()
     except exc.IntegrityError:
+        session.rollback()
         return handle_error('Integrity error: e-mail address is already taken.')
     except:
+        traceback.print_exc()
         return handle_error()
-    finally:
-        session.rollback()
-
-    return json.dumps({
-        'success': True
-    })
 
 
 @app.route('/api/dataset', methods=['GET'])
@@ -110,8 +109,8 @@ def add_dataset():
         user = session.query(User).filter(User.email == json_data['userEmail']).one()
         dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=user.id)
 
+        # Commit DB changes
         user.datasets.append(dataset)
-
         session.commit()
 
         # Reflect the changes on the server side - create a new folder named after dataset PK
@@ -122,20 +121,16 @@ def add_dataset():
         })
     except KeyError:
         return handle_error('Required attributes are missing')
+    except OSError:
+        return handle_error('Error while creating backend dataset hierarchy')
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try logging in again.')
     except:
         return handle_error()
-    finally:
-        session.rollback()
 
 
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
-    # For cleaning up purposes (see 'finally' block)
-    task = None
-    dataset = None
-
     try:
         # Handle request data
         try:
@@ -150,8 +145,6 @@ def add_dataset_task():
             dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
             task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
                                dataset_id=dataset.id)
-
-            dataset.tasks.append(task)
         except KeyError:
             traceback.print_exc()
             return handle_error('Required attributes are missing')
@@ -160,31 +153,59 @@ def add_dataset_task():
 
         # Reflect the changes on the server side - commit & create a new folder named after dataset PK
         try:
-            fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
+            # Commit DB changes
+            dataset.tasks.append(task)
             session.commit()
+
+            fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
 
             return handle_success({
                 'id': task.id
             })
         except ValueError:
-            session.rollback()
+            # Try to delete any data previously created
+            session.delete(task)
+            session.commit()
 
-            # Try to delete any dirs/files previously created
-            if task is not None and dataset is not None:
-                shutil.rmtree(os.path.join(
-                    config['DATASET_FOLDER'],
-                    config['DATASET_PREFIX'] + str(dataset.id),
-                    config['TASK_PREFIX'] + str(task.id))
-                )
+            fileFormat.silent_dir_remove(os.path.join(
+                config['DATASET_FOLDER'],
+                config['DATASET_PREFIX'] + str(dataset.id),
+                config['TASK_PREFIX'] + str(task.id))
+            )
 
             traceback.print_exc()
-            return handle_error('Failed to parse the submitted data')
+            return handle_error('Failed to parse the submitted data format.')
     except:
         traceback.print_exc()
         return handle_error()
 
 
-@app.route('/custom', methods=['GET', 'POST'])
+@app.route('/api/task', methods=['DELETE'])
+def del_dataset_task():
+    try:
+        json_data = json.loads(request.data)
+        task = session.query(DatasetTask).filter(DatasetTask.id == json_data['taskId']).one()
+
+        fileFormat.silent_dir_remove(os.path.join(
+            config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(task.dataset_id),
+            config['TASK_PREFIX'] + str(task.id))
+        )
+
+        # Commit changes to the DB
+        session.delete(task)
+        session.commit()
+
+        return handle_success()
+    except KeyError:
+        return handle_error('Task attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        return handle_error()
+
+
+@app.route('/custom', methods=['POST'])
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]
     # Check if the request data contains the custom scanpath
@@ -235,6 +256,8 @@ def get_trending_scanpath():
 
 @app.route('/get_task_data', methods=['GET'])
 def get_task_data():
+    """ Returns JSON formatted task data (individual scanpaths, similarities etc.) """
+
     # Look for the task identifier in request URL
     try:
         task_id = request.args.get('taskId')
