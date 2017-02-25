@@ -54,6 +54,9 @@ DEPENDENCIES:
                 </li>
             </ul>
         </li>
+        <li>
+            <a href="https://github.com/danialfarid/ng-file-upload">ng-file-upload</a>
+        </li>
     </ul>
 </p> 
 PAGE RENDERING & NAVIGATION:<br />
