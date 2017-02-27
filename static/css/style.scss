@@ -72,6 +72,7 @@ optgroup {
 		visibility: hidden;
 	}
 
+	// Excluding/including individual scanpaths
 	.row-excluded {
 		background-color: rgba($dark-red, 0.05);
 
@@ -107,6 +108,14 @@ optgroup {
 		padding: 2px;
 		border-radius: 4px
 	}
+}
+
+#enableAllButton {
+	border: 1px solid $dark-green;
+}
+
+#disableAllButton {
+	border: 1px solid $dark-red;
 }
 
 // Dataset related screens

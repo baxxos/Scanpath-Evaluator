@@ -146,10 +146,29 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	// Removes excluded flag from all available scanpaths
-	$scope.enableAllScanpaths = function() {
+	$scope.setAllScanpathsValue = function(val) {
+		// Re-initialize the excluded scanpaths array
+		$scope.task.excludedScanpaths = [];
+
+		// Make sure the value is really a boolean (e.g. not "0" which would be true)
+		if(typeof(val) === "boolean") {
+			$scope.task.scanpaths.forEach(function(scanpath) {
+				scanpath.excluded = val;
+
+				// If the scanpath is about to be excluded
+				if(val) {
+					$scope.task.excludedScanpaths.push(scanpath.identifier);
+				}
+			});
+		}
+	};
+
+	// Inverse function to the one above (since classic toggle is not user friendly)
+	$scope.disableAllScanpaths = function() {
 		$scope.task.excludedScanpaths = [];
 		$scope.task.scanpaths.forEach(function(scanpath) {
-			scanpath.excluded = false;
+			scanpath.excluded = true;
+			$scope.task.excludedScanpaths.push(scanpath.id);
 		});
 	};
 

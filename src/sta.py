@@ -208,7 +208,11 @@ def removeInsignificantAoIs(Sequences, AoIList):
                 temp.append(Sequences[keys[y]][k])
             except:
                 continue
-        Sequences[keys[y]] = temp
+        # Fix for scanpaths consisting only from insignificant aois - remove such scanpaths
+        if len(temp) > 0:
+            Sequences[keys[y]] = temp
+        else:
+            Sequences.pop(keys[y], None)
     return Sequences
 
 
