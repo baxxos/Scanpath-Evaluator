@@ -13,7 +13,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				$scope.task.visuals = response.data.visuals;
 				$scope.task.aois = response.data.aois;
 
-				initCanvas();
+				redrawCanvas();
 			},
 			function(data) {
 				console.error('Failed to get task data content.', data);
@@ -181,23 +181,20 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
     	$scope.ctx = $scope.canvas.getContext('2d');
 
 		// Basic canvas setup
-		$scope.canvas.width = $scope.canvas.offsetWidth;
-		$scope.canvas.height = $scope.canvas.offsetHeight;
-		$scope.canvas.style.backgroundImage = 'url(' + $scope.task.visuals.main + ')';
-		$scope.ctx.globalAlpha = 1.0;
-		$scope.ctx.beginPath();
-
-		/*$scope.data = [
-			{x: 111, y: 111, r: 10},
-			{x: 50, y: 50, r: 30},
-			{x: 222, y: 222, r: 20}
-		];*/
-
 		$scope.canvasInfo = {
 			whitespaceToKeep: 0,
 			scale: 1,
 			offset: 2
 		};
+
+		$scope.ctx.globalAlpha = 1.0;
+		$scope.ctx.beginPath();
+	};
+
+	var redrawCanvas = function() {
+		// Fetch and setup the canvas element in an non-angular way://
+		$scope.canvas = document.getElementById('commonScanpathCanvas');
+		$scope.canvas.style.backgroundImage = 'url(' + $scope.task.visuals.main + ')';
 
 		// Load the canvas background image again to get its natural resolution
 		var canvasImage = new Image();
@@ -218,9 +215,11 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				(canvasWrapper.offsetWidth - $scope.canvasInfo.whitespaceToKeep - $scope.canvasInfo.offset * 2) /
 				canvasImage.naturalWidth;
 
-			// Set scaled width/height and the apply the default offset
-			$scope.canvas.style.width = (canvasImage.naturalWidth) * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
-			$scope.canvas.style.height = (canvasImage.naturalHeight) * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
+			// Set scaled sizes of width/height and the apply the default offset
+			$scope.canvas.style.width =
+				canvasImage.naturalWidth * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
+			$scope.canvas.style.height =
+				canvasImage.naturalHeight * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
 			// Make canvas resolution match its real size
 			$scope.canvas.width = $scope.canvas.offsetWidth;
 			$scope.canvas.height = $scope.canvas.offsetHeight;
@@ -232,24 +231,17 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			});
 
 			drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, colors);
-			// drawFixations($scope.data);
 		};
 		canvasImage.src = $scope.task.visuals.main;
 	};
 
-	 function removePoint(point) {
-        for(var i = 0; i < $scope.data.length; i++) {
-            if($scope.data[i].id === point.id) {
-                console.log("removing item at position: " + i);
-                $scope.data.splice(i, 1);
-            }
-        }
+	var clearFixations = function() {
+		// Erase common scanpath fixation drawing by re-creating the canvas without it
+		$scope.ctx.clearRect(0, 0, $scope.canvas.width, $scope.canvas.height);
+		drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, colors);
+    };
 
-        $scope.ctx.clearRect(0, 0, $scope.canvas.width, $scope.canvas.height);
-        drawFixations($scope.data);
-    }
-
-    function getBoundingBox(data) {
+    var calcBoundingBox = function(data) {
 		// Calculate bounding box for all aois
 		var topLeftPoint = {
 			x: data[0][1],
@@ -257,37 +249,30 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		};
 
 		var bottomRightPoint = {
-			x: data[0][1] + data[0][2],
-			y: data[0][3] + data[0][4]
+			x: topLeftPoint.x + data[0][2],
+			y: topLeftPoint.y + data[0][4]
 		};
 
+		// Search the AOIs for the most upper-left and right-down points
 		for(var i = 0; i < data.length; i++) {
 			var actAoi = data[i];
 
-			if(actAoi[1] < topLeftPoint.x) {
-				topLeftPoint.x = actAoi[1];
-			}
+			topLeftPoint.x = (actAoi[1] < topLeftPoint.x ? actAoi[1] : topLeftPoint.x);
+			topLeftPoint.y = (actAoi[3] < topLeftPoint.y ? actAoi[3] : topLeftPoint.y);
 
-			if(actAoi[3] < topLeftPoint.y) {
-				topLeftPoint.y = actAoi[3];
-			}
-
-			if(actAoi[1] + actAoi[2] > bottomRightPoint.x) {
-				bottomRightPoint.x = actAoi[1] + actAoi[2];
-			}
-
-			if(actAoi[3] + actAoi[4] > bottomRightPoint.y) {
-				bottomRightPoint.y = actAoi[3] + actAoi[4];
-			}
+			bottomRightPoint.x =
+				(actAoi[1] + actAoi[2] > bottomRightPoint.x ? actAoi[1] + actAoi[2] : bottomRightPoint.x);
+			bottomRightPoint.y =
+				(actAoi[3] + actAoi[4] > bottomRightPoint.y ? actAoi[3] + actAoi[4] : bottomRightPoint.y);
 		}
 
 		return {
 			topLeftPoint: topLeftPoint,
 			bottomRightPoint: bottomRightPoint
 		}
-	}
+	};
 
-    function drawAois(data, scale, offset, colors) {
+    var drawAois = function(data, scale, offset, colors) {
 		// Data from backed is formatted as: ['aoiName', 'xFrom', 'xLen', 'yFrom', 'yLen', 'aoiShortName']
 		// Convert from strings to numbers TODO do this at the backend
 		for(var j = 0; j < data.length; j++) {
@@ -297,17 +282,44 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 
 		data.forEach(function(aoi, index) {
-			drawRect({
+			var aoiBox = {
 				x: (aoi[1] * scale) + offset,
 				y: (aoi[3] * scale) + offset,
 				xLen: aoi[2] * scale,
 				yLen: aoi[4] * scale,
 				color: colors[index]
-			});
-		});
-	}
+			};
 
-    function drawFixations(data) {
+			// Draw the AOI box
+			drawRect(aoiBox, false);
+			// Draw the AOI label
+			drawLabel(aoiBox, aoi[5]);
+		});
+	};
+
+	var drawLabel = function(aoiBox, aoiName) {
+		// Initialize label style
+		var fontSize = 14;
+		$scope.ctx.font = 'bold ' + fontSize + 'px Helvetica, Arial';
+		$scope.ctx.textAlign = 'center';
+		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
+
+		// Draw the label background rectangle in the center of the AOI box
+		var labelBox = {
+			x: aoiBox.x + (aoiBox.xLen / 2) - (fontSize / 2), // Center the label horizontally
+			y: aoiBox.y + (aoiBox.yLen / 2) - (fontSize - $scope.ctx.lineWidth), // Center it vertically
+			xLen: fontSize,
+			yLen: fontSize,
+			color: '#000'
+		};
+		drawRect(labelBox, true);
+
+		// Draw text in the exact center of the AOI box
+		$scope.ctx.fillStyle = '#fff';
+		$scope.ctx.fillText(aoiName, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
+	};
+
+    var drawFixations = function(data) {
 		for(var i = 1; i < data.length; i++) {
 			drawLine(data[i], data[i-1]);
         }
@@ -315,9 +327,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		data.forEach(function(circle) {
 			drawCircle(circle);
 		});
-    }
+    };
 
-    function drawCircle(data) {
+    var drawCircle = function(data) {
         $scope.ctx.beginPath();
         $scope.ctx.arc(data.x, data.y, data.r, 0, 2*Math.PI, false);
         $scope.ctx.fillStyle = "#44f";
@@ -325,23 +337,30 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
         $scope.ctx.lineWidth = $scope.canvasInfo.offset;
         $scope.ctx.strokeStyle = "#000";
         $scope.ctx.stroke();
-    }
+    };
 
-    function drawRect(data) {
+    var drawRect = function(data, isFilled) {
 		$scope.ctx.beginPath();
 		$scope.ctx.rect(data.x, data.y, data.xLen, data.yLen);
 		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
         $scope.ctx.strokeStyle = data.color;
 		$scope.ctx.stroke();
-	}
 
-    function drawLine(data1, data2) {
+		// Optional: fill the rect area
+		if(isFilled) {
+			$scope.ctx.fillStyle = data.color;
+        	$scope.ctx.fill();
+		}
+	};
+
+    var drawLine = function(data1, data2) {
         $scope.ctx.beginPath();
         $scope.ctx.moveTo(data1.x, data1.y);
         $scope.ctx.lineTo(data2.x, data2.y);
+		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
         $scope.ctx.strokeStyle = "black";
         $scope.ctx.stroke();
-    }
+    };
 
     var initController = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
@@ -354,7 +373,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			// Sort the data based on a default column
 			sortBy: 'identifier'
 		};
-
+		// Initialize the canvas element
+		initCanvas();
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
 	};

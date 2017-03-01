@@ -9,7 +9,6 @@ from sqlalchemy import exc, orm
 from passlib.hash import sha256_crypt
 
 import os
-import shutil
 import json
 import traceback
 import fileFormat

@@ -12,7 +12,7 @@ my_env = Environment(0.5, 60, 1920, 1080, 17)
 
 def createSequences(Participants, myAoIs, errorRateArea):
     # LEGACY CODE downloaded from the STA research paper
-    # TODO this lacks refactoring more than I lack money.. and I'm pretty poor right now
+    # TODO this SERIOUSLY lacks refactoring
     Sequences = {}
     keys = Participants.keys()
     for y in range(0, len(keys)):
@@ -31,7 +31,7 @@ def createSequences(Participants, myAoIs, errorRateArea):
                         Participants[keys[y]][z][4]) < (
                 ((float(myAoIs[k][3]) - errorRateArea) + (float(myAoIs[k][4]) + 2 * errorRateArea))):
                     # tempAoI.append(myAoIs[k][5])
-                    # Workaround due to the shitty legacy code - we need to know total area for each tempAoI
+                    # Workaround due to the poor legacy code - we need to know total area for each tempAoI
                     # ['header', '0', '1864', '0', '90', 'Aa'] -> ['Aa', 1864 * 90]
                     tempAoI.append([myAoIs[k][5], int(myAoIs[k][4]) * int(myAoIs[k][2])])
                     tempDuration = int(Participants[keys[y]][z][2])

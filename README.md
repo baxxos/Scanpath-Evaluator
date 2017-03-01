@@ -62,7 +62,15 @@ DEPENDENCIES:
         </li>
     </ul>
 </p> 
-PAGE RENDERING & NAVIGATION:<br />
-HTML files are served by custom Angular routing provider (UI-router). It<br />
-enhances the basic Angular $routeProvider functionality by replacing it with own<br />
-$stateProvider keyword. It can be used for remembering states (e.g. for breadcrumbs) etc.
+
+CONSTRAINTS:
+<p>
+    <ul>
+        <li>File size - 100MB for scanpath data/10MB for AOI data</li>
+        <li>AOI count - maximum of 52 AOIs (26 lowercase + 26 uppercase characters)</li>
+        <li>AOI shape - exactly 4 vertices for each AOI (rect/square)</li>
+        <li>Nested and overlapping AOIs - try to avoid this for correct results</li>
+        <li>The original AOI image and its resolution must exactly match the uploaded AOI data</li>
+        <li>Canvas is not optimized for retina displays and its content is scaled according to its parent</li>
+    </ul>
+</p>

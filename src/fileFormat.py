@@ -82,7 +82,9 @@ def format_scanpaths(keep_cols, file_path):
         # Keep only relevant columns
         fr = fr[keep_cols]
 
+        # Save formatted data & delete raw file uploaded by the user
         fr.to_csv(os.path.join(file_path, config['SCANPATHS_FILE']), index=False, sep='\t')
+        silent_file_remove(os.path.join(file_path, config['SCANPATHS_FILE_RAW']))
     except:
         silent_file_remove(os.path.join(file_path, config['SCANPATHS_FILE_RAW']))
         traceback.print_exc()
@@ -137,17 +139,29 @@ def format_aois(file_path):
                     x_from = int(float(coords_from[0].replace(',', '.')))
                     y_from = int(float(coords_from[1].replace(',', '.')))
 
-                    # Normalize negative values
+                    # Normalize negative values of starting points
                     x_from = x_from if x_from > 0 else 0
                     y_from = y_from if y_from > 0 else 0
 
+                    # Calculate X coord of the starting point and width (x_size) of the aoi
                     line = next(fr)
-                    x_size = int(float(line.split()[0].replace(',', '.'))) - x_from
-                    x_size = abs(x_size) # TODO the value can be negative indicating AOI to the LEFT!
+                    x_to = int(float(line.split()[0].replace(',', '.')))
+                    x_size = x_to - x_from
 
+                    # Fix for occasionally inconsistent data format (swapped from/to lines)
+                    if x_size < 0:
+                        x_from, x_to = x_to, x_from  # Swaps the values of the from/to points in a pythonic way
+                        x_size *= -1
+
+                    # Calculate Y coord of the starting point and height (y_size) of the aoi
                     line = next(fr)
-                    y_size = int(float(line.split()[1].replace(',', '.'))) - y_from
-                    y_size = abs(y_size)
+                    y_to = int(float(line.split()[1].replace(',', '.')))
+                    y_size = y_to - y_from
+
+                    # Fix for occasionally inconsistent data format (swapped from/to lines)
+                    if y_size < 0:
+                        y_from, y_to = y_to, y_from  # Swaps the values of the from/to points in a pythonic way
+                        y_size *= -1
 
                     if name_it < len(string.uppercase):
                         act_aoi['shortName'] = string.uppercase[name_it]
@@ -176,3 +190,6 @@ def format_aois(file_path):
                 # Skip empty or unknown formatted lines
                 else:
                     continue
+
+    # Delete raw data uploaded by the user
+    silent_file_remove(os.path.join(file_path, config['AOIS_FILE_RAW']))

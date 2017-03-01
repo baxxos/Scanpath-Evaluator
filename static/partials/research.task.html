@@ -48,11 +48,11 @@
 <!-- Dataset overview -->
 <div class="row">
     <div class="col-md-6">
-        <h2>Results overview</h2>
+        <h3>Results overview</h3>
         <!-- Calculated common scanpath -->
         <div class="row" ng-show="!customScanpath">
             <div class="col-md-12">
-                <h3>Common scanpath:</h3>
+                <h4>Common scanpath:</h4>
                 <p>
                     <span ng-hide="task.commonScanpath">Not available</span>
                     <span ng-repeat="fixation in task.commonScanpath.fixations track by $index">
@@ -67,6 +67,8 @@
                     </span>
                     <span ng-hide="task.commonScanpath.avgSimToCommon">N/A</span>
                 </p>
+
+                <h3>Display controls:</h3>
             </div>
         </div>
         <!-- Custom common scanpath -->
