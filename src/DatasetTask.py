@@ -148,7 +148,7 @@ class DatasetTask(Base):
         for filename in files_list:
             if filename.endswith(valid_extensions):
                 # images[main] = static/images/datasets/template_sta/main.png
-                images_list[path.splitext(filename)[0]] = folder_path_visuals + filename
+                images_list[path.splitext(filename)[0]] = path.join(folder_path_visuals, filename).replace('\\', '/')
 
         self.visuals = images_list
 

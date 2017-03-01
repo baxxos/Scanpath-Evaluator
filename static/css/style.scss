@@ -111,11 +111,29 @@ optgroup {
 }
 
 #enableAllButton {
-	border: 1px solid $dark-green;
+	border: 2px solid $dark-green;
 }
 
 #disableAllButton {
-	border: 1px solid $dark-red;
+	border: 2px solid $dark-red;
+}
+
+#commonScanpathCanvas {
+	// border: 1px gray solid;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 100%;
+	transition: opacity 1s ease-in-out;
+	max-width: 100%;
+}
+
+#canvasWrapper {
+	max-width: 100%;
+}
+
+.transparent {
+	opacity: 0;
 }
 
 // Dataset related screens

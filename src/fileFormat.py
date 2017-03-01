@@ -143,7 +143,7 @@ def format_aois(file_path):
 
                     line = next(fr)
                     x_size = int(float(line.split()[0].replace(',', '.'))) - x_from
-                    x_size = abs(x_size)
+                    x_size = abs(x_size) # TODO the value can be negative indicating AOI to the LEFT!
 
                     line = next(fr)
                     y_size = int(float(line.split()[1].replace(',', '.'))) - y_from

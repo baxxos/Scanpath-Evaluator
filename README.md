@@ -57,6 +57,9 @@ DEPENDENCIES:
         <li>
             <a href="https://github.com/danialfarid/ng-file-upload">ng-file-upload</a>
         </li>
+        <li>
+            <a href="http://jtblin.github.io/angular-chart.js">angular-chart</a> (requires <a href="https://github.com/chartjs/Chart.js">Chart.js</a>)
+        </li>
     </ul>
 </p> 
 PAGE RENDERING & NAVIGATION:<br />

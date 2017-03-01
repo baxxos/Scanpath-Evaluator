@@ -129,6 +129,29 @@ def add_dataset():
         return handle_error()
 
 
+@app.route('/get_task_data', methods=['GET'])
+def get_dataset_task():
+    """ Returns JSON formatted task data (individual scanpaths, visuals, similarities etc.) """
+
+    # Look for the task identifier in request URL
+    try:
+        task_id = request.args.get('taskId')
+    except:
+        traceback.print_exc()
+        return handle_error('Task ID is missing')
+
+    # Load additional required data and return task info
+    try:
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+
+        return get_task_data_json(task)
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        return handle_error()
+
+
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
     try:
@@ -251,29 +274,6 @@ def get_trending_scanpath():
         return handle_error('Incorrect task ID')
     except:
         traceback.print_exc()
-        return handle_error()
-
-
-@app.route('/get_task_data', methods=['GET'])
-def get_task_data():
-    """ Returns JSON formatted task data (individual scanpaths, similarities etc.) """
-
-    # Look for the task identifier in request URL
-    try:
-        task_id = request.args.get('taskId')
-    except:
-        traceback.print_exc()
-        return handle_error('Task ID is missing')
-
-    # Load additional required data and return task info
-    try:
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
-
-        return get_task_data_json(task)
-    except orm.exc.NoResultFound:
-        return handle_error('Incorrect task ID')
-    except:
         return handle_error()
 
 

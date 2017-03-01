@@ -31,4 +31,3 @@ FullName	XFrom	XSize	YFrom	YSize	ShortName
  down-menu-accessiblity	1331	207	1526	362	d
  main-body	0	1862	394	850	e
  Rectangle 32	0	339	388	1136	f
- Polygon	1862	635	390	453	g

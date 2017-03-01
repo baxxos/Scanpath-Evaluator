@@ -328,7 +328,8 @@ def get_task_data_json(dataset_task):
     # Return necessary dataset info which will be processed and rendered on the client side
     ret_dataset = {
         'scanpaths': formatted_sequences,
-        'visuals': dataset_task.visuals
+        'visuals': dataset_task.visuals,
+        'aois': dataset_task.aois
     }
 
     return json.dumps(ret_dataset)

@@ -63,10 +63,24 @@ optgroup {
     opacity: 1; }
 
 #enableAllButton {
-  border: 1px solid #006400; }
+  border: 2px solid #006400; }
 
 #disableAllButton {
-  border: 1px solid #a00; }
+  border: 2px solid #a00; }
+
+#commonScanpathCanvas {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 100%;
+  transition: opacity 1s ease-in-out;
+  max-width: 100%; }
+
+#canvasWrapper {
+  max-width: 100%; }
+
+.transparent {
+  opacity: 0; }
 
 #dataset-name-heading {
   font-weight: bold; }

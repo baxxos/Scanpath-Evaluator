@@ -11,9 +11,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			function(response) {
 				$scope.task.scanpaths = response.data.scanpaths;
 				$scope.task.visuals = response.data.visuals;
+				$scope.task.aois = response.data.aois;
+
+				initCanvas();
 			},
 			function(data) {
-				console.log('Failed to get task data content.', data);
+				console.error('Failed to get task data content.', data);
 			}
 		);
     };
@@ -171,6 +174,174 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			$scope.task.excludedScanpaths.push(scanpath.id);
 		});
 	};
+
+	var initCanvas = function() {
+		// Fetch canvas element in an un-angular way://
+		$scope.canvas = document.getElementById('commonScanpathCanvas');
+    	$scope.ctx = $scope.canvas.getContext('2d');
+
+		// Basic canvas setup
+		$scope.canvas.width = $scope.canvas.offsetWidth;
+		$scope.canvas.height = $scope.canvas.offsetHeight;
+		$scope.canvas.style.backgroundImage = 'url(' + $scope.task.visuals.main + ')';
+		$scope.ctx.globalAlpha = 1.0;
+		$scope.ctx.beginPath();
+
+		/*$scope.data = [
+			{x: 111, y: 111, r: 10},
+			{x: 50, y: 50, r: 30},
+			{x: 222, y: 222, r: 20}
+		];*/
+
+		$scope.canvasInfo = {
+			whitespaceToKeep: 0,
+			scale: 1,
+			offset: 2
+		};
+
+		// Load the canvas background image again to get its natural resolution
+		var canvasImage = new Image();
+		// Callback that gets triggered once the img has completed loading - it adjusts the canvas to the img
+		canvasImage.onload = function() {
+			// Determine how much whitespace do we need to keep around the canvas after scaling
+			var canvasWrapper = document.getElementById('canvasWrapper');
+			var canvasWrapperStyle = window.getComputedStyle(canvasWrapper);
+
+			$scope.canvasInfo.whitespaceToKeep =
+				parseInt(canvasWrapperStyle.marginRight) +
+				parseInt(canvasWrapperStyle.marginLeft) +
+				parseInt(canvasWrapperStyle.paddingLeft) +
+				parseInt(canvasWrapperStyle.paddingRight);
+
+			// Determine the scaling based on canvas max width, whitespace and offset <-> image raw resolution
+			$scope.canvasInfo.scale =
+				(canvasWrapper.offsetWidth - $scope.canvasInfo.whitespaceToKeep - $scope.canvasInfo.offset * 2) /
+				canvasImage.naturalWidth;
+
+			// Set scaled width/height and the apply the default offset
+			$scope.canvas.style.width = (canvasImage.naturalWidth) * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
+			$scope.canvas.style.height = (canvasImage.naturalHeight) * $scope.canvasInfo.scale + ($scope.canvasInfo.offset * 2) + 'px';
+			// Make canvas resolution match its real size
+			$scope.canvas.width = $scope.canvas.offsetWidth;
+			$scope.canvas.height = $scope.canvas.offsetHeight;
+
+			// Set of colors to be used for drawing AOIs
+			var colors = randomColor({
+				luminosity: 'bright',
+				count: $scope.task.aois.length
+			});
+
+			drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, colors);
+			// drawFixations($scope.data);
+		};
+		canvasImage.src = $scope.task.visuals.main;
+	};
+
+	 function removePoint(point) {
+        for(var i = 0; i < $scope.data.length; i++) {
+            if($scope.data[i].id === point.id) {
+                console.log("removing item at position: " + i);
+                $scope.data.splice(i, 1);
+            }
+        }
+
+        $scope.ctx.clearRect(0, 0, $scope.canvas.width, $scope.canvas.height);
+        drawFixations($scope.data);
+    }
+
+    function getBoundingBox(data) {
+		// Calculate bounding box for all aois
+		var topLeftPoint = {
+			x: data[0][1],
+			y: data[0][3]
+		};
+
+		var bottomRightPoint = {
+			x: data[0][1] + data[0][2],
+			y: data[0][3] + data[0][4]
+		};
+
+		for(var i = 0; i < data.length; i++) {
+			var actAoi = data[i];
+
+			if(actAoi[1] < topLeftPoint.x) {
+				topLeftPoint.x = actAoi[1];
+			}
+
+			if(actAoi[3] < topLeftPoint.y) {
+				topLeftPoint.y = actAoi[3];
+			}
+
+			if(actAoi[1] + actAoi[2] > bottomRightPoint.x) {
+				bottomRightPoint.x = actAoi[1] + actAoi[2];
+			}
+
+			if(actAoi[3] + actAoi[4] > bottomRightPoint.y) {
+				bottomRightPoint.y = actAoi[3] + actAoi[4];
+			}
+		}
+
+		return {
+			topLeftPoint: topLeftPoint,
+			bottomRightPoint: bottomRightPoint
+		}
+	}
+
+    function drawAois(data, scale, offset, colors) {
+		// Data from backed is formatted as: ['aoiName', 'xFrom', 'xLen', 'yFrom', 'yLen', 'aoiShortName']
+		// Convert from strings to numbers TODO do this at the backend
+		for(var j = 0; j < data.length; j++) {
+			for(var k = 1; k <= 4; k++) {
+				data[j][k] = Number(data[j][k]);
+			}
+		}
+
+		data.forEach(function(aoi, index) {
+			drawRect({
+				x: (aoi[1] * scale) + offset,
+				y: (aoi[3] * scale) + offset,
+				xLen: aoi[2] * scale,
+				yLen: aoi[4] * scale,
+				color: colors[index]
+			});
+		});
+	}
+
+    function drawFixations(data) {
+		for(var i = 1; i < data.length; i++) {
+			drawLine(data[i], data[i-1]);
+        }
+
+		data.forEach(function(circle) {
+			drawCircle(circle);
+		});
+    }
+
+    function drawCircle(data) {
+        $scope.ctx.beginPath();
+        $scope.ctx.arc(data.x, data.y, data.r, 0, 2*Math.PI, false);
+        $scope.ctx.fillStyle = "#44f";
+        $scope.ctx.fill();
+        $scope.ctx.lineWidth = $scope.canvasInfo.offset;
+        $scope.ctx.strokeStyle = "#000";
+        $scope.ctx.stroke();
+    }
+
+    function drawRect(data) {
+		$scope.ctx.beginPath();
+		$scope.ctx.rect(data.x, data.y, data.xLen, data.yLen);
+		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
+        $scope.ctx.strokeStyle = data.color;
+		$scope.ctx.stroke();
+	}
+
+    function drawLine(data1, data2) {
+        $scope.ctx.beginPath();
+        $scope.ctx.moveTo(data1.x, data1.y);
+        $scope.ctx.lineTo(data2.x, data2.y);
+        $scope.ctx.strokeStyle = "black";
+        $scope.ctx.stroke();
+    }
 
     var initController = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
