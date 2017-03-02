@@ -56,6 +56,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 					var act_scanpath = $scope.task.scanpaths[index];
 					act_scanpath.simToCommon = similarities[act_scanpath.identifier];
 				}
+
+				// Draw the common scanpath on the canvas
+				drawFixations($scope.task.commonScanpath.fixations, $scope.canvasInfo.aois);
 			},
 			function(data) {
 				console.error('Failed to get common scanpath response from the server.', data);
@@ -175,6 +178,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		});
 	};
 
+	// TODO move canvas to its own TaskCanvasCtrl
 	var initCanvas = function() {
 		// Fetch canvas element in an un-angular way://
 		$scope.canvas = document.getElementById('commonScanpathCanvas');
@@ -184,7 +188,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.canvasInfo = {
 			whitespaceToKeep: 0,
 			scale: 1,
-			offset: 2
+			offset: 2,
+			aois: {} // Serves for accessing the aois after drawing (e.g. for common scanpath displaying)
 		};
 
 		$scope.ctx.globalAlpha = 1.0;
@@ -273,6 +278,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
     var drawAois = function(data, scale, offset, colors) {
+		// Reset previously drawn AOIs
+		$scope.canvasInfo.aois = {};
+
 		// Data from backed is formatted as: ['aoiName', 'xFrom', 'xLen', 'yFrom', 'yLen', 'aoiShortName']
 		// Convert from strings to numbers TODO do this at the backend
 		for(var j = 0; j < data.length; j++) {
@@ -287,17 +295,56 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				y: (aoi[3] * scale) + offset,
 				xLen: aoi[2] * scale,
 				yLen: aoi[4] * scale,
-				color: colors[index]
+				color: colors[index],
+				name: aoi[5],
+				fullName: aoi[0]
 			};
 
 			// Draw the AOI box
 			drawRect(aoiBox, false);
 			// Draw the AOI label
-			drawLabel(aoiBox, aoi[5]);
+			drawLabel(aoiBox);
+			// Remember the current AOI data for later access
+			$scope.canvasInfo.aois[aoiBox.name] = aoiBox;
 		});
 	};
 
-	var drawLabel = function(aoiBox, aoiName) {
+	var drawFixations = function(commonScanpath, aois) {
+		for(var i = 1; i < commonScanpath.length; i++) {
+			// scanpathData fixations are formatted as: [["E", 500], ["C", 350] ... ]
+			var actFixation = commonScanpath[i];
+			var prevFixation = commonScanpath[i - 1];
+
+			var lineFrom = {
+				x: aois[prevFixation[0]].x + (aois[prevFixation[0]].xLen / 2),
+				y: aois[prevFixation[0]].y + (aois[prevFixation[0]].yLen / 2)
+			};
+
+			var lineTo = {
+				x: aois[actFixation[0]].x + (aois[actFixation[0]].xLen / 2),
+				y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
+			};
+
+			drawLine(lineFrom, lineTo);
+        }
+
+		commonScanpath.forEach(function(fixation, index) {
+			var fixationCircle = {
+				// Draw a circle in the middle of a corresponding AOI box
+				x: aois[fixation[0]].x + (aois[fixation[0]].xLen / 2),
+				y: aois[fixation[0]].y + (aois[fixation[0]].yLen / 2),
+				r: fixation[1] / 40 // TODO limit the radius of circle to the enclosing AOI
+			};
+			drawCircle(fixationCircle);
+
+			$scope.ctx.fillStyle = '#fff';
+			$scope.ctx.lineWidth = $scope.canvasInfo.offset;
+			var fontSize = 14;
+			$scope.ctx.fillText((index + 1).toString(), fixationCircle.x, fixationCircle.y + (fontSize / 2) - $scope.ctx.lineWidth);
+		});
+    };
+
+	var drawLabel = function(aoiBox) {
 		// Initialize label style
 		var fontSize = 14;
 		$scope.ctx.font = 'bold ' + fontSize + 'px Helvetica, Arial';
@@ -316,18 +363,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 
 		// Draw text in the exact center of the AOI box
 		$scope.ctx.fillStyle = '#fff';
-		$scope.ctx.fillText(aoiName, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
+		$scope.ctx.fillText(aoiBox.name, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
 	};
-
-    var drawFixations = function(data) {
-		for(var i = 1; i < data.length; i++) {
-			drawLine(data[i], data[i-1]);
-        }
-
-		data.forEach(function(circle) {
-			drawCircle(circle);
-		});
-    };
 
     var drawCircle = function(data) {
         $scope.ctx.beginPath();
