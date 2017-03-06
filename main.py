@@ -242,7 +242,7 @@ def get_similarity_to_custom():
             task.load_data()
             task.exclude_participants(json_data['excludedScanpaths'])
 
-            return custom_run(task, custom_scanpath)
+            return handle_success(custom_run(task, custom_scanpath))
         else:
             return handle_error('Wrong custom scanpath format - alphabet characters only.')
     except KeyError:

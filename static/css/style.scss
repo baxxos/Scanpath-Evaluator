@@ -2,6 +2,14 @@
 $dark-red: #a00;
 $dark-green: #006400;
 
+$text-size-default: 16px;
+$text-size-smaller: 14px;
+
+// Global
+body {
+	font-size: $text-size-default;
+}
+
 // Forms
 #login-panel-main, #new-dataset-panel, #register_panel {
 	// User inputs with the same width
@@ -36,8 +44,7 @@ form {
 }
 
 select, optgroup {
-	font-size: 14px;
-    font-weight: bold;
+	font-size: $text-size-default;
     border: 1px solid rgb(204, 204, 204);
     border-radius: 4px;
 }
@@ -55,6 +62,8 @@ optgroup {
 }
 
 #scanpathTable {
+	font-size: $text-size-smaller;
+
 	td, th:not(:nth-child(2)) {
 		text-align: center;
 	}
@@ -81,7 +90,7 @@ optgroup {
 		}
 	}
 
-	.control-include {
+	.control-include, .control-exclude {
 		&:focus, &:active, &:hover {
 			opacity: 1;
 		}
@@ -92,30 +101,23 @@ optgroup {
 		color: white;
 		background-color: $dark-green;
 		padding: 2px;
-		border-radius: 4px
+		border-radius: 4px;
 	}
 
 	.control-exclude {
-		&:focus, &:active, &:hover {
-			opacity: 1;
-		}
-
-		cursor: pointer;
-		margin: 8px 4px;
-		opacity: 0.25;
-		color: white;
+		// Overwrite style inherited from .control-include
 		background-color: $dark-red;
-		padding: 2px;
-		border-radius: 4px
 	}
 }
 
 #enableAllButton {
 	border: 2px solid $dark-green;
+	font-weight: bold;
 }
 
 #disableAllButton {
 	border: 2px solid $dark-red;
+	font-weight: bold;
 }
 
 #commonScanpathCanvas {

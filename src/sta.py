@@ -402,4 +402,4 @@ def custom_run(dataset_task, custom_scanpath):
         'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath)
     }
 
-    return json.dumps(res_data)
+    return res_data

@@ -1,5 +1,5 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http) {
+angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http, CanvasDrawService) {
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',
@@ -80,8 +80,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	var getCustomScanpathDetails = function(customScanpathStr) {
-		// Convert user input to uppercase and remove all whitespaces by regex
-		customScanpathStr = customScanpathStr.toUpperCase();
+		// Remove all whitespaces from the user input by regex
 		customScanpathStr = customScanpathStr.replace(/\s/g, "");
 		// Regex to normalize the scanpath (remove repeated AOIs: AABC -> ABC)
 		// The Regex /(.)\1+/ matches any single char followed by the same char at least once (+)
@@ -97,17 +96,25 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			}
 		}).then(
 			function(response) {
-				// Get the common scanpath
-				$scope.task.customScanpath = response.data;
-				// Get the similarity object
-				var similarities = $scope.task.customScanpath.similarity;
-				// Get the average similarity of each user scanpath to the common scanpath
-				$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom(similarities);
+				if(response.data.success == true) {
+					// Get the common scanpath
+					$scope.task.customScanpath = response.data.load;
+					// Get the similarity object
+					var similarities = $scope.task.customScanpath.similarity;
+					// Get the average similarity of each user scanpath to the common scanpath
+					$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom(similarities);
 
-				// Assign each user scanpath its similarity to the common scanpath
-				for (var index in $scope.task.scanpaths) {
-					var act_scanpath = $scope.task.scanpaths[index];
-					act_scanpath.simToCommon = similarities[act_scanpath.identifier];
+					// Assign each user scanpath its similarity to the common scanpath
+					for (var index in $scope.task.scanpaths) {
+						var act_scanpath = $scope.task.scanpaths[index];
+						act_scanpath.simToCommon = similarities[act_scanpath.identifier];
+					}
+
+					// Draw the custom scanpath onto the canvas
+					drawFixations($scope.task.customScanpath.fixations, $scope.canvasInfo.aois);
+				}
+				else {
+					console.error(response.data.message);
 				}
 			},
 			function(data) {
@@ -178,14 +185,14 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		});
 	};
 
-	// TODO move canvas to its own TaskCanvasCtrl
 	var initCanvas = function() {
-		// Fetch canvas element in an un-angular way://
+		// Fetch canvas element in a non-angular way://
 		$scope.canvas = document.getElementById('commonScanpathCanvas');
     	$scope.ctx = $scope.canvas.getContext('2d');
 
 		// Basic canvas setup
 		$scope.canvasInfo = {
+			fontSize: 14,
 			whitespaceToKeep: 0,
 			scale: 1,
 			offset: 2,
@@ -197,8 +204,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	var redrawCanvas = function() {
-		// Fetch and setup the canvas element in an non-angular way://
-		$scope.canvas = document.getElementById('commonScanpathCanvas');
+		// Reset background image
 		$scope.canvas.style.backgroundImage = 'url(' + $scope.task.visuals.main + ')';
 
 		// Load the canvas background image again to get its natural resolution
@@ -215,7 +221,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				parseInt(canvasWrapperStyle.paddingLeft) +
 				parseInt(canvasWrapperStyle.paddingRight);
 
-			// Determine the scaling based on canvas max width, whitespace and offset <-> image raw resolution
+			// Determine the scaling based on canvas max width, whitespace and offset compared to image raw resolution
 			$scope.canvasInfo.scale =
 				(canvasWrapper.offsetWidth - $scope.canvasInfo.whitespaceToKeep - $scope.canvasInfo.offset * 2) /
 				canvasImage.naturalWidth;
@@ -230,12 +236,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			$scope.canvas.height = $scope.canvas.offsetHeight;
 
 			// Set of colors to be used for drawing AOIs
-			var colors = randomColor({
+			$scope.canvasInfo.colors = randomColor({
 				luminosity: 'bright',
 				count: $scope.task.aois.length
 			});
 
-			drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, colors);
+			drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, $scope.canvasInfo.colors);
 		};
 		canvasImage.src = $scope.task.visuals.main;
 	};
@@ -243,39 +249,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	var clearFixations = function() {
 		// Erase common scanpath fixation drawing by re-creating the canvas without it
 		$scope.ctx.clearRect(0, 0, $scope.canvas.width, $scope.canvas.height);
-		drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, colors);
+		drawAois($scope.task.aois, $scope.canvasInfo.scale, $scope.canvasInfo.offset, $scope.canvasInfo.colors);
     };
-
-    var calcBoundingBox = function(data) {
-		// Calculate bounding box for all aois
-		var topLeftPoint = {
-			x: data[0][1],
-			y: data[0][3]
-		};
-
-		var bottomRightPoint = {
-			x: topLeftPoint.x + data[0][2],
-			y: topLeftPoint.y + data[0][4]
-		};
-
-		// Search the AOIs for the most upper-left and right-down points
-		for(var i = 0; i < data.length; i++) {
-			var actAoi = data[i];
-
-			topLeftPoint.x = (actAoi[1] < topLeftPoint.x ? actAoi[1] : topLeftPoint.x);
-			topLeftPoint.y = (actAoi[3] < topLeftPoint.y ? actAoi[3] : topLeftPoint.y);
-
-			bottomRightPoint.x =
-				(actAoi[1] + actAoi[2] > bottomRightPoint.x ? actAoi[1] + actAoi[2] : bottomRightPoint.x);
-			bottomRightPoint.y =
-				(actAoi[3] + actAoi[4] > bottomRightPoint.y ? actAoi[3] + actAoi[4] : bottomRightPoint.y);
-		}
-
-		return {
-			topLeftPoint: topLeftPoint,
-			bottomRightPoint: bottomRightPoint
-		}
-	};
 
     var drawAois = function(data, scale, offset, colors) {
 		// Reset previously drawn AOIs
@@ -295,13 +270,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				y: (aoi[3] * scale) + offset,
 				xLen: aoi[2] * scale,
 				yLen: aoi[4] * scale,
-				color: colors[index],
 				name: aoi[5],
 				fullName: aoi[0]
 			};
 
 			// Draw the AOI box
-			drawRect(aoiBox, false);
+			CanvasDrawService.drawRect($scope.ctx, aoiBox, colors[index], $scope.canvasInfo.offset);
 			// Draw the AOI label
 			drawLabel(aoiBox);
 			// Remember the current AOI data for later access
@@ -310,43 +284,59 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	var drawFixations = function(commonScanpath, aois) {
+		// Clear the canvas from previous fixation drawings first
+		clearFixations();
+
 		for(var i = 1; i < commonScanpath.length; i++) {
 			// scanpathData fixations are formatted as: [["E", 500], ["C", 350] ... ]
 			var actFixation = commonScanpath[i];
 			var prevFixation = commonScanpath[i - 1];
 
+			// Skip undefined AOIs (e.g. wrong user input)
+			if(!aois[prevFixation[0]] || !aois[actFixation[0]]) {
+				console.error('No such area of interest : ' + prevFixation[0] + ' or ' + actFixation[0]);
+				clearFixations();
+				return;
+			}
+
+			// Line from the center of the previous fixation
 			var lineFrom = {
 				x: aois[prevFixation[0]].x + (aois[prevFixation[0]].xLen / 2),
 				y: aois[prevFixation[0]].y + (aois[prevFixation[0]].yLen / 2)
 			};
-
+			// Line to the center of the current fixation
 			var lineTo = {
 				x: aois[actFixation[0]].x + (aois[actFixation[0]].xLen / 2),
 				y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
 			};
 
-			drawLine(lineFrom, lineTo);
+			CanvasDrawService.drawLine($scope.ctx, lineFrom, lineTo, '#000', $scope.canvasInfo.offset);
         }
 
 		commonScanpath.forEach(function(fixation, index) {
+			// Draw a circle in the middle of a corresponding AOI box
 			var fixationCircle = {
-				// Draw a circle in the middle of a corresponding AOI box
 				x: aois[fixation[0]].x + (aois[fixation[0]].xLen / 2),
 				y: aois[fixation[0]].y + (aois[fixation[0]].yLen / 2),
-				r: fixation[1] / 40 // TODO limit the radius of circle to the enclosing AOI
+				r: (fixation[1] ? fixation[1] : 400) / 40 // TODO limit the radius of circle to the enclosing AOI
 			};
-			drawCircle(fixationCircle);
 
+			CanvasDrawService.drawCircle($scope.ctx, fixationCircle, '#000', $scope.canvasInfo.offset, '#44f');
+
+			// Draw a label (centering is based on the fontSize and stroke line width)
 			$scope.ctx.fillStyle = '#fff';
 			$scope.ctx.lineWidth = $scope.canvasInfo.offset;
-			var fontSize = 14;
-			$scope.ctx.fillText((index + 1).toString(), fixationCircle.x, fixationCircle.y + (fontSize / 2) - $scope.ctx.lineWidth);
+			$scope.ctx.fillText(
+				(index + 1).toString(),
+				fixationCircle.x,
+				fixationCircle.y + ($scope.canvasInfo.fontSize / 2) - $scope.ctx.lineWidth
+			);
 		});
     };
 
 	var drawLabel = function(aoiBox) {
 		// Initialize label style
-		var fontSize = 14;
+		var fontSize = $scope.canvasInfo.fontSize;
 		$scope.ctx.font = 'bold ' + fontSize + 'px Helvetica, Arial';
 		$scope.ctx.textAlign = 'center';
 		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
@@ -356,48 +346,14 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			x: aoiBox.x + (aoiBox.xLen / 2) - (fontSize / 2), // Center the label horizontally
 			y: aoiBox.y + (aoiBox.yLen / 2) - (fontSize - $scope.ctx.lineWidth), // Center it vertically
 			xLen: fontSize,
-			yLen: fontSize,
-			color: '#000'
+			yLen: fontSize
 		};
-		drawRect(labelBox, true);
+		CanvasDrawService.drawRect($scope.ctx, labelBox, '#000', $scope.canvasInfo.offset, '#000');
 
 		// Draw text in the exact center of the AOI box
 		$scope.ctx.fillStyle = '#fff';
 		$scope.ctx.fillText(aoiBox.name, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
 	};
-
-    var drawCircle = function(data) {
-        $scope.ctx.beginPath();
-        $scope.ctx.arc(data.x, data.y, data.r, 0, 2*Math.PI, false);
-        $scope.ctx.fillStyle = "#44f";
-        $scope.ctx.fill();
-        $scope.ctx.lineWidth = $scope.canvasInfo.offset;
-        $scope.ctx.strokeStyle = "#000";
-        $scope.ctx.stroke();
-    };
-
-    var drawRect = function(data, isFilled) {
-		$scope.ctx.beginPath();
-		$scope.ctx.rect(data.x, data.y, data.xLen, data.yLen);
-		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
-        $scope.ctx.strokeStyle = data.color;
-		$scope.ctx.stroke();
-
-		// Optional: fill the rect area
-		if(isFilled) {
-			$scope.ctx.fillStyle = data.color;
-        	$scope.ctx.fill();
-		}
-	};
-
-    var drawLine = function(data1, data2) {
-        $scope.ctx.beginPath();
-        $scope.ctx.moveTo(data1.x, data1.y);
-        $scope.ctx.lineTo(data2.x, data2.y);
-		$scope.ctx.lineWidth = $scope.canvasInfo.offset;
-        $scope.ctx.strokeStyle = "black";
-        $scope.ctx.stroke();
-    };
 
     var initController = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
