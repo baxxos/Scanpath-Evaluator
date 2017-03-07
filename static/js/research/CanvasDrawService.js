@@ -38,6 +38,52 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		}
 	};
 
+	// Advanced scanpath geometry methods
+	this.drawLabel = function(ctx, canvasInfo, aoiBox) {
+		// Initialize label style
+		var fontSize = canvasInfo.fontSize;
+		ctx.font = 'bold ' + fontSize + 'px Helvetica, Arial';
+		ctx.textAlign = 'center';
+		ctx.lineWidth = canvasInfo.offset;
+
+		// Draw the label background rectangle in the center of the AOI box
+		var labelBox = {
+			x: aoiBox.x + (aoiBox.xLen / 2) - (fontSize / 2), // Center the label horizontally
+			y: aoiBox.y + (aoiBox.yLen / 2) - (fontSize - ctx.lineWidth), // Center it vertically
+			xLen: fontSize,
+			yLen: fontSize
+		};
+		this.drawRect(ctx, labelBox, '#000', canvasInfo.offset, '#000');
+
+		// Draw text in the exact center of the AOI box
+		ctx.fillStyle = '#fff';
+		ctx.fillText(aoiBox.name, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
+	};
+
+	this.drawSaccade = function(ctx, canvasInfo, aois, prevFixation, actFixation) {
+		// Draw a line connecting each pair of fixations in the given scanpath
+		// Passed fixations are formatted as: [["E", 500], ["C", 350] ... ]
+
+		// Skip undefined AOIs (e.g. wrong user input)
+		if(!aois[prevFixation[0]] || !aois[actFixation[0]]) {
+			console.error('No such area of interest : ' + prevFixation[0] + ' or ' + actFixation[0]);
+			return false;
+		}
+
+		// Line from the center of the previous fixation
+		var lineFrom = {
+			x: aois[prevFixation[0]].x + (aois[prevFixation[0]].xLen / 2),
+			y: aois[prevFixation[0]].y + (aois[prevFixation[0]].yLen / 2)
+		};
+		// Line to the center of the current fixation
+		var lineTo = {
+			x: aois[actFixation[0]].x + (aois[actFixation[0]].xLen / 2),
+			y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
+		};
+
+		this.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
+	};
+
 	this.calcBoundingBox = function(data) {
 		// Calculates bounding box for a set of square/rectangle AOIs
 		var topLeftPoint = {

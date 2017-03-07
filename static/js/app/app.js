@@ -1,6 +1,7 @@
 // ngAnimate and ngTouch provide basic animations e.g. on a collapsing element
 // ui.router defines routes and states (app.config.js) - these are then used in ncy-angular-breadcrumb
 // ui.bootstrap to prevent full jQuery import in bootstrapJS
+// TODO migrate to Angular 1.6.x and update ui-bootstrap/router as well
 angular.module(
 	'gazerApp',
 	[

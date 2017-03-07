@@ -77,10 +77,6 @@ optgroup {
 		text-align: justify;
 	}
 
-	.hidden {
-		visibility: hidden;
-	}
-
 	// Excluding/including individual scanpaths
 	.row-excluded {
 		background-color: rgba($dark-red, 0.05);
@@ -120,7 +116,7 @@ optgroup {
 	font-weight: bold;
 }
 
-#commonScanpathCanvas {
+#scanpathCanvas {
 	// border: 1px gray solid;
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -128,9 +124,17 @@ optgroup {
 	width: 100%;
 	transition: opacity 1s ease-in-out;
 	max-width: 100%;
+	cursor: pointer;
 }
 
-#canvasWrapper {
+#scanpathCanvasModal {
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 100%;
+}
+
+.canvasWrapper {
 	max-width: 100%;
 }
 
