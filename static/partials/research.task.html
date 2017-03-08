@@ -67,8 +67,6 @@
                     </span>
                     <span ng-hide="task.commonScanpath.avgSimToCommon">N/A</span>
                 </p>
-
-                <h3>Display controls:</h3>
             </div>
         </div>
         <!-- Custom common scanpath -->
@@ -89,6 +87,12 @@
                     </span>
                     <span ng-hide="task.customScanpath.avgSimToCommon">N/A</span>
                 </p>
+            </div>
+        </div>
+        <!-- Display controls -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Display controls:</h3>
             </div>
         </div>
     </div>
@@ -120,7 +124,7 @@
             <thead>
                 <tr>
                     <th ng-click="setSort('identifier')">ID</th>
-                    <th>Eye fixations (ms)</th>
+                    <th>Controls</th>
                     <th ng-click="setSort('fixations.length')">Scanpath length</th>
                     <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
                     <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
@@ -129,32 +133,50 @@
                     <th ng-click="setSort('simToCommon')">Similarity to common</th>
                 </tr>
             </thead>
-            <tr ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
-                ng-class="{'row-excluded': scanpath.excluded}">
-                <td>{{ scanpath.identifier }} <br />
-                    <span class="glyphicon glyphicon-ok control-include"
-                          ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}"></span>
-                    <span class="glyphicon glyphicon-remove control-exclude"
-                          ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}"></span>
-                </td>
-                <td class="colFixations col-md-4">
-                    <span ng-repeat="fixation in scanpath.fixations track by $index">
-                        {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>
-                    </span>
-                    <a href="" class="pull-right"><span class="glyphicon glyphicon-menu-down"></span></a>
-                </td>
-                <td>{{ scanpath.fixations.length }}</td>
-                <td>{{ scanpath.maxSimilarity.identifier }}</td>
-                <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
-                <td>{{ scanpath.minSimilarity.identifier }}</td>
-                <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-                <td ng-show="scanpath.simToCommon >= 0">
-                    {{ scanpath.simToCommon | number: 2 }}%
-                </td>
-                <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
-            </tr>
+            <tbody ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
+                ng-class="{'row-container-expanded': expanded[scanpath.identifier]}" ng-class="{'row-expanded': expanded[scanpath.identifier]}">
+                <tr ng-class="{'row-excluded': scanpath.excluded}">
+                    <td class="userScanpathId"
+                        ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]">
+                        {{ scanpath.identifier }}
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-ok control-include"
+                              ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}"></span>
+                        <span class="glyphicon glyphicon-remove control-exclude"
+                              ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}"></span>
+                        <span class="glyphicon glyphicon-menu-down userScanpathExpand"
+                              ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]"></span>
+                    </td>
+                    <td>{{ scanpath.fixations.length }}</td>
+                    <td>{{ scanpath.maxSimilarity.identifier }}</td>
+                    <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+                    <td>{{ scanpath.minSimilarity.identifier }}</td>
+                    <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
+                    <td ng-show="scanpath.simToCommon >= 0">
+                        {{ scanpath.simToCommon | number: 2 }}%
+                    </td>
+                    <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
+                </tr>
+                <tr ng-if="expanded[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
+                    <td colspan="42" class="userScanpathFixations">
+                        <span ng-repeat="fixation in scanpath.fixations track by $index">
+                            {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
-    <button class="btn btn-default btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">Enable all</button>
-    <button class="btn btn-default btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">Disable all</button>
+    <div id="scanpathTableControls">
+        <div class="btn-group">
+            <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">Enable all</button>
+            <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">Disable all</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(true)">Expand all</button>
+            <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(false)">Collapse all</button>
+        </div>
+    </div>
 </div>

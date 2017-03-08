@@ -1,5 +1,6 @@
 /*** Colors ***/
 $dark-red: #a00;
+$faded-red: #fff5f5;
 $dark-green: #006400;
 
 $text-size-default: 16px;
@@ -101,24 +102,28 @@ optgroup {
 #scanpathTable {
 	font-size: $text-size-smaller;
 
-	td, th:not(:nth-child(2)) {
-		text-align: center;
+	td, th {
+		text-align: left;
 	}
 
 	th:not(:nth-child(2)):hover {
 		cursor: pointer;
 		text-decoration: underline;
 	}
-
-	.colFixations {
-		text-align: justify;
+	
+	tr {
+		&:hover {
+			.userScanpathId {
+				text-decoration: underline;
+			}
+		}
 	}
 
 	// Excluding/including individual scanpaths
 	.row-excluded {
-		background-color: rgba($dark-red, 0.05);
+		background-color: $faded-red;
 
-		td:not(:nth-child(1)) {
+		td:not(:nth-child(1)), .userScanpathFixations {
 			opacity: 0.25;
 		}
 	}
@@ -129,9 +134,9 @@ optgroup {
 		}
 
 		cursor: pointer;
-		margin: 8px 4px;
 		opacity: 0.25;
 		color: white;
+		margin-right: 5px;
 		background-color: $dark-green;
 		padding: 2px;
 		border-radius: 4px;
@@ -141,16 +146,45 @@ optgroup {
 		// Overwrite style inherited from .control-include
 		background-color: $dark-red;
 	}
+
+	// Expanding/collapsing individual scanpaths
+	.row-container-expanded {
+		background-color: #efefef;
+	}
+
+	.userScanpathId {
+		&:hover {
+			cursor: pointer;
+			text-decoration: underline;
+		}
+	}
+
+	.userScanpathFixations {
+		text-align: justify;
+	}
+
+	.userScanpathExpand {
+		color: #337ab7;
+		cursor: pointer;
+		padding: 2px;
+		border-radius: 4px;
+		background-color: #fff;
+		border-color: #337ab7;
+		border: 1px solid;
+
+		&:hover {
+			border-color: #23527c;
+			background-color: #e8f7ff;
+			color: #23527c;
+			font-weight: bold;
+		}
+	}
 }
 
-#enableAllButton {
-	border: 2px solid $dark-green;
-	font-weight: bold;
-}
-
-#disableAllButton {
-	border: 2px solid $dark-red;
-	font-weight: bold;
+#scanpathTableControls {
+	.btn-group {
+		margin-right: 15px;
+	}
 }
 
 // Task canvas elements

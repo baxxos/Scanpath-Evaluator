@@ -396,6 +396,18 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
+	$scope.toggleAllRows = function(toggleValue) {
+		if(toggleValue == false) {
+			$scope.expanded = {};
+		}
+		else {
+			for (var i = 0; i < $scope.task.scanpaths.length; i++) {
+				var id = $scope.task.scanpaths[i].identifier;
+				$scope.expanded[id] = true;
+			}
+		}
+	};
+
     var initController = function() {
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {
@@ -418,6 +430,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
+
+		// Scanpath table rows expanding/collapsing controls
+		$scope.expanded = {};
 	};
 	// Perform view initialization
 	initController();
