@@ -86,8 +86,6 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		this.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
 	};
 
-
-
 	this.calcWhitespaceToKeep = function(computedStyle) {
 		return (
 			parseInt(computedStyle.marginRight) +
