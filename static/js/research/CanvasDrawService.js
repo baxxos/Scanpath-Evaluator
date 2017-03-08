@@ -1,4 +1,5 @@
 angular.module('gazerApp').service('CanvasDrawService', function() {
+	/*** BASIC DRAWINGS ***/
 	// Handles drawing of basic geometric shapes onto the canvas
 	this.drawCircle = function(ctx, coords, strokeColor, lineWidth, fillColor) {
         ctx.beginPath();
@@ -38,6 +39,7 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		}
 	};
 
+	/*** SCANPATH SPECIFIC DRAWINGS ***/
 	// Advanced scanpath geometry methods
 	this.drawLabel = function(ctx, canvasInfo, aoiBox) {
 		// Initialize label style
@@ -84,34 +86,14 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		this.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
 	};
 
-	this.calcBoundingBox = function(data) {
-		// Calculates bounding box for a set of square/rectangle AOIs
-		var topLeftPoint = {
-			x: data[0][1],
-			y: data[0][3]
-		};
 
-		var bottomRightPoint = {
-			x: topLeftPoint.x + data[0][2],
-			y: topLeftPoint.y + data[0][4]
-		};
 
-		// Search the AOIs for the most upper-left and right-down points
-		for(var i = 0; i < data.length; i++) {
-			var actAoi = data[i];
-
-			topLeftPoint.x = (actAoi[1] < topLeftPoint.x ? actAoi[1] : topLeftPoint.x);
-			topLeftPoint.y = (actAoi[3] < topLeftPoint.y ? actAoi[3] : topLeftPoint.y);
-
-			bottomRightPoint.x =
-				(actAoi[1] + actAoi[2] > bottomRightPoint.x ? actAoi[1] + actAoi[2] : bottomRightPoint.x);
-			bottomRightPoint.y =
-				(actAoi[3] + actAoi[4] > bottomRightPoint.y ? actAoi[3] + actAoi[4] : bottomRightPoint.y);
-		}
-
-		return {
-			topLeftPoint: topLeftPoint,
-			bottomRightPoint: bottomRightPoint
-		}
+	this.calcWhitespaceToKeep = function(computedStyle) {
+		return (
+			parseInt(computedStyle.marginRight) +
+			parseInt(computedStyle.marginLeft) +
+			parseInt(computedStyle.paddingLeft) +
+			parseInt(computedStyle.paddingRight)
+		);
 	};
 });

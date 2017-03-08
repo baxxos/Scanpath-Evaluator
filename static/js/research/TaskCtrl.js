@@ -9,11 +9,13 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			}
 		}).then(
 			function(response) {
-				$scope.task.scanpaths = response.data.scanpaths;
-				$scope.task.visuals = response.data.visuals;
-				$scope.task.aois = response.data.aois;
+				$scope.task.scanpaths = response.data.load.scanpaths;
+				$scope.task.visuals = response.data.load.visuals;
+				$scope.task.aois = response.data.load.aois;
 
-				redrawCanvas($scope.canvas, $scope.canvasWrapper, $scope.ctx, $scope.task.visuals.main, 'canvasInfo');
+				redrawCanvas(
+					$scope.canvas, $scope.canvasWrapper, $scope.ctx, $scope.canvasInfo,
+					$scope.task.visuals.main, 'default');
 			},
 			function(data) {
 				console.error('Failed to get task data content.', data);
@@ -21,7 +23,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		);
     };
 
-    // Calculate average similarity in a common scanpath similarity object provided by back-end as response
+    // Calculate average similarity in a common/custom scanpath similarity object provided by back-end as response
     var calcAvgSimToCommon = function(commonScanpathSimilarity) {
 		var similarity = 0, total = 0;
 
@@ -58,7 +60,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				}
 
 				// Draw the common scanpath on the canvas
-				drawFixations($scope.ctx, $scope.task.commonScanpath.fixations, $scope.canvasInfo.aois);
+				drawFixations(
+					$scope.canvas, $scope.ctx, $scope.canvasInfo,
+					$scope.task.commonScanpath.fixations, $scope.canvasInfo.aois, 'default'
+				);
 			},
 			function(data) {
 				console.error('Failed to get common scanpath response from the server.', data);
@@ -66,25 +71,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		);
     };
 
-    // Calculate average similarity to a custom scanpath data object provided by back-end as a response
-    var calcAvgSimToCustom = function(customScanpathSimilarity) {
-		var similarity = 0, total = 0;
-
-		// Loop through all similarity values stored in the similarity object
-		for (var scanpath in customScanpathSimilarity) {
-			similarity += customScanpathSimilarity[scanpath];
-			// Keep track of the total number of scanpaths as there is no keys.length in dict
-			total++;
-		}
-		return similarity / total;
-	};
-
 	var getCustomScanpathDetails = function(customScanpathStr) {
 		// Remove all whitespaces from the user input by regex
 		customScanpathStr = customScanpathStr.replace(/\s/g, "");
-		// Regex to normalize the scanpath (remove repeated AOIs: AABC -> ABC)
-		// The Regex /(.)\1+/ matches any single char followed by the same char at least once (+)
-		customScanpathStr = customScanpathStr.replace(/(.)\1+/g, '$1');
 
 		$http({
 			url: '/custom',
@@ -102,7 +91,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 					// Get the similarity object
 					var similarities = $scope.task.customScanpath.similarity;
 					// Get the average similarity of each user scanpath to the common scanpath
-					$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCustom(similarities);
+					$scope.task.customScanpath.avgSimToCommon = calcAvgSimToCommon(similarities);
 
 					// Assign each user scanpath its similarity to the common scanpath
 					for (var index in $scope.task.scanpaths) {
@@ -111,7 +100,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 					}
 
 					// Draw the custom scanpath onto the canvas
-					drawFixations($scope.ctx, $scope.task.customScanpath.fixations, $scope.canvasInfo.aois);
+					drawFixations(
+						$scope.canvas, $scope.ctx, $scope.canvasInfo,
+						$scope.task.customScanpath.fixations, $scope.canvasInfo.aois, 'default'
+					);
 				}
 				else {
 					console.error(response.data.message);
@@ -185,28 +177,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		});
 	};
 
-	// TODO move following to a separate ctrl/service OR move scanpath handling methods above
-	// Utility canvas methods
-	var calcWhitespaceToKeep = function(computedStyle) {
-		return (
-			parseInt(computedStyle.marginRight) +
-			parseInt(computedStyle.marginLeft) +
-			parseInt(computedStyle.paddingLeft) +
-			parseInt(computedStyle.paddingRight)
-		);
-	};
-
 	// Returns a set of random colors if none has been generated for the basic canvas yet
 	var getAoiColors = function() {
-		if($scope.canvasInfo.colors) {
-			return $scope.canvasInfo.colors;
-		}
-		else {
-			return randomColor({
-				luminosity: 'bright',
-				count: $scope.task.aois.length
-			});
-		}
+		return ($scope.canvasInfo.colors
+			? $scope.canvasInfo.colors
+			: randomColor({ luminosity: 'bright', count: $scope.task.aois.length })
+		);
 	};
 
 	// Canvas manipulation
@@ -217,7 +193,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
     	$scope.ctx = $scope.canvas.getContext('2d');
 
 		// Determine how much whitespace do we need to keep around the canvas after scaling
-		var whitespaceToKeep = calcWhitespaceToKeep(window.getComputedStyle($scope.canvasWrapper));
+		var whitespaceToKeep = CanvasDrawService.calcWhitespaceToKeep(
+			window.getComputedStyle($scope.canvasWrapper)
+		);
 
 		// Basic canvas setup
 		$scope.canvasInfo = {
@@ -233,13 +211,15 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	var initCanvasModal = function(canvasId, canvasWrapperId) {
-		// Fetch canvas elements in a non-angular way://
+		// Fetch modal canvas elements in a non-angular way://
 		$scope.canvasModal = document.getElementById(canvasId);
 		$scope.canvasModalWrapper = document.getElementById(canvasWrapperId);
     	$scope.ctxModal = $scope.canvasModal.getContext('2d');
 
 		// Determine how much whitespace do we need to keep around the canvas after scaling
-		var whitespaceToKeep = calcWhitespaceToKeep(window.getComputedStyle($scope.canvasModalWrapper));
+		var whitespaceToKeep = CanvasDrawService.calcWhitespaceToKeep(
+			window.getComputedStyle($scope.canvasModalWrapper)
+		);
 
 		// Basic canvas setup
 		$scope.canvasModalInfo = {
@@ -254,7 +234,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.ctxModal.beginPath();
 	};
 
-	var redrawCanvas = function(canvas, canvasWrapper, ctx, bgImagePath, canvasInfoObj) {
+	// TODO ditch target variable and include it in the canvasInfo object
+	var redrawCanvas = function(canvas, canvasWrapper, ctx, canvasInfo, bgImagePath, target, fixations) {
 		// Reset background image
 		canvas.style.backgroundImage = 'url(' + bgImagePath + ')';
 
@@ -263,46 +244,61 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		// Callback that gets triggered once the img has completed loading - it adjusts the canvas to the img
 		canvasImage.onload = function() {
 			// Determine the scaling based on canvas max width, whitespace and offset compared to image raw resolution
-			$scope[canvasInfoObj].scale =
-				(canvasWrapper.offsetWidth - $scope[canvasInfoObj].whitespaceToKeep - $scope[canvasInfoObj].offset * 2)
+			var scale =
+				(canvasWrapper.offsetWidth - canvasInfo.whitespaceToKeep - canvasInfo.offset * 2)
 				/ canvasImage.naturalWidth;
 
 			// Set scaled sizes of width/height and the apply the default offset
 			canvas.style.width =
-				canvasImage.naturalWidth * $scope[canvasInfoObj].scale + ($scope[canvasInfoObj].offset * 2) + 'px';
+				canvasImage.naturalWidth * scale + (canvasInfo.offset * 2) + 'px';
 			canvas.style.height =
-				canvasImage.naturalHeight * $scope[canvasInfoObj].scale + ($scope[canvasInfoObj].offset * 2) + 'px';
+				canvasImage.naturalHeight * scale + (canvasInfo.offset * 2) + 'px';
 			// Make canvas resolution match its real size
 			canvas.width = canvas.offsetWidth;
 			canvas.height = canvas.offsetHeight;
 
-			// Set of colors to be used for drawing AOIs
-			$scope[canvasInfoObj].colors = getAoiColors();
+			// Set of colors to be used for drawing AOIs - default needs to be checked first (not modal)
+			$scope.canvasInfo.colors = getAoiColors();
+			$scope.canvasModalInfo.colors = getAoiColors();
+
+			// Assign the calculated scale level to the correct canvas element
+			if(target === 'default') {
+				$scope.canvasInfo.scale = scale;
+			}
+			else if(target === 'modal') {
+				$scope.canvasModalInfo.scale = scale;
+			}
 
 			// ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
-			$scope[canvasInfoObj].aois = drawAois(ctx, $scope[canvasInfoObj], $scope.task.aois);
+			// If fixations are specified draw them (includes drawing AOIs implicitly)
+			if(fixations) {
+				drawFixations(canvas, ctx, canvasInfo, fixations, canvasInfo.aois, target);
+			}
+			// Else draw only AOIs
+			else {
+				drawAois(ctx, canvasInfo, $scope.task.aois, target);
+			}
 		};
 		canvasImage.src = bgImagePath;
 	};
 
-	var clearFixations = function() {
-		// Erase common scanpath fixation drawing by re-creating the canvas without it
-		$scope.ctx.clearRect(0, 0, $scope.canvas.width, $scope.canvas.height);
-		$scope.canvasInfo.aois = drawAois($scope.ctx, $scope.canvasInfo, $scope.task.aois);
+	var clearFixations = function(canvas, ctx, aois, target) {
+		// Erase common scanpath fixation drawing by erasing whole canvas
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		// Draw only AOIs next on the specified canvas (default/modal)
+		if(target === 'modal') {
+			drawAois(ctx, $scope.canvasModalInfo, aois, target);
+		}
+		else if(target === 'default') {
+			drawAois(ctx, $scope.canvasInfo, aois, target);
+		}
     };
 
-    var drawAois = function(ctx, canvasInfo, aoiData) {
-		// Reset previously drawn AOIs (object will be returned)
-		var drawnAois = {};
+    var drawAois = function(ctx, canvasInfo, aoiData, target) {
+		// Reset previously drawn AOIs
+		var aoiCanvasData = {};
 
-		// Data from backed is formatted as: ['aoiName', 'xFrom', 'xLen', 'yFrom', 'yLen', 'aoiShortName']
-		// Convert from strings to numbers TODO do this at the backend
-		for(var j = 0; j < aoiData.length; j++) {
-			for(var k = 1; k <= 4; k++) {
-				aoiData[j][k] = Number(aoiData[j][k]);
-			}
-		}
-
+		// Data from backed is formatted as: ['aoiName', xFrom, xLen, yFrom, yLen, 'aoiShortName']
 		aoiData.forEach(function(actAoi, index) {
 			var aoiBox = {
 				x: (actAoi[1] * canvasInfo.scale) + canvasInfo.offset,
@@ -318,22 +314,28 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			// Draw the AOI label
 			CanvasDrawService.drawLabel(ctx, canvasInfo, aoiBox);
 			// Remember the current AOI data for later access
-			drawnAois[aoiBox.name] = aoiBox;
+			aoiCanvasData[aoiBox.name] = aoiBox;
 		});
-		// Return the drawn AOI data such as coord, color etc.
-		return drawnAois;
+
+		// Remember the drawn aois based on the canvas target
+		if(target === 'modal') {
+			$scope.canvasModalInfo.aois = aoiCanvasData;
+		}
+		else if(target === 'default') {
+			$scope.canvasInfo.aois = aoiCanvasData;
+		}
 	};
 
-	var drawFixations = function(ctx, scanpath, aois) {
-		// Clear the canvas from previous fixation drawings first
-		clearFixations();
+	var drawFixations = function(canvas, ctx, canvasInfo, scanpath, aois, target) {
+		// Clear the specified canvas from previous fixation drawings first
+		clearFixations(canvas, ctx, $scope.task.aois, target);
 
 		for(var i = 1; i < scanpath.length; i++) {
 			// Fix for user-submitted common scanpath - the AOI might not be in the actual aoi set
 			if(CanvasDrawService.drawSaccade(
-				ctx, $scope.canvasInfo, aois, scanpath[i - 1], scanpath[i]) === false) {
+				ctx, canvasInfo, aois, scanpath[i - 1], scanpath[i]) === false) {
 				// Leave only AOIs drawn on the canvas and return
-				clearFixations();
+				clearFixations(canvas, ctx, $scope.task.aois, target);
 				return;
 			}
         }
@@ -346,15 +348,15 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				r: (fixation[1] ? fixation[1] : 400) / 40 // TODO limit the radius of circle to the enclosing AOI
 			};
 
-			CanvasDrawService.drawCircle(ctx, fixationCircle, '#000', $scope.canvasInfo.offset, '#44f');
+			CanvasDrawService.drawCircle(ctx, fixationCircle, '#000', canvasInfo.offset, '#44f');
 
 			// Draw a label (centering is based on the fontSize and stroke line width)
 			ctx.fillStyle = '#fff';
-			ctx.lineWidth = $scope.canvasInfo.offset;
+			ctx.lineWidth = canvasInfo.offset;
 			ctx.fillText(
 				(index + 1).toString(),
 				fixationCircle.x,
-				fixationCircle.y + ($scope.canvasInfo.fontSize / 2) - ctx.lineWidth
+				fixationCircle.y + (canvasInfo.fontSize / 2) - ctx.lineWidth
 			);
 		});
     };
@@ -363,8 +365,20 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.showCanvasModal = !$scope.showCanvasModal;
 
 		if($scope.showCanvasModal == true) {
-			initCanvasModal('scanpathCanvasModal', 'canvasWrapperModal');
-			redrawCanvas($scope.canvasModal, $scope.canvasModalWrapper, $scope.ctxModal, $scope.task.visuals.main, 'canvasModalInfo');
+			// Redraw the modal canvas when the element is revealed and its true size is known
+			var fixations = undefined;
+
+			if($scope.task.commonScanpath) {
+				fixations = $scope.task.commonScanpath.fixations;
+			}
+			if($scope.task.customScanpath) {
+				fixations = $scope.task.customScanpath.fixations;
+			}
+
+			redrawCanvas(
+				$scope.canvasModal, $scope.canvasModalWrapper, $scope.ctxModal, $scope.canvasModalInfo,
+				$scope.task.visuals.main, 'modal', fixations
+			);
 		}
 	};
 
@@ -382,8 +396,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		// Hide the zoomed in (modal) canvas element
 		$scope.showCanvasModal = false;
 
-		// Initialize the canvas element
+		// Initialize the canvas elements
 		initCanvas('scanpathCanvas', 'canvasWrapper');
+		initCanvasModal('scanpathCanvasModal', 'canvasWrapperModal');
+
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();
 	};

@@ -130,7 +130,7 @@ class DatasetTask(Base):
                 continue
             else:
                 temp = file_lines[x].split('\t')
-                self.aois.append([temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]])
+                self.aois.append([temp[0], int(temp[1]), int(temp[2]), int(temp[3]), int(temp[4]), temp[5]])
 
         fo.close()
 

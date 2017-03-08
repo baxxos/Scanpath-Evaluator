@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from User import User
 from Dataset import Dataset
 from DatasetTask import DatasetTask
-from sta import sta_run, custom_run, get_task_data_json
+from sta import sta_run, custom_run, get_task_data
 from database import session
 from config import config
 from sqlalchemy import exc, orm
@@ -144,10 +144,11 @@ def get_dataset_task():
         task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
-        return get_task_data_json(task)
+        return handle_success(get_task_data(task))
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
+        traceback.print_exc()
         return handle_error()
 
 

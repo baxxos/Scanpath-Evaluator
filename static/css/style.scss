@@ -1,16 +1,53 @@
-// Colors
+/*** Colors ***/
 $dark-red: #a00;
 $dark-green: #006400;
 
 $text-size-default: 16px;
 $text-size-smaller: 14px;
 
-// Global
+/*** Globals ***/
 body {
 	font-size: $text-size-default;
 }
 
-// Forms
+/*** Utilities **/
+.transparent {
+	opacity: 0;
+}
+
+// Modal window background
+.modal {
+    display: block; // Hidden by default
+    position: fixed; // Stay in place
+    z-index: 1; // Sit on top
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; // Enable scroll if needed
+    background-color: rgba(0, 0, 0, 0.4); // Black with opacity
+    cursor: pointer;
+}
+
+// Modal dismiss button
+.modal-close {
+    color: #a00;
+    font-size: $text-size-default * 2;
+	font-weight: bold;
+    cursor: pointer;
+}
+
+// Modal content
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; // 5% from the top and centered
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    cursor: default;
+}
+
+/*** Forms ***/
 #login-panel-main, #new-dataset-panel, #register_panel {
 	// User inputs with the same width
 	.input-group {
@@ -54,7 +91,7 @@ optgroup {
     padding-bottom: 6px;
 }
 
-// Task related screens
+/*** Task related elements ***/
 #scanpathTableWrapper {
 	max-height: 500px;
 	overflow: auto;
@@ -116,8 +153,8 @@ optgroup {
 	font-weight: bold;
 }
 
+// Task canvas elements
 #scanpathCanvas {
-	// border: 1px gray solid;
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center center;
@@ -138,11 +175,7 @@ optgroup {
 	max-width: 100%;
 }
 
-.transparent {
-	opacity: 0;
-}
-
-// Dataset related screens
+/*** Dataset related screens **/
 #dataset-name-heading {
 	font-weight: bold;
 }
@@ -168,7 +201,7 @@ label {
 	}
 }
 
-// Dataset sidebar screen
+/*** Dataset sidebar screen **/
 // Hard coded link to add a new dataset under dataset global tree navigation
 #addTreeData {
     padding: 3px 10px;

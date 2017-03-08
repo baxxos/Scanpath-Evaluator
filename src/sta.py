@@ -12,63 +12,59 @@ my_env = Environment(0.5, 60, 1920, 1080, 17)
 
 def createSequences(Participants, myAoIs, errorRateArea):
     # LEGACY CODE downloaded from the STA research paper
-    # TODO this SERIOUSLY lacks refactoring
     Sequences = {}
-    keys = Participants.keys()
-    for y in range(0, len(keys)):
-        sequence = ""
+    for participant_id in Participants:
+        sequence = ''
         prev_aoi = ''
         prev_duration = 0
         prev_total_duration = 0
-        for z in range(0, len(Participants[keys[y]])):
-            tempAoI = []
-            tempDuration = 0
-            for k in range(0, len(myAoIs)):
-                if float(Participants[keys[y]][z][3]) >= (float(myAoIs[k][1]) - errorRateArea) and float(
-                        Participants[keys[y]][z][3]) < (
-                ((float(myAoIs[k][1]) - errorRateArea) + (float(myAoIs[k][2]) + 2 * errorRateArea))) and float(
-                        Participants[keys[y]][z][4]) >= (float(myAoIs[k][3]) - errorRateArea) and float(
-                        Participants[keys[y]][z][4]) < (
-                ((float(myAoIs[k][3]) - errorRateArea) + (float(myAoIs[k][4]) + 2 * errorRateArea))):
-                    # tempAoI.append(myAoIs[k][5])
-                    # Workaround due to the poor legacy code - we need to know total area for each tempAoI
+        for fixation in Participants[participant_id]:
+            temp_aoi = []
+            temp_duration = 0
+            for act_aoi in myAoIs:
+                if float(fixation[3]) >= (act_aoi[1] - errorRateArea) and \
+                        float(fixation[3]) < ((act_aoi[1] - errorRateArea) + (act_aoi[2] + 2 * errorRateArea)) and \
+                        float(fixation[4]) >= (act_aoi[3] - errorRateArea) and \
+                        float(fixation[4]) < ((act_aoi[3] - errorRateArea) + (act_aoi[4] + 2 * errorRateArea)):
+                    # temp_aoi.append(act_aoi[5])
+                    # Workaround due to the poor quality legacy code - we need to know total area for each temp_aoi
                     # ['header', '0', '1864', '0', '90', 'Aa'] -> ['Aa', 1864 * 90]
-                    tempAoI.append([myAoIs[k][5], int(myAoIs[k][4]) * int(myAoIs[k][2])])
-                    tempDuration = int(Participants[keys[y]][z][2])
+                    temp_aoi.append([act_aoi[5], act_aoi[4] * act_aoi[2]])
+                    temp_duration = int(fixation[2])
 
             distanceList = []
 
-            if len(tempAoI) > 1:
-                tempAoI.sort(key=lambda x: x[1])
-                tempAoI = tempAoI[0][0]
+            if len(temp_aoi) > 1:
+                temp_aoi.sort(key=lambda x: x[1])
+                temp_aoi = temp_aoi[0][0]
                 """
-                for m in tempAoI:
+                for m in temp_aoi:
                     for n in range(0, len(myAoIs)):
                         if m == myAoIs[n][5]:
                             distance = []
                             for s in range(int(myAoIs[n][1]), int(myAoIs[n][1]) + int(myAoIs[n][2])):
                                 for f in range(int(myAoIs[n][3]), int(myAoIs[n][3]) + int(myAoIs[n][4])):
-                                    distance.append(math.sqrt(pow(float(Participants[keys[y]][z][3]) - s, 2) + pow(
-                                        float(Participants[keys[y]][z][4]) - f, 2)))
+                                    distance.append(math.sqrt(pow(float(fixation[3]) - s, 2) + pow(
+                                        float(fixation[4]) - f, 2)))
                             distanceList.append([myAoIs[n][5], min(distance)])
                 distanceList.sort(key=lambda x: x[1])
-                tempAoI = distanceList[0][0]
+                temp_aoi = distanceList[0][0]
                 """
-            if len(tempAoI) == 1:
-                if prev_aoi != tempAoI[0][0]:
-                    sequence = sequence + tempAoI[0][0] + "-" + str(tempDuration) + "."
-                    prev_total_duration = tempDuration
+            if len(temp_aoi) == 1:
+                if prev_aoi != temp_aoi[0][0]:
+                    sequence = sequence + temp_aoi[0][0] + "-" + str(temp_duration) + "."
+                    prev_total_duration = temp_duration
                 else:
-                    new_len = prev_total_duration + tempDuration
+                    new_len = prev_total_duration + temp_duration
 
                     sequence = sequence[0:(len(sequence) - len(str(prev_total_duration)) - 1)] + str(new_len) + '.'
 
-                    prev_total_duration += tempDuration
+                    prev_total_duration += temp_duration
 
-                prev_aoi = tempAoI[0][0]
-                prev_duration = tempDuration
+                prev_aoi = temp_aoi[0][0]
+                prev_duration = temp_duration
 
-        Sequences[keys[y]] = sequence
+        Sequences[participant_id] = sequence
 
     return Sequences
 
@@ -316,7 +312,7 @@ def get_raw_sequences(dataset_task):
 
 
 # Alter the sequences from their default format to the desired format used on client-side
-def get_task_data_json(dataset_task):
+def get_task_data(dataset_task):
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
@@ -332,7 +328,7 @@ def get_task_data_json(dataset_task):
         'aois': dataset_task.aois
     }
 
-    return json.dumps(ret_dataset)
+    return ret_dataset
 
 # STA Algorithm
 def sta_run(dataset_task):
