@@ -1,4 +1,6 @@
 angular.module('gazerApp').service('CanvasDrawService', function() {
+	var self = this;
+
 	/*** BASIC DRAWINGS ***/
 	// Handles drawing of basic geometric shapes onto the canvas
 	this.drawCircle = function(ctx, coords, strokeColor, lineWidth, fillColor) {
@@ -55,7 +57,7 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			xLen: fontSize,
 			yLen: fontSize
 		};
-		this.drawRect(ctx, labelBox, '#000', canvasInfo.offset, '#000');
+		self.drawRect(ctx, labelBox, '#000', canvasInfo.offset, '#000');
 
 		// Draw text in the exact center of the AOI box
 		ctx.fillStyle = '#fff';
@@ -83,9 +85,36 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
 		};
 
-		this.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
+		self.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
 	};
 
+	this.drawAois = function(ctx, canvasInfo, aoiData) {
+		// Reset previously drawn AOIs
+		var aoiCanvasData = {};
+
+		// Data from backed is formatted as: ['aoiName', xFrom, xLen, yFrom, yLen, 'aoiShortName']
+		aoiData.forEach(function(actAoi, index) {
+			var aoiBox = {
+				x: (actAoi[1] * canvasInfo.scale) + canvasInfo.offset,
+				y: (actAoi[3] * canvasInfo.scale) + canvasInfo.offset,
+				xLen: actAoi[2] * canvasInfo.scale,
+				yLen: actAoi[4] * canvasInfo.scale,
+				name: actAoi[5],
+				fullName: actAoi[0]
+			};
+
+			// Draw the AOI box
+			self.drawRect(ctx, aoiBox, canvasInfo.colors[index], canvasInfo.offset);
+			// Draw the AOI label
+			self.drawLabel(ctx, canvasInfo, aoiBox);
+			// Remember the current AOI data for later access
+			aoiCanvasData[aoiBox.name] = aoiBox;
+		});
+		// Return data (e.g. to be assigned to the scope)
+		return aoiCanvasData;
+	};
+
+	/*** UTILITIES ***/
 	this.calcWhitespaceToKeep = function(computedStyle) {
 		return (
 			parseInt(computedStyle.marginRight) +

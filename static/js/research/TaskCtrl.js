@@ -1,5 +1,6 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
 angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http, $window, CanvasDrawService) {
+	/*** DATA-HANDLING METHODS ***/
 	$scope.getTaskScanpaths = function() {
 		$http({
 			url: 'get_task_data',
@@ -123,6 +124,19 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		);
     };
 
+    /*** VIEW-HANDLING METHODS ***/
+	$scope.toggleAllRows = function(toggleValue) {
+		if(toggleValue == false) {
+			$scope.expanded = {};
+		}
+		else {
+			for (var i = 0; i < $scope.task.scanpaths.length; i++) {
+				var id = $scope.task.scanpaths[i].identifier;
+				$scope.expanded[id] = true;
+			}
+		}
+	};
+
 	$scope.fillTableDetails = function() {
 		if ($scope.customScanpath && $scope.customScanpathText) {
 			getCustomScanpathDetails($scope.customScanpathText);
@@ -158,7 +172,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
-	// Removes excluded flag from all available scanpaths
+	// Removes the excluded flag from all available scanpaths
 	$scope.setAllScanpathsValue = function(val) {
 		// Re-initialize the excluded scanpaths array
 		$scope.task.excludedScanpaths = [];
@@ -176,21 +190,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
-	// Inverse function to the one above (since classic toggle is not user friendly)
-	$scope.disableAllScanpaths = function() {
-		$scope.task.excludedScanpaths = [];
-		$scope.task.scanpaths.forEach(function(scanpath) {
-			scanpath.excluded = true;
-			$scope.task.excludedScanpaths.push(scanpath.id);
-		});
-	};
-
-	// Returns a set of random colors if none has been generated for the basic canvas yet
-	var getAoiColors = function() {
-		return ($scope.canvasInfo.colors
+	/*** CANVAS CONTROLS ***/
+	// Returns a set of random colors if none has been generated for the specified source canvas yet
+	var getAoiColors = function(aois) {
+		return $scope.canvasInfo.colors
 			? $scope.canvasInfo.colors
-			: randomColor({ luminosity: 'bright', count: $scope.task.aois.length })
-		);
+			: randomColor({ luminosity: 'bright', count: aois.length });
 	};
 
 	// Canvas manipulation
@@ -265,9 +270,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			canvas.width = canvas.offsetWidth;
 			canvas.height = canvas.offsetHeight;
 
-			// Set of colors to be used for drawing AOIs - default needs to be checked first (not modal)
-			$scope.canvasInfo.colors = getAoiColors();
-			$scope.canvasModalInfo.colors = getAoiColors();
+			// Set of colors to be used for drawing AOIs - default canvas needs to be checked first (not the modal one)
+			$scope.canvasInfo.colors = getAoiColors($scope.task.aois);
+			$scope.canvasModalInfo.colors = getAoiColors($scope.task.aois);
 
 			// Assign the calculated scale level to the correct canvas element
 			if(canvasInfo.target === 'default') {
@@ -286,10 +291,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			else {
 				// Store the drawn aois (based on the canvas target)
 				if(canvasInfo.target === 'modal') {
-					$scope.canvasModalInfo.aois = drawAois(ctx, canvasInfo, aois);
+					$scope.canvasModalInfo.aois = CanvasDrawService.drawAois(ctx, canvasInfo, aois);
 				}
 				else if(canvasInfo.target === 'default') {
-					$scope.canvasInfo.aois = drawAois(ctx, canvasInfo, aois);
+					$scope.canvasInfo.aois = CanvasDrawService.drawAois(ctx, canvasInfo, aois);
 				}
 			}
 		};
@@ -301,38 +306,12 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		// Draw only AOIs next on the specified canvas (default/modal)
 		if(target === 'modal') {
-			$scope.canvasModalInfo.aois = drawAois(ctx, $scope.canvasModalInfo, aois);
+			$scope.canvasModalInfo.aois = CanvasDrawService.drawAois(ctx, $scope.canvasModalInfo, aois);
 		}
 		else if(target === 'default') {
-			$scope.canvasInfo.aois = drawAois(ctx, $scope.canvasInfo, aois);
+			$scope.canvasInfo.aois = CanvasDrawService.drawAois(ctx, $scope.canvasInfo, aois);
 		}
     };
-
-    var drawAois = function(ctx, canvasInfo, aoiData) {
-		// Reset previously drawn AOIs
-		var aoiCanvasData = {};
-
-		// Data from backed is formatted as: ['aoiName', xFrom, xLen, yFrom, yLen, 'aoiShortName']
-		aoiData.forEach(function(actAoi, index) {
-			var aoiBox = {
-				x: (actAoi[1] * canvasInfo.scale) + canvasInfo.offset,
-				y: (actAoi[3] * canvasInfo.scale) + canvasInfo.offset,
-				xLen: actAoi[2] * canvasInfo.scale,
-				yLen: actAoi[4] * canvasInfo.scale,
-				name: actAoi[5],
-				fullName: actAoi[0]
-			};
-
-			// Draw the AOI box
-			CanvasDrawService.drawRect(ctx, aoiBox, canvasInfo.colors[index], canvasInfo.offset);
-			// Draw the AOI label
-			CanvasDrawService.drawLabel(ctx, canvasInfo, aoiBox);
-			// Remember the current AOI data for later access
-			aoiCanvasData[aoiBox.name] = aoiBox;
-		});
-		// Return data (e.g. to be assigned to the scope)
-		return aoiCanvasData;
-	};
 
 	var drawFixations = function(canvas, ctx, canvasInfo, scanpath) {
 		// Get the drawn AOIs data from canvasInfo (coords, size etc.)
@@ -413,18 +392,6 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				$scope.canvasModal, $scope.canvasModalWrapper, $scope.ctxModal, $scope.canvasModalInfo,
 				$scope.task.visuals.main, $scope.task.aois, fixations
 			);
-		}
-	};
-
-	$scope.toggleAllRows = function(toggleValue) {
-		if(toggleValue == false) {
-			$scope.expanded = {};
-		}
-		else {
-			for (var i = 0; i < $scope.task.scanpaths.length; i++) {
-				var id = $scope.task.scanpaths[i].identifier;
-				$scope.expanded[id] = true;
-			}
 		}
 	};
 
