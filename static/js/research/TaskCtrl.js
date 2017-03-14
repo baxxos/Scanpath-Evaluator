@@ -197,6 +197,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
+	$scope.viewCanvasAsImage = function() {
+		window.open($scope.canvas.toDataURL('image/jpeg', 0.5), '_blank');
+	};
+
 	/*** CANVAS CONTROLS ***/
 	// Returns a set of random colors if none has been generated for the specified source canvas yet
 	var getAoiColors = function(aois) {
