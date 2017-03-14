@@ -15,6 +15,7 @@ angular.module('gazerApp').service('DataTreeService', function($http) {
 			}
 		}).then(
 			function(response) {
+				// Replace the current data tree (any depending ctrl will fire $watch event)
                 DataTreeService.dataTree = response.data;
 			},
 			function(data){

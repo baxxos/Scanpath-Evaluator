@@ -48,7 +48,7 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		var fontSize = canvasInfo.fontSize;
 		ctx.font = 'bold ' + fontSize + 'px Helvetica, Arial';
 		ctx.textAlign = 'center';
-		ctx.lineWidth = canvasInfo.offset;
+		ctx.lineWidth = canvasInfo.lineWidth;
 
 		// Draw the label background rectangle in the center of the AOI box
 		var labelBox = {
@@ -57,7 +57,7 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			xLen: fontSize,
 			yLen: fontSize
 		};
-		self.drawRect(ctx, labelBox, '#000', canvasInfo.offset, '#000');
+		self.drawRect(ctx, labelBox, '#000', canvasInfo.lineWidth, '#000');
 
 		// Draw text in the exact center of the AOI box
 		ctx.fillStyle = '#fff';
@@ -85,12 +85,15 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
 		};
 
-		self.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.offset);
+		self.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.lineWidth / 2);
 	};
 
-	this.drawAois = function(ctx, canvasInfo, aoiData) {
+	this.drawAois = function(canvas, ctx, canvasInfo, backgroundImg, aoiData) {
 		// Reset previously drawn AOIs
 		var aoiCanvasData = {};
+		// Clear canvas and draw background image
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
 
 		// Data from backed is formatted as: ['aoiName', xFrom, xLen, yFrom, yLen, 'aoiShortName']
 		aoiData.forEach(function(actAoi, index) {
@@ -104,7 +107,7 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			};
 
 			// Draw the AOI box
-			self.drawRect(ctx, aoiBox, canvasInfo.colors[index], canvasInfo.offset);
+			self.drawRect(ctx, aoiBox, canvasInfo.colors[index], canvasInfo.lineWidth);
 			// Draw the AOI label
 			self.drawLabel(ctx, canvasInfo, aoiBox);
 			// Remember the current AOI data for later access
@@ -112,15 +115,5 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		});
 		// Return data (e.g. to be assigned to the scope)
 		return aoiCanvasData;
-	};
-
-	/*** UTILITIES ***/
-	this.calcWhitespaceToKeep = function(computedStyle) {
-		return (
-			parseInt(computedStyle.marginRight) +
-			parseInt(computedStyle.marginLeft) +
-			parseInt(computedStyle.paddingLeft) +
-			parseInt(computedStyle.paddingRight)
-		);
 	};
 });
