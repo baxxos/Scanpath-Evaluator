@@ -90,10 +90,23 @@
             </div>
         </div>
         <!-- Display controls -->
-        <div class="row">
+        <div class="row" id="displayControls">
             <div class="col-md-12">
                 <h3>Display controls:</h3>
                 <button class="btn btn-default" ng-click="viewCanvasAsImage()">View as image</button>
+                <button class="btn btn-default" ng-click="showAoiLegend = !showAoiLegend">AOI legend</button>
+            </div>
+        </div>
+        <!-- AOI legend -->
+        <div class="row" uib-collapse="!showAoiLegend" id="aoiLegend">
+            <div class="col-md-12">
+                <div class="well well-sm">
+                    <ul>
+                        <li ng-repeat="aoi in task.aois">
+                            {{ aoi[5] }} - {{ aoi[0] }} <span class="aoiFullName">({{ aoi[2] }} x {{ aoi[4] }})</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

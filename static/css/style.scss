@@ -187,6 +187,20 @@ optgroup {
 	}
 }
 
+#displayControls {
+	margin-bottom: 15px;
+}
+
+#aoiLegend {
+	ul {
+		list-style-type: circle;
+	}
+	
+	.aoiFullName {
+		font-style: italic;
+	}
+}
+
 // Task canvas elements
 #scanpathCanvas {
 	background-size: cover;

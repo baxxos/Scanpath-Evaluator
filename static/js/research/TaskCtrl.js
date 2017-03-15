@@ -354,8 +354,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			// Remember last user action to determine modal canvas content
 			lastAction: ''
 		};
-		// Hide the zoomed in (modal) canvas element
+		// Hide the zoomed in (modal) canvas element and AOI legend
 		$scope.showCanvasModal = false;
+		$scope.showAoiLegend = false;
 
 		// Initialize the canvas elements
 		initCanvas('scanpathCanvas', 'canvasWrapper');
