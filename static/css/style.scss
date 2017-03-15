@@ -1,7 +1,11 @@
+/*** Imports ***/
+@import "open-color";
+
 /*** Colors ***/
-$dark-red: #a00;
-$faded-red: #fff5f5;
-$dark-green: #006400;
+$red-cancel: $oc-red-9;
+$red-faded: $oc-red-0;
+$green-success: $oc-green-9;
+$blue-controls: $oc-blue-9;
 
 $text-size-default: 16px;
 $text-size-smaller: 14px;
@@ -32,7 +36,7 @@ body {
 
 // Modal dismiss button
 .modal-close {
-    color: #a00;
+    color: $red-cancel;
     font-size: $text-size-default * 2;
 	font-weight: bold;
     cursor: pointer;
@@ -73,7 +77,7 @@ body {
 
 form {
 	.input-required {
-			color: $dark-red;
+			color: $red-cancel;
 	}
 
 	label {
@@ -119,32 +123,59 @@ optgroup {
 		}
 	}
 
+	// The user-selected individual scanpath for visualization
+	.row-selected {
+		background-color: $oc-blue-0;
+	}
+
 	// Excluding/including individual scanpaths
 	.row-excluded {
-		background-color: $faded-red;
+		background-color: $red-faded;
 
-		td:not(:nth-child(1)), .userScanpathFixations {
+		// Set lower opacity for all table data except first two (ID & controls)
+		td:not(:nth-child(2)), .userScanpathFixations {
 			opacity: 0.25;
 		}
 	}
 
-	.control-include, .control-exclude {
+	.control-include, .control-exclude, .control-expand, .control-visualize {
 		&:focus, &:active, &:hover {
 			opacity: 1;
 		}
 
+		margin-right: 5px;
 		cursor: pointer;
 		opacity: 0.25;
-		color: white;
-		margin-right: 5px;
-		background-color: $dark-green;
-		padding: 2px;
 		border-radius: 4px;
+		padding: 2px;
+		color: white;
+	}
+
+	.control-include {
+		background-color: $green-success;
 	}
 
 	.control-exclude {
-		// Overwrite style inherited from .control-include
-		background-color: $dark-red;
+		background-color: $red-cancel;
+	}
+
+	.control-visualize {
+		color: $blue-controls;
+		background-color: #fff;
+		border-color: $blue-controls;
+		border: 1px solid;
+	}
+
+	.control-expand {
+		color: $blue-controls;
+		background-color: #fff;
+		border-color: $blue-controls;
+		border: 1px solid;
+
+		&:focus, &:active, &:hover {
+			background-color: $oc-blue-0;
+			font-weight: bold;
+		}
 	}
 
 	// Expanding/collapsing individual scanpaths
@@ -162,23 +193,6 @@ optgroup {
 	.userScanpathFixations {
 		text-align: justify;
 	}
-
-	.userScanpathExpand {
-		color: #337ab7;
-		cursor: pointer;
-		padding: 2px;
-		border-radius: 4px;
-		background-color: #fff;
-		border-color: #337ab7;
-		border: 1px solid;
-
-		&:hover {
-			border-color: #23527c;
-			background-color: #e8f7ff;
-			color: #23527c;
-			font-weight: bold;
-		}
-	}
 }
 
 #scanpathTableControls {
@@ -189,11 +203,21 @@ optgroup {
 
 #displayControls {
 	margin-bottom: 15px;
+
+	// Separate the buttons visually if they ever become stacked (too many of them)
+	button {
+		margin-bottom: 5px;
+	}
 }
 
 #aoiLegend {
 	ul {
 		list-style-type: circle;
+	}
+
+	.well {
+		overflow: auto;
+		max-height: 250px;
 	}
 	
 	.aoiFullName {

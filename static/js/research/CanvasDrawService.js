@@ -116,4 +116,50 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 		// Return data (e.g. to be assigned to the scope)
 		return aoiCanvasData;
 	};
+
+	this.drawFixations = function(canvas, ctx, canvasInfo, drawnAois, scanpath) {
+		for(var i = 1; i < scanpath.length; i++) {
+			// Fix for user-submitted common scanpath - the AOI might not be in the actual aoi set
+			if(self.drawSaccade(
+				ctx, canvasInfo, drawnAois, scanpath[i - 1], scanpath[i]) === false) {
+				return false;
+			}
+        }
+
+        /* Normalize the fixation circles to a maximum size of 1/10 of the corresponding canvas
+         * (max circle radius equal to 1/20 of canvas width). */
+        var maxCircleRadius = canvas.width / 20;
+		var minCircleRadius = canvasInfo.fontSize / 2;
+        var fixationLengths = scanpath.map(function(fixation) { return fixation[1]; });
+		var sizeRatio = Math.max.apply(Math, fixationLengths) / maxCircleRadius;
+
+		sizeRatio = (sizeRatio > 0 ? sizeRatio : 1);
+
+		// Draw a fixation circle in the approximate center of the corresponding AOI box
+		scanpath.forEach(function(fixation, index) {
+			/* If there is no data about fixation length (e.g. user-submitted common scanpath) then set all circle
+			 * sizes equal to the half of the maximum circle radius */
+			var fixationRadius = (fixation[1] ? fixation[1] : (maxCircleRadius / 2));
+			// Normalize the values by previously computed ratio
+			fixationRadius /= sizeRatio;
+
+			var fixationCircle = {
+				x: drawnAois[fixation[0]].x + (drawnAois[fixation[0]].xLen / 2),
+				y: drawnAois[fixation[0]].y + (drawnAois[fixation[0]].yLen / 2),
+				// Minimum readable circle size radius must be at least equal to the half of the font size
+				r: (fixationRadius >= (minCircleRadius) ? fixationRadius : (minCircleRadius))
+			};
+
+			self.drawCircle(ctx, fixationCircle, '#000', canvasInfo.lineWidth / 2, '#44f');
+
+			// Draw a label (centering is based on the fontSize and stroke line width)
+			ctx.fillStyle = '#fff';
+			ctx.lineWidth = canvasInfo.lineWidth;
+			ctx.fillText(
+				(index + 1).toString(),
+				fixationCircle.x,
+				fixationCircle.y + (canvasInfo.fontSize / 2) - ctx.lineWidth
+			);
+		});
+    };
 });

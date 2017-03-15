@@ -95,6 +95,7 @@
                 <h3>Display controls:</h3>
                 <button class="btn btn-default" ng-click="viewCanvasAsImage()">View as image</button>
                 <button class="btn btn-default" ng-click="showAoiLegend = !showAoiLegend">AOI legend</button>
+                <button class="btn btn-default" ng-click="clearFixations()">Clear fixations</button>
             </div>
         </div>
         <!-- AOI legend -->
@@ -148,18 +149,20 @@
                 </tr>
             </thead>
             <tbody ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
-                ng-class="{'row-container-expanded': expanded[scanpath.identifier]}" ng-class="{'row-expanded': expanded[scanpath.identifier]}">
-                <tr ng-class="{'row-excluded': scanpath.excluded}">
+                   ng-class="{'row-container-expanded': expanded[scanpath.identifier]}">
+                <tr ng-class="{'row-selected': task.individualScanpath.identifier == scanpath.identifier, 'row-excluded': scanpath.excluded}">
                     <td class="userScanpathId"
                         ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]">
                         {{ scanpath.identifier }}
                     </td>
-                    <td>
-                        <span class="glyphicon glyphicon-ok control-include"
+                    <td class="col-md-2">
+                        <span class="glyphicon glyphicon-ok control-include" title="This scanpath is included"
                               ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}"></span>
-                        <span class="glyphicon glyphicon-remove control-exclude"
+                        <span class="glyphicon glyphicon-remove control-exclude" title="This scanpath is excluded"
                               ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}"></span>
-                        <span class="glyphicon glyphicon-menu-down userScanpathExpand"
+                        <span class="glyphicon glyphicon-picture control-visualize" title="Visualize this scanpath"
+                              ng-click="drawIndividualScanpath(scanpath)"></span>
+                        <span class="glyphicon glyphicon-menu-down control-expand" title="View scanpath fixations"
                               ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]"></span>
                     </td>
                     <td>{{ scanpath.fixations.length }}</td>
@@ -184,8 +187,12 @@
     </div>
     <div id="scanpathTableControls">
         <div class="btn-group">
-            <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">Enable all</button>
-            <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">Disable all</button>
+            <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">
+                Enable all
+            </button>
+            <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">
+                Disable all
+            </button>
         </div>
 
         <div class="btn-group">
