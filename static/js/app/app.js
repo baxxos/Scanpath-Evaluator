@@ -6,7 +6,7 @@ angular.module(
 	'gazerApp',
 	[
 		'ngAnimate', 'ngTouch', 'ui.router', 'ui.bootstrap', 'ncy-angular-breadcrumb',
-		'angularBootstrapNavTree', 'ngCookies', 'ngFileUpload'
+		'angularBootstrapNavTree', 'ngCookies', 'ngFileUpload', 'ngSanitize', 'ngCsv'
 	]
 );
 

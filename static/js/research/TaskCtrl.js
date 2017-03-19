@@ -20,7 +20,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				$scope.canvasInfo.backgroundImg.onload = function() {
 					// Draw returned data onto the default canvas
 					$scope.canvasInfo.aois = redrawCanvas(
-						$scope.canvas, $scope.canvasWrapper, $scope.ctx, $scope.canvasInfo,
+						$scope.canvas, $scope.ctx, $scope.canvasInfo,
 						$scope.canvasInfo.backgroundImg, $scope.task.aois
 					);
 				};
@@ -218,12 +218,37 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	$scope.clearFixations = function() {
 		// Remember the action & scanpath data for drawing on modal canvas later
 		$scope.task.lastAction = '';
+
+		// Reset any previously calculated individual, custom and common scanpaths
 		$scope.task.individualScanpath = {};
+		$scope.task.commonScanpath = {};
+		$scope.task.customScanpath = {};
 
 		$scope.canvasInfo.aois = redrawCanvas(
-			$scope.canvas, $scope.canvasWrapper, $scope.ctx, $scope.canvasInfo,
+			$scope.canvas, $scope.ctx, $scope.canvasInfo,
 			$scope.canvasInfo.backgroundImg, $scope.task.aois
 		);
+	};
+
+	// CSV export utility method
+	$scope.getTableExport = function() {
+		var exportArray = [];
+
+		for(var i = 0; i < $scope.task.scanpaths.length; i++) {
+			var actScanpath = $scope.task.scanpaths[i];
+
+			exportArray.push({
+				id: actScanpath.identifier,
+				totalFixations: actScanpath.fixations.length,
+				mostSimilarTo: actScanpath.minSimilarity.identifier,
+				mostSimilarVal: actScanpath.minSimilarity.value,
+				leastSimilarTo: actScanpath.maxSimilarity.identifier,
+				leastSimilarVal: actScanpath.maxSimilarity.value,
+				simToCommon: actScanpath.simToCommon ? actScanpath.simToCommon : 'N/A'
+			});
+		}
+
+		return exportArray;
 	};
 
 	/*** CANVAS CONTROLS ***/
@@ -235,10 +260,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	// Canvas manipulation
-	var initCanvas = function(canvasId, canvasWrapperId) {
+	var initCanvasDefault = function(canvasId) {
 		// Fetch canvas elements in a non-angular way://
 		$scope.canvas = document.getElementById(canvasId);
-		$scope.canvasWrapper = document.getElementById(canvasWrapperId);
     	$scope.ctx = $scope.canvas.getContext('2d');
 
 		// Basic canvas setup
@@ -255,10 +279,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.ctx.beginPath();
 	};
 
-	var initCanvasModal = function(canvasId, canvasWrapperId) {
+	var initCanvasModal = function(canvasId) {
 		// Fetch modal canvas elements in a non-angular way://
 		$scope.canvasModal = document.getElementById(canvasId);
-		$scope.canvasModalWrapper = document.getElementById(canvasWrapperId);
     	$scope.ctxModal = $scope.canvasModal.getContext('2d');
 
 		$scope.ctxModal.globalAlpha = 1.0;
@@ -266,7 +289,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	// Redraws the specified canvas with AOIs and also fixations if provided
-	var redrawCanvas = function(canvas, canvasWrapper, ctx, canvasInfo, backgroundImage, aois, fixations) {
+	var redrawCanvas = function(canvas, ctx, canvasInfo, backgroundImage, aois, fixations) {
 		// Make canvas resolution match its real size
 		canvas.width = backgroundImage.naturalWidth;
 		canvas.height = backgroundImage.naturalHeight;
@@ -323,7 +346,7 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			}
 
 			$scope.canvasInfo.aoisModal = redrawCanvas(
-				$scope.canvasModal, $scope.canvasModalWrapper, $scope.ctxModal, $scope.canvasInfo,
+				$scope.canvasModal, $scope.ctxModal, $scope.canvasInfo,
 				$scope.canvasInfo.backgroundImg, $scope.task.aois, fixations
 			);
 		}
@@ -347,8 +370,8 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		$scope.showAoiLegend = false;
 
 		// Initialize the canvas elements
-		initCanvas('scanpathCanvas', 'canvasWrapper');
-		initCanvasModal('scanpathCanvasModal', 'canvasWrapperModal');
+		initCanvasDefault('scanpathCanvas');
+		initCanvasModal('scanpathCanvasModal');
 
 		// Get the basic scanpath data
 		$scope.getTaskScanpaths();

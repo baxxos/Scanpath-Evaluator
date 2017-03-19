@@ -101,6 +101,7 @@ optgroup {
 	max-height: 500px;
 	overflow: auto;
 	margin-bottom: 20px;
+	margin-top: 20px;
 }
 
 #scanpathTable {
@@ -123,11 +124,6 @@ optgroup {
 		}
 	}
 
-	// The user-selected individual scanpath for visualization
-	.row-selected {
-		background-color: $oc-blue-0;
-	}
-
 	// Excluding/including individual scanpaths
 	.row-excluded {
 		background-color: $red-faded;
@@ -136,6 +132,11 @@ optgroup {
 		td:not(:nth-child(2)), .userScanpathFixations {
 			opacity: 0.25;
 		}
+	}
+
+	// The user-selected individual scanpath for visualization
+	.row-selected {
+		background-color: $oc-blue-0;
 	}
 
 	.control-include, .control-exclude, .control-expand, .control-visualize {

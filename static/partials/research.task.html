@@ -54,7 +54,7 @@
             <div class="col-md-12">
                 <h4>Common scanpath:</h4>
                 <p>
-                    <span ng-hide="task.commonScanpath">Not available</span>
+                    <span ng-hide="task.commonScanpath.fixations">Not available</span>
                     <span ng-repeat="fixation in task.commonScanpath.fixations track by $index">
                         {{ fixation[0] }} <sup>{{ fixation[1] }}</sup>
                     </span>
@@ -74,7 +74,7 @@
             <div class="col-md-12">
                 <h3>Custom scanpath:</h3>
                 <p>
-                    <span ng-hide="task.customScanpath">Not available</span>
+                    <span ng-hide="task.customScanpath.fixations">Not available</span>
                     <span ng-repeat="fixation in task.customScanpath.fixations track by $index">
                         {{ fixation[0] }}
                     </span>
@@ -95,7 +95,7 @@
                 <h3>Display controls:</h3>
                 <button class="btn btn-default" ng-click="viewCanvasAsImage()">View as image</button>
                 <button class="btn btn-default" ng-click="showAoiLegend = !showAoiLegend">AOI legend</button>
-                <button class="btn btn-default" ng-click="clearFixations()">Clear fixations</button>
+                <button class="btn btn-default" ng-click="clearFixations()">Clear results</button>
             </div>
         </div>
         <!-- AOI legend -->
@@ -130,74 +130,88 @@
         </div>
     </div>
 </div>
-<hr />
 
 <div class="row">
-    <div id="scanpathTableWrapper">
-        <!-- Results overview -->
-        <table class="table table-hover table-responsive" id="scanpathTable">
-            <thead>
-                <tr>
-                    <th ng-click="setSort('identifier')">ID</th>
-                    <th>Controls</th>
-                    <th ng-click="setSort('fixations.length')">Scanpath length</th>
-                    <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
-                    <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
-                    <th ng-click="setSort('minSimilarity.identifier')">Least similar to</th>
-                    <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
-                    <th ng-click="setSort('simToCommon')">Similarity to common</th>
-                </tr>
-            </thead>
-            <tbody ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
-                   ng-class="{'row-container-expanded': expanded[scanpath.identifier]}">
-                <tr ng-class="{'row-selected': task.individualScanpath.identifier == scanpath.identifier, 'row-excluded': scanpath.excluded}">
-                    <td class="userScanpathId"
-                        ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]">
-                        {{ scanpath.identifier }}
-                    </td>
-                    <td class="col-md-2">
-                        <span class="glyphicon glyphicon-ok control-include" title="This scanpath is included"
-                              ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}"></span>
-                        <span class="glyphicon glyphicon-remove control-exclude" title="This scanpath is excluded"
-                              ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}"></span>
-                        <span class="glyphicon glyphicon-picture control-visualize" title="Visualize this scanpath"
-                              ng-click="drawIndividualScanpath(scanpath)"></span>
-                        <span class="glyphicon glyphicon-menu-down control-expand" title="View scanpath fixations"
-                              ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]"></span>
-                    </td>
-                    <td>{{ scanpath.fixations.length }}</td>
-                    <td>{{ scanpath.maxSimilarity.identifier }}</td>
-                    <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
-                    <td>{{ scanpath.minSimilarity.identifier }}</td>
-                    <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
-                    <td ng-show="scanpath.simToCommon >= 0">
-                        {{ scanpath.simToCommon | number: 2 }}%
-                    </td>
-                    <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
-                </tr>
-                <tr ng-if="expanded[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
-                    <td colspan="42" class="userScanpathFixations">
-                        <span ng-repeat="fixation in scanpath.fixations track by $index">
-                            {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>
-                        </span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="scanpathTableControls">
-        <div class="btn-group">
-            <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">
-                Enable all
-            </button>
-            <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">
-                Disable all
-            </button>
+    <div class="col-md-12">
+        <div class="panel panel-default" id="scanpathTableWrapper">
+            <!-- Results table heading -->
+            <div class="panel-heading">Individual scanpaths</div>
+            <!-- Results table overview content -->
+            <table class="table table-hover table-responsive" id="scanpathTable">
+                <thead>
+                    <tr>
+                        <th ng-click="setSort('identifier')">ID</th>
+                        <th>Controls</th>
+                        <th ng-click="setSort('fixations.length')">Scanpath length</th>
+                        <th ng-click="setSort('maxSimilarity.identifier')">Most similar to</th>
+                        <th ng-click="setSort('maxSimilarity.value')">Most similar to (val)</th>
+                        <th ng-click="setSort('minSimilarity.identifier')">Least similar to</th>
+                        <th ng-click="setSort('minSimilarity.value')">Least similar to (val)</th>
+                        <th ng-click="setSort('simToCommon')">Similarity to common</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
+                       ng-class="{'row-container-expanded': expanded[scanpath.identifier]}">
+                    <tr ng-class="{'row-selected': task.individualScanpath.identifier == scanpath.identifier, 'row-excluded': scanpath.excluded}">
+                        <td class="userScanpathId"
+                            ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]">
+                            {{ scanpath.identifier }}
+                        </td>
+                        <td class="col-md-2">
+                            <span class="glyphicon glyphicon-ok control-include" title="This scanpath is included"
+                                  ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}">
+                            </span>
+                            <span class="glyphicon glyphicon-remove control-exclude" title="This scanpath is excluded"
+                                  ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}">
+                            </span>
+                            <span class="glyphicon glyphicon-picture control-visualize" title="Visualize this scanpath"
+                                  ng-click="drawIndividualScanpath(scanpath)"></span>
+                            <span class="glyphicon glyphicon-menu-down control-expand" title="View scanpath fixations"
+                                  ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]"></span>
+                        </td>
+                        <td>{{ scanpath.fixations.length }}</td>
+                        <td>{{ scanpath.maxSimilarity.identifier }}</td>
+                        <td>{{ scanpath.maxSimilarity.value | number: 2}}%</td>
+                        <td>{{ scanpath.minSimilarity.identifier }}</td>
+                        <td>{{ scanpath.minSimilarity.value | number: 2}}%</td>
+                        <td ng-show="scanpath.simToCommon >= 0">
+                            {{ scanpath.simToCommon | number: 2 }}%
+                        </td>
+                        <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
+                    </tr>
+                    <tr ng-if="expanded[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
+                        <td colspan="42" class="userScanpathFixations">
+                            <span ng-repeat="fixation in scanpath.fixations track by $index">
+                                {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
-        <div class="btn-group">
-            <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(true)">Expand all</button>
-            <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(false)">Collapse all</button>
+        <!-- Scanpath table control panel -->
+        <div id="scanpathTableControls">
+            <!-- Include/exclude scanpaths from calculations -->
+            <div class="btn-group">
+                <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">
+                    Enable all
+                </button>
+                <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">
+                    Disable all
+                </button>
+            </div>
+            <!-- Expand/collapse advanced scanpath data -->
+            <div class="btn-group">
+                <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(true)">Expand all</button>
+                <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(false)">Collapse all</button>
+            </div>
+            <!-- Utility functions -->
+            <div class="btn-group">
+                <button class="btn btn-default btn-sm" ng-csv="getTableExport()" csv-label="true"
+                        filename="scanpathsExport.csv">
+                    CSV export
+                </button>
+            </div>
         </div>
     </div>
 </div>

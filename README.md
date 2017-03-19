@@ -58,7 +58,7 @@ DEPENDENCIES:
             <a href="https://github.com/danialfarid/ng-file-upload">ng-file-upload</a>
         </li>
         <li>
-            <a href="http://jtblin.github.io/angular-chart.js">angular-chart</a> (requires <a href="https://github.com/chartjs/Chart.js">Chart.js</a>)
+            <a href="https://github.com/asafdav/ng-csv">ng-csv</a> (requires <a href="https://cdnjs.com/libraries/angular-sanitize/1.5.11">Angular-sanitize</a>)
         </li>
     </ul>
 </p> 
