@@ -14,7 +14,7 @@ angular.module('gazerApp').controller('DefaultCtrl', function($scope, $rootScope
 
 	// Consider moving to a separate controller
 	$scope.logout = function() {
-		AuthenticationService.ClearCredentials();
+		AuthenticationService.clearCredentials();
 	};
 
     var initController = function() {

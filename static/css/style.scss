@@ -96,6 +96,12 @@ optgroup {
     padding-bottom: 6px;
 }
 
+// Center the google button generated in a wrapper div
+#googleLoginBtn > div {
+	margin: auto;
+	width: 50%;
+}
+
 /*** Task related elements ***/
 #scanpathTableWrapper {
 	max-height: 500px;

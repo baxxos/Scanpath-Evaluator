@@ -1,17 +1,8 @@
-angular.module('gazerApp').factory('AuthenticationService', AuthenticationService);
+angular.module('gazerApp').service('AuthenticationService', AuthenticationService);
 
 function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
-	// Public interface
-	var service = {};
-
-	service.Login = Login;
-	service.SetCredentials = SetCredentials;
-	service.ClearCredentials = ClearCredentials;
-
-	return service;
-
 	// Method accepts login credentials and functions which will be executed after receiving a response
-	function Login(email, password, callback_success, callback_failed) {
+	this.login = function(email, password, callback_success, callback_failed) {
 		$http({
 			method: 'POST',
 			url: 'api/user/auth',
@@ -32,10 +23,10 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 				console.error('Server error: no response to the authorization request.')
 			}
 		);
-	}
+	};
 
-	function SetCredentials(email, password) {
-		var authdata = Base64.encode(email + ':' + password);
+	this.setCredentials = function(email, password) {
+		var authdata = base64.encode(email + ':' + password);
 
 		$rootScope.globals.currentUser = {
 			email: email,
@@ -49,9 +40,9 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 		var cookieExp = new Date();
 		cookieExp.setDate(cookieExp.getDate() + 1);
 		$cookies.putObject('globals', $rootScope.globals, { expires: cookieExp });
-	}
+	};
 
-	function ClearCredentials() {
+	this.clearCredentials = function() {
 		// Invalidate global user objects and remove cookies
 		$rootScope.globals.currentUser = false;
 		$cookies.remove('globals');
@@ -62,7 +53,7 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 }
 
 // Base64 encoding service used by AuthenticationService
-var Base64 = {
+var base64 = {
 	keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
 
 	encode: function (input) {

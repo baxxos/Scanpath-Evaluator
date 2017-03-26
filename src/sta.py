@@ -369,7 +369,7 @@ def sta_run(dataset_task):
     common_scanpath = getAbstractedSequence(commonSequence)
     common_scanpath_str = ''
 
-    # For determining levenshtein distance we need a prue string of common scanpath ('ABC')
+    # For determining levenshtein distance we need a pure string version of the common scanpath ('ABC')
     for fixation in common_scanpath:
         common_scanpath_str += fixation[0]
 

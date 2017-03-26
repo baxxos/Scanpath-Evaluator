@@ -1,10 +1,10 @@
 angular.module('gazerApp').controller('LoginCtrl', function($scope, $state, AuthenticationService) {
     $scope.login = function() {
-        AuthenticationService.Login(
+        AuthenticationService.login(
             $scope.userInputs.email,
             $scope.userInputs.password,
             function(response) {
-                AuthenticationService.SetCredentials(
+                AuthenticationService.setCredentials(
                     $scope.userInputs.email,
                     $scope.userInputs.password
                 );
@@ -15,6 +15,7 @@ angular.module('gazerApp').controller('LoginCtrl', function($scope, $state, Auth
             }
         );
     };
+
 
     var initController = function() {
         $scope.userInputs = {};

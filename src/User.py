@@ -52,5 +52,5 @@ class User(Base):
 
         return json.dumps(data_tree)
 
-from database import engine
-Base.metadata.create_all(engine)
+# from database import engine
+# Base.metadata.create_all(engine)
