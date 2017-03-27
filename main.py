@@ -51,7 +51,9 @@ def authenticate():
     try:
         user = session.query(User).filter(User.email == email).one()
         if sha256_crypt.verify(password, user.password):
-            return handle_success()
+            return handle_success({
+                'id': user.id
+            })
         else:
             return handle_error('Invalid user credentials - try again.')
     except orm.exc.NoResultFound:
@@ -105,11 +107,10 @@ def add_dataset():
     try:
         json_data = json.loads(request.data)
 
-        user = session.query(User).filter(User.email == json_data['userEmail']).one()
-        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=user.id)
+        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=json_data['userId'])
 
         # Commit DB changes
-        user.datasets.append(dataset)
+        session.add(dataset)
         session.commit()
 
         # Reflect the changes on the server side - create a new folder named after dataset PK
@@ -283,11 +284,13 @@ def get_data_tree():
 
     try:
         json_data = json.loads(request.data)
-        user_email = json_data['email']
+        user_id = json_data['userId']
+
+        user = session.query(User).filter(User.id == user_id).one()
     except KeyError:
         return handle_error('User ID is missing')
-
-    user = session.query(User).filter(User.email == user_email).one()
+    except orm.exc.NoResultFound:
+        return handle_error('Unknown user ID')
 
     try:
         return user.get_data_tree_json()
@@ -296,4 +299,4 @@ def get_data_tree():
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost
-    app.run(host='127.0.0.1', port=8888, threaded=True)
+    app.run(host='localhost', port=8888, threaded=True)

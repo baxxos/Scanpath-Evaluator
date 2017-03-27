@@ -97,7 +97,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 					$scope.taskNew.id = response.data.load.id;
 
 					// Update navigation view
-					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
 					loadDataset($scope.dataset.id);
 
@@ -146,7 +146,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 			}).then(
 				function(response) {
 					// Update navigation view
-					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
 					loadDataset($scope.dataset.id);
 				},

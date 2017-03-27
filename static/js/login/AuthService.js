@@ -25,10 +25,11 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 		);
 	};
 
-	this.setCredentials = function(email, password) {
+	this.setCredentials = function(id, email, password) {
 		var authdata = base64.encode(email + ':' + password);
 
 		$rootScope.globals.currentUser = {
+			id: id,
 			email: email,
 			authdata: authdata
 		};

@@ -6,12 +6,12 @@ angular.module('gazerApp').service('DataTreeService', function($http) {
 
 	// Updates data tree navigation object according to the current user.
 	// This object is $watched in controllers which refresh the view in case of change
-    this.updateNavTreeData = function(userEmail) {
+    this.updateNavTreeData = function(userId) {
         $http({
 			url: '/api/user/get_data_tree',
 			method: 'POST',
 			data: {
-				email: userEmail
+				userId: userId
 			}
 		}).then(
 			function(response) {

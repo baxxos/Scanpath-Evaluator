@@ -26,6 +26,7 @@ angular.module('gazerApp').controller('DatasetFormCtrl', function($scope, $rootS
             url: 'api/dataset/add',
             method: 'POST',
             data: {
+                userId: $rootScope.globals.currentUser.id,
                 name: $scope.datasetNew.name,
                 userEmail: $rootScope.globals.currentUser.email,
                 // Optional attributes, replace 'undefined' by 'null' to ensure valid JSON object
@@ -39,7 +40,7 @@ angular.module('gazerApp').controller('DatasetFormCtrl', function($scope, $rootS
                     $scope.datasetNew.id = response.data.load.id;
 
                     // Update navigation view
-                    DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+                    DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 
                     // If the user wishes to be redirected afterwards
                     if($scope.datasetNew.redirect == true) {

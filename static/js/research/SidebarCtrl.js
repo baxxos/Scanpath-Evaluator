@@ -37,7 +37,7 @@ angular.module('gazerApp').controller('SidebarCtrl', function($scope, $rootScope
 
         // Update navigation view with user owned datasets (if the current user is set)
         if($rootScope.globals.currentUser) {
-            DataTreeService.updateNavTreeData($rootScope.globals.currentUser.email);
+            DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
         }
     };
 

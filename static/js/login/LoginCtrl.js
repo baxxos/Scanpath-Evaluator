@@ -5,13 +5,14 @@ angular.module('gazerApp').controller('LoginCtrl', function($scope, $state, Auth
             $scope.userInputs.password,
             function(response) {
                 AuthenticationService.setCredentials(
+                    response.data.load.id,
                     $scope.userInputs.email,
                     $scope.userInputs.password
                 );
                 $state.go('index');
             },
             function(response) {
-                alert(response.data.message);
+                console.error(response.data.message);
             }
         );
     };
