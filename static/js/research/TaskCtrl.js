@@ -48,9 +48,10 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		return similarity / total;
 	};
 
-	var getCommonScanpathDetails = function() {
+	var getCommonScanpathDetails = function(algorithm) {
+		// The algorithm specifies url to be used from the backend API - e.g. '/sta' or '/emine'
 		$http({
-			url: '/sta',
+			url: '/' + algorithm,
 			method: 'POST',
 			data: {
 				taskId: $scope.task.id,
@@ -58,27 +59,32 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			}
 		}).then(
 			function(response) {
-				// Get the common scanpath
-				$scope.task.commonScanpath = response.data;
-				// Get the similarity object
-				var similarities = $scope.task.commonScanpath.similarity;
-				// Get the average similarity of user scanpath to the common scanpath
-				$scope.task.commonScanpath.avgSimToCommon = calcAvgSimToCommon(similarities);
+				if(response.data.success == true) {
+					// Get the common scanpath
+					$scope.task.commonScanpath = response.data.load;
+					// Get the similarity object
+					var similarities = $scope.task.commonScanpath.similarity;
+					// Get the average similarity of user scanpath to the common scanpath
+					$scope.task.commonScanpath.avgSimToCommon = calcAvgSimToCommon(similarities);
 
-				// Assign each user scanpath its similarity to the common scanpath
-				for (var index in $scope.task.scanpaths) {
-					var act_scanpath = $scope.task.scanpaths[index];
-					act_scanpath.simToCommon = similarities[act_scanpath.identifier];
+					// Assign each user scanpath its similarity to the common scanpath
+					for (var index in $scope.task.scanpaths) {
+						var act_scanpath = $scope.task.scanpaths[index];
+						act_scanpath.simToCommon = similarities[act_scanpath.identifier];
+					}
+
+					// Remember user action for drawing on modal canvas
+					$scope.task.lastAction = 'commonScanpath';
+
+					// Draw the common scanpath on the default canvas
+					$scope.canvasInfo.aois = drawFixationsAndAois(
+						$scope.canvas, $scope.ctx, $scope.canvasInfo, $scope.canvasInfo.backgroundImg,
+						$scope.task.aois, $scope.task.commonScanpath.fixations
+					);
 				}
-
-				// Remember user action for drawing on modal canvas
-				$scope.task.lastAction = 'commonScanpath';
-
-				// Draw the common scanpath on the default canvas
-				$scope.canvasInfo.aois = drawFixationsAndAois(
-					$scope.canvas, $scope.ctx, $scope.canvasInfo, $scope.canvasInfo.backgroundImg,
-					$scope.task.aois, $scope.task.commonScanpath.fixations
-				);
+				else {
+					console.error(response.data.message);
+				}
 			},
 			function(data) {
 				console.error('Failed to get common scanpath response from the server.', data);
@@ -146,12 +152,13 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		}
 	};
 
-	$scope.fillTableDetails = function() {
+	$scope.getTableDetails = function() {
+		// TODO store these variables in a $scope.userInputs along with all other user inputs
 		if ($scope.customScanpath && $scope.customScanpathText) {
 			getCustomScanpathDetails($scope.customScanpathText);
 		}
-		else {
-			getCommonScanpathDetails();
+		else if($scope.commonScanpathAlg) {
+			getCommonScanpathDetails($scope.commonScanpathAlg);
 		}
 	};
 

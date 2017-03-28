@@ -20,6 +20,8 @@ def convert_to_strs(scanpaths):
 
 
 def calc_mutual_similarity(scanpath_strs):
+    clear_mutual_similarity(scanpath_strs)
+
     for i_first in range(0, len(scanpath_strs)):
         # Each scanpath has a similarity object - similarity[id] represents
         # the level of similarity to the scanpath identified by id
@@ -53,23 +55,68 @@ def calc_mutual_similarity(scanpath_strs):
             scanpath_strs[i_second]['similarity'][identifier_first] = similarity
 
 
+def get_most_similar_pair(scanpath_strs):
+    most_similar_pair = [scanpath_strs[0], scanpath_strs[0], -1]
+
+    for scanpath in scanpath_strs:
+        for scanpath_id in scanpath['similarity']:
+            if scanpath['similarity'][scanpath_id] > most_similar_pair[2]:
+                most_similar_pair = [
+                    scanpath,
+                    get_scanpath_str_by_id(scanpath_strs, scanpath_id),
+                    scanpath['similarity'][scanpath_id]
+                ]
+
+    return most_similar_pair
+
+
+def get_scanpath_str_by_id(scanpath_strs, id):
+    for scanpath in scanpath_strs:
+        if scanpath['identifier'] == id:
+            return scanpath
+
+
+def clear_mutual_similarity(scanpath_strs):
+    for scanpath in scanpath_strs:
+        scanpath.pop('similarity', None)
+
+
 def calc_similarity_to_common(scanpath_strs, scanpath_common):
     # Object storing similarities of each individual scanpath to the common one
     similarity_obj = {}
     len_common = len(scanpath_common)
-    # Calculate similarity of each scanpath to the common (trending) scanpath
-    for scanpath_str in scanpath_strs:
-        edit_distance = levenshtein(scanpath_str['raw_str'], scanpath_common)
-        len_act = len(scanpath_str['raw_str'])
-        # Calculate similarity as edit 1 - distance/length(longer string)
-        # Non-integer division (python future import)
-        similarity = 1 - (edit_distance / (len_act if len_act > len_common else len_common))
-        # Set similarity as percentage
-        similarity *= 100
 
-        similarity_obj[scanpath_str['identifier']] = similarity
+    # If the common scanpath is not empty (there are such cases sometimes)
+    if len_common:
+        # Calculate similarity of each scanpath to the common (trending) scanpath
+        for scanpath_str in scanpath_strs:
+            edit_distance = levenshtein(scanpath_str['raw_str'], scanpath_common)
+            len_act = len(scanpath_str['raw_str'])
+            # Calculate similarity as edit 1 - distance/length(longer string)
+            # Non-integer division (python future import)
+            similarity = 1 - (edit_distance / (len_act if len_act > len_common else len_common))
+            # Set similarity as percentage
+            similarity *= 100
+
+            similarity_obj[scanpath_str['identifier']] = similarity
 
     return similarity_obj
+
+
+def get_longest_common_substring(s1, s2):
+    # Source: https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Longest_common_substring
+    m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
+    longest, x_longest = 0, 0
+    for x in xrange(1, 1 + len(s1)):
+        for y in xrange(1, 1 + len(s2)):
+            if s1[x - 1] == s2[y - 1]:
+                m[x][y] = m[x - 1][y - 1] + 1
+                if m[x][y] > longest:
+                    longest = m[x][y]
+                    x_longest = x
+            else:
+                m[x][y] = 0
+    return s1[x_longest - longest: x_longest]
 
 
 def levenshtein(s1, s2):

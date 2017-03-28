@@ -1,9 +1,9 @@
 from __future__ import division
 from DatasetTask import DatasetTask
 from Environment import Environment
-from stringEditAlgs import convert_to_strs, calc_similarity_to_common
-import json
-import math
+from stringEditAlgs import *
+
+import copy
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
@@ -317,9 +317,9 @@ def get_task_data(dataset_task):
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
     # Additional info - calculate edit distances/similarity between dataset scanpaths
-    dataset_task.get_edit_distances(formatted_sequences)
-    dataset_task.get_max_similarity(formatted_sequences)
-    dataset_task.get_min_similarity(formatted_sequences)
+    formatted_sequences = dataset_task.calc_edit_distances(formatted_sequences)
+    formatted_sequences = dataset_task.calc_max_similarity(formatted_sequences)
+    formatted_sequences = dataset_task.calc_min_similarity(formatted_sequences)
 
     # Return necessary dataset info which will be processed and rendered on the client side
     ret_dataset = {
@@ -329,6 +329,7 @@ def get_task_data(dataset_task):
     }
 
     return ret_dataset
+
 
 # STA Algorithm
 def sta_run(dataset_task):
@@ -378,10 +379,10 @@ def sta_run(dataset_task):
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
 
-    return json.dumps(res_data)
+    return res_data
 
 
-# Reversed STA algorithm on a dataset task - the "common" scanpath is known from the start
+# Reversed common scanpath algorithm - the "common" scanpath is known from the start
 def custom_run(dataset_task, custom_scanpath):
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
@@ -396,6 +397,60 @@ def custom_run(dataset_task, custom_scanpath):
     res_data = {
         'fixations': custom_scanpath_arr,
         'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath)
+    }
+
+    return res_data
+
+
+# eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
+def emine_run(dataset_task):
+    my_sequences = get_raw_sequences(dataset_task)
+    formatted_sequences = dataset_task.format_sequences(my_sequences)
+
+    # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)
+    scanpath_strs = convert_to_strs(formatted_sequences)
+    scanpath_strs_unmodified = copy.deepcopy(scanpath_strs)
+
+    calc_mutual_similarity(scanpath_strs)
+
+    # For determining levenshtein distance we need a pure string version of the common scanpath ('ABC')
+    common_scanpath_str = ''
+
+    # Process until there is only 1 (common) scanpath left in the set
+    while len(scanpath_strs) > 1:
+        # Get the two most similar scanpaths
+        most_similar_pair = get_most_similar_pair(scanpath_strs)
+
+        lcs = get_longest_common_substring(
+            most_similar_pair[0]['raw_str'],
+            most_similar_pair[1]['raw_str'],
+        )
+
+        # Common scanpath does not exist
+        if not lcs:
+            break
+
+        # Remove them from the set and insert their longest common substring instead
+        scanpath_strs.remove(most_similar_pair[0])
+        scanpath_strs.remove(most_similar_pair[1])
+        scanpath_strs.append({
+            'raw_str': lcs,
+            'identifier': most_similar_pair[0]['identifier']
+        })
+
+        # Re-calculate the similarities (now with the added LCS)
+        if len(scanpath_strs) > 1:
+            calc_mutual_similarity(scanpath_strs)
+        else:
+            common_scanpath_str = scanpath_strs[0]['raw_str']
+
+    common_scanpath_arr = []
+    for i in range(0, len(common_scanpath_str)):
+        common_scanpath_arr.append([common_scanpath_str[i], 0])
+
+    res_data = {
+        'fixations': common_scanpath_arr,
+        'similarity': calc_similarity_to_common(scanpath_strs_unmodified, common_scanpath_str)
     }
 
     return res_data

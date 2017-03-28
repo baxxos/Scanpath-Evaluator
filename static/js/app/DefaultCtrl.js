@@ -2,7 +2,7 @@
 angular.module('gazerApp').controller('DefaultCtrl', function($scope, $rootScope, $state, AuthenticationService){
 	// Used for excluding breadcrumbs in particular states
 	$scope.isBreadcrumbAreaDisplayed = function() {
-		var excluded_states = ['login', 'register'];
+		var excluded_states = ['login', 'register', 'index'];
 
 		for (var i = 0; i < excluded_states.length; i++) {
 			if ($state.includes(excluded_states[i])) {

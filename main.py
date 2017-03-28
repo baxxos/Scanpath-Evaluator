@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from User import User
 from Dataset import Dataset
 from DatasetTask import DatasetTask
-from sta import sta_run, custom_run, get_task_data
+from sta import sta_run, custom_run, emine_run, get_task_data
 from database import session
 from config import config
 from sqlalchemy import exc, orm
@@ -89,6 +89,26 @@ def add_user():
     except:
         traceback.print_exc()
         return handle_error()
+
+
+@app.route('/api/user/get_data_tree', methods=['POST'])
+def get_data_tree():
+    """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
+
+    try:
+        json_data = json.loads(request.data)
+        user_id = json_data['userId']
+
+        user = session.query(User).filter(User.id == user_id).one()
+    except KeyError:
+        return handle_error('User ID is missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Unknown user ID')
+
+    try:
+        return user.get_data_tree_json()
+    except:
+        return handle_error('Failed to obtain user data tree structure')
 
 
 @app.route('/api/dataset', methods=['GET'])
@@ -257,7 +277,7 @@ def get_similarity_to_custom():
 
 
 @app.route('/sta', methods=['POST'])
-def get_trending_scanpath():
+def get_sta_common():
     # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
@@ -268,7 +288,7 @@ def get_trending_scanpath():
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return sta_run(task)
+        return handle_success(sta_run(task))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -278,24 +298,27 @@ def get_trending_scanpath():
         return handle_error()
 
 
-@app.route('/api/user/get_data_tree', methods=['POST'])
-def get_data_tree():
-    """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
-
+@app.route('/emine', methods=['POST'])
+def get_emine_common():
+    # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
-        user_id = json_data['userId']
+        task_id = json_data['taskId']
 
-        user = session.query(User).filter(User.id == user_id).one()
+        # Load additional required data and perform sta_run
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+        task.exclude_participants(json_data['excludedScanpaths'])
+
+        return handle_success(emine_run(task))
     except KeyError:
-        return handle_error('User ID is missing')
+        return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
-        return handle_error('Unknown user ID')
-
-    try:
-        return user.get_data_tree_json()
+        return handle_error('Incorrect task ID')
     except:
-        return handle_error('Failed to obtain user data tree structure')
+        traceback.print_exc()
+        return handle_error()
+
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost

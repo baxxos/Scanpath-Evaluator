@@ -14,10 +14,11 @@
 <form class="form-vertical">
     <div class="form-group">
         <label for="selectAlgorithm">Algorithm for common scanpath comptutation:</label>
-        <select id="selectAlgorithm" class="form-control" ng-model="modSelectAlgorithm" ng-disabled="customScanpath">
+        <select id="selectAlgorithm" class="form-control" ng-model="commonScanpathAlg" ng-disabled="customScanpath">
             <option value="">Choose an algorithm..</option>
             <optgroup label="Custom algorithms">
-                <option>Scanpath trend analysis</option>
+                <option value="sta">Scanpath trend analysis</option>
+                <option value="emine">eMINE</option>
             </optgroup>
             <optgroup label="String-edit algorithms">
                 <option>Longest common subsequence</option>
@@ -41,7 +42,7 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary" ng-click="fillTableDetails()">Submit</button>
+    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()">Submit</button>
 </form>
 <hr />
 

@@ -22,9 +22,6 @@ class DatasetTask(Base):
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
 
-    # Reference to the visuals/AOIs
-    # TODO
-
     def __init__(self, **kwargs):
         # ORM init
         super(DatasetTask, self).__init__(**kwargs)
@@ -36,7 +33,7 @@ class DatasetTask(Base):
 
     @orm.reconstructor
     def __init_on_load__(self):
-        # Data holding objects
+        # Data holding objects - gets fired after the init method. Not sure if still needed
         self.participants = {}
         self.aois = []
         self.visuals = {}
@@ -168,13 +165,14 @@ class DatasetTask(Base):
 
         return formatted_sequences
 
-    def get_max_similarity(self, scanpaths):
+    def calc_max_similarity(self, scanpaths):
         """ Function calculates most similar pair for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
-            max_similar = {}
-            max_similar['identifier'] = ''
-            max_similar['value'] = -1
+            max_similar = {
+                'identifier':  '',
+                'value': -1
+            }
             # Iterate through previously calculated similarity values of given scanpath
             for similarity_iter in scanpath['similarity']:
                 similarity_val = scanpath['similarity'][similarity_iter]
@@ -184,13 +182,16 @@ class DatasetTask(Base):
             # Assign max_similarity object to scanpath (in JSON-style)
             scanpath['maxSimilarity'] = max_similar
 
-    def get_min_similarity(self, scanpaths):
-        """ Function calculates most similar pair for each scanpath in the set """
+        return scanpaths
+
+    def calc_min_similarity(self, scanpaths):
+        """ Function calculates least similar pair for each scanpath in the set """
         for scanpath in scanpaths:
             # Create empty max_similarity object
-            min_similar = {}
-            min_similar['identifier'] = ''
-            min_similar['value'] = 101
+            min_similar = {
+                'identifier': '',
+                'value': 101
+            }
             # Iterate through previously calculated similarity values of given scanpath
             for similarity_iter in scanpath['similarity']:
                 similarity_val = scanpath['similarity'][similarity_iter]
@@ -200,7 +201,9 @@ class DatasetTask(Base):
             # Assign max_similarity object to scanpath (in JSON-style)
             scanpath['minSimilarity'] = min_similar
 
-    def get_edit_distances(self, scanpaths):
+        return scanpaths
+
+    def calc_edit_distances(self, scanpaths):
         # Store scanpaths as an array of string-converted original scanpaths
         scanpath_strs = convert_to_strs(scanpaths)
 
@@ -211,4 +214,6 @@ class DatasetTask(Base):
         for i_first in range(0, len(scanpath_strs)):
             # Save the calculations to the original scanpaths object
             scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
+
+        return scanpaths
 
