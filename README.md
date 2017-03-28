@@ -1,4 +1,4 @@
-# scanpath_app
+# Scanpath Evaluator
 
 DEPENDENCIES:
 <p>
