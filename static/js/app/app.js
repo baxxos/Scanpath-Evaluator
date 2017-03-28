@@ -22,7 +22,7 @@ angular.module('gazerApp').run(function($rootScope, $cookies, $state, $http) {
 
 	$rootScope.$on('$stateChangeSuccess', function (event, next, current) {
 		// Redirect to login page if not logged in and trying to access a restricted page
-		var allowed_states = ['login', 'register'];
+		var allowed_states = ['login', 'register', 'index'];
 		var allowedPage = false;
 
 		for (var i = 0; i < allowed_states.length; i++) {

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="static/css/abn_tree.css">
     <link rel="stylesheet" href="static/css/style.css">
 </head>
-<body ng-controller="DefaultCtrl">
+<body ng-controller="DefaultCtrl" ng-class="{'landingHeroImage': isHomePage()}">
     <!-- Common top navigation & breadcrumbs area -->
     <nav class="navbar navbar-inverse navbar-static-top">
         <div class="container">
@@ -26,7 +26,9 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#/index" ng-click="isNavCollapsed = true">Brand</a>
+              <a class="navbar-brand visible-xs" href="#/index" ng-click="isNavCollapsed = true">
+                  Scanpath Evaluator
+              </a>
             </div>
 
             <!-- Main nav buttons area -->

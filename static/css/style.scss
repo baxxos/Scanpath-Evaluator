@@ -11,13 +11,31 @@ $text-size-default: 16px;
 $text-size-smaller: 14px;
 
 /*** Globals ***/
+
+html {
+	// Remove the white space under body on mobile devices
+	height: 100%;
+}
+
 body {
 	font-size: $text-size-default;
+	// Remove the white space under body on mobile devices
+	min-height: 100%;
+	// Give footer some space
+	padding-bottom: 20px;
 }
 
 /*** Utilities **/
 .transparent {
 	opacity: 0;
+}
+
+.italic {
+	font-style: italic;
+}
+
+.text-white {
+	color: $oc-gray-0;
 }
 
 // Modal window background
@@ -292,5 +310,21 @@ label {
 
 	.glyphicon-plus {
     	padding: 0 2px;
+	}
+}
+
+/*** Landing page ***/
+.landingHeroImage {
+	background-image: url('/static/images/landing.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
+
+#landingContainer {
+	margin-top: -20px; // To remove the white space under navbar on the landing screen only
+
+	#landingJumbotron {
+		background: transparent;
 	}
 }

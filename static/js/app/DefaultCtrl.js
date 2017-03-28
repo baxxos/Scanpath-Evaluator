@@ -12,6 +12,11 @@ angular.module('gazerApp').controller('DefaultCtrl', function($scope, $rootScope
 		return false;
 	};
 
+	// Used for controlling the body background (image/none)
+	$scope.isHomePage = function() {
+		return $state.includes('index');
+	};
+
 	// Consider moving to a separate controller
 	$scope.logout = function() {
 		AuthenticationService.clearCredentials();

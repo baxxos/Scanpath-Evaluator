@@ -1,6 +1,21 @@
-<footer class="container">
-    <div class="col-md-12">
-        <hr />
-        Footer element
+<footer class="container text-white" ng-if="isHomePage()">
+    <hr />
+    <div class="col-md-4 text-center">
+        <img src="/static/images/fiit.png" height="35">
+    </div>
+    <div class="col-md-4 text-center">
+        <span class="italic">© 2017 Slovenská technická univerzita v Bratislave</span>
+    </div>
+    <div class="col-md-4 text-center">
+        <a href="https://github.com/baxxos/scanpath_app">
+            <img src="/static/images/github.png" height="35">
+        </a>
+    </div>
+</footer>
+
+<footer class="container" ng-if="!isHomePage()">
+    <hr />
+    <div class="col-md-12 text-center">
+        <span class="italic">© 2017 Slovenská technická univerzita v Bratislave</span>
     </div>
 </footer>
