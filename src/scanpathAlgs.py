@@ -14,7 +14,9 @@ def createSequences(Participants, myAoIs, errorRateArea):
     # LEGACY CODE downloaded from the STA research paper
     Sequences = {}
     for participant_id in Participants:
+        # An individual sequence/scanpath
         sequence = ''
+        # For simplifying/normalizing the scanpaths ('AAABBBC' -> 'ABC')
         prev_aoi = ''
         prev_duration = 0
         prev_total_duration = 0
@@ -37,6 +39,9 @@ def createSequences(Participants, myAoIs, errorRateArea):
             if len(temp_aoi) > 1:
                 temp_aoi.sort(key=lambda x: x[1])
                 temp_aoi = temp_aoi[0][0]
+                # The code below was supposed to solve the cases when a fixation points to two AOIs at the same time
+                # However, it was causing STA to run extremely slow so we just pick the smaller AOI
+                # This is mainly useful for hierarchy AOIs but not so much for overlapping ones
                 """
                 for m in temp_aoi:
                     for n in range(0, len(myAoIs)):
@@ -51,14 +56,17 @@ def createSequences(Participants, myAoIs, errorRateArea):
                 temp_aoi = distanceList[0][0]
                 """
             if len(temp_aoi) == 1:
+                # If the current fixation target is a different AOI than the one before
                 if prev_aoi != temp_aoi[0][0]:
                     sequence = sequence + temp_aoi[0][0] + "-" + str(temp_duration) + "."
                     prev_total_duration = temp_duration
+                # If the current fixation target is the same as before then just update the duration
                 else:
+                    # Updated fixation duration
                     new_len = prev_total_duration + temp_duration
-
+                    # Updated sequence string
                     sequence = sequence[0:(len(sequence) - len(str(prev_total_duration)) - 1)] + str(new_len) + '.'
-
+                    # Save the updated values
                     prev_total_duration += temp_duration
 
                 prev_aoi = temp_aoi[0][0]
@@ -332,7 +340,7 @@ def get_task_data(dataset_task):
 
 
 # STA Algorithm
-def sta_run(dataset_task):
+def run_sta(dataset_task):
     # Preliminary Stage
     mySequences = get_raw_sequences(dataset_task)
 
@@ -348,10 +356,8 @@ def sta_run(dataset_task):
 
     # Second-Pass
     myNewAoIList = getExistingAoIList(myNewSequences)
-    # B gets flagged as false
     myNewAoIList = calculateTotalNumberDurationofFixationsandNSV(myNewAoIList,
                                                                  calculateNumberDurationOfFixationsAndNSV(myNewSequences))
-    # B gets removed
     myFinalList = getValueableAoIs(myNewAoIList)
 
     myFinalList.sort(key=lambda x: (x[4], x[3], x[2]))
@@ -383,7 +389,7 @@ def sta_run(dataset_task):
 
 
 # Reversed common scanpath algorithm - the "common" scanpath is known from the start
-def custom_run(dataset_task, custom_scanpath):
+def run_custom(dataset_task, custom_scanpath):
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
@@ -403,7 +409,7 @@ def custom_run(dataset_task, custom_scanpath):
 
 
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
-def emine_run(dataset_task):
+def run_emine(dataset_task):
     my_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(my_sequences)
 
@@ -411,13 +417,18 @@ def emine_run(dataset_task):
     scanpath_strs = convert_to_strs(formatted_sequences)
     scanpath_strs_unmodified = copy.deepcopy(scanpath_strs)
 
-    calc_mutual_similarity(scanpath_strs)
-
     # For determining levenshtein distance we need a pure string version of the common scanpath ('ABC')
     common_scanpath_str = ''
 
     # Process until there is only 1 (common) scanpath left in the set
-    while len(scanpath_strs) > 1:
+    while len(scanpath_strs):
+        # Calculate the mutual similarities if there are at least 2 scanpaths in the set
+        if len(scanpath_strs) > 1:
+            calc_mutual_similarity(scanpath_strs)
+        else:
+            common_scanpath_str = scanpath_strs[0]['raw_str']
+            break
+
         # Get the two most similar scanpaths
         most_similar_pair = get_most_similar_pair(scanpath_strs)
 
@@ -430,19 +441,16 @@ def emine_run(dataset_task):
         if not lcs:
             break
 
-        # Remove them from the set and insert their longest common substring instead
-        scanpath_strs.remove(most_similar_pair[0])
-        scanpath_strs.remove(most_similar_pair[1])
+        # Remove the most similar pair of scanpaths from the set
+        rem_scanpath_strs_by_id(
+            scanpath_strs,
+            [most_similar_pair[0]['identifier'], most_similar_pair[1]['identifier']]
+        )
+        # Insert their longest common substring instead
         scanpath_strs.append({
             'raw_str': lcs,
             'identifier': most_similar_pair[0]['identifier']
         })
-
-        # Re-calculate the similarities (now with the added LCS)
-        if len(scanpath_strs) > 1:
-            calc_mutual_similarity(scanpath_strs)
-        else:
-            common_scanpath_str = scanpath_strs[0]['raw_str']
 
     common_scanpath_arr = []
     for i in range(0, len(common_scanpath_str)):

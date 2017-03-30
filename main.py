@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from User import User
 from Dataset import Dataset
 from DatasetTask import DatasetTask
-from sta import sta_run, custom_run, emine_run, get_task_data
+from scanpathAlgs import run_sta, run_custom, run_emine, get_task_data
 from database import session
 from config import config
 from sqlalchemy import exc, orm
@@ -264,7 +264,7 @@ def get_similarity_to_custom():
             task.load_data()
             task.exclude_participants(json_data['excludedScanpaths'])
 
-            return handle_success(custom_run(task, custom_scanpath))
+            return handle_success(run_custom(task, custom_scanpath))
         else:
             return handle_error('Wrong custom scanpath format - alphabet characters only.')
     except KeyError:
@@ -283,12 +283,12 @@ def get_sta_common():
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
-        # Load additional required data and perform sta_run
+        # Load additional required data and perform run_sta
         task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(sta_run(task))
+        return handle_success(run_sta(task))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -305,12 +305,12 @@ def get_emine_common():
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
-        # Load additional required data and perform sta_run
+        # Load additional required data and perform run_sta
         task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(emine_run(task))
+        return handle_success(run_emine(task))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
