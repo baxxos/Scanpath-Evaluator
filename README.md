@@ -71,6 +71,5 @@ CONSTRAINTS:
         <li>AOI shape - exactly 4 vertices for each AOI (rect/square)</li>
         <li>Nested and overlapping AOIs - try to avoid this for correct results</li>
         <li>The original AOI image and its resolution must exactly match the uploaded AOI data</li>
-        <li>Canvas is not optimized for retina displays and its content is scaled according to its parent</li>
     </ul>
 </p>

@@ -16,58 +16,16 @@
     <link rel="icon" type="image/png" href="/static/images/favicon.png" />
 </head>
 <body ng-controller="DefaultCtrl" ng-class="{'landingHeroImage': isHomePage()}">
-    <!-- Common top navigation & breadcrumbs area -->
-    <nav class="navbar navbar-inverse navbar-static-top">
-        <div class="container">
-            <!-- Brand and toggle grouped together -->
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed"
-                      aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand visible-xs" href="#/index" ng-click="isNavCollapsed = true">
-                  Scanpath Evaluator
-              </a>
-            </div>
-
-            <!-- Main nav buttons area -->
-            <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
-                <ul class="nav navbar-nav">
-                    <!-- Navbar list items -->
-                    <li ui-sref-active="active">
-                        <a href="#" ng-click="isNavCollapsed = true" ui-sref="index">Home</a>
-                    </li>
-                    <li ui-sref-active="active">
-                        <a href="#/research" ng-click="isNavCollapsed = true" ui-sref="research">Research</a>
-                    </li>
-                </ul>
-                <!-- Login/user-area button -->
-                <ul class="nav navbar-nav navbar-right">
-                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
-                        <a href="#/login" ui-sref="login">Log in</a>
-                    </li>
-                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
-                        <a href="#/register" ui-sref="register">Register</a>
-                    </li>
-                    <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="$root.globals.currentUser">
-                        <a href="#/profile" ui-sref="profile"><span class="glyphicon glyphicon-user"></span> Profile</a>
-                    </li>
-                    <li ng-click="isNavCollapsed = true; logout()" ng-show="$root.globals.currentUser">
-                        <a href="#">Log out</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- Top navigation bar area -->
+    <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common.nav.html'"></nav>
 
     <!-- Breadcrumbs panel -->
     <section class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></section>
+
     <!-- Main content view -->
     <section ui-view></section>
-    <!-- Common footer area -->
+
+    <!-- Bottom footer area -->
     <footer ng-include="'static/partials/common.footer.html'"></footer>
 </body>
     <!-- CDN Angular libraries -->

@@ -14,7 +14,7 @@ $text-size-smaller: 14px;
 
 html {
 	// Remove the white space under body on mobile devices
-	height: 100%;
+	min-height: 100%;
 }
 
 body {
@@ -25,9 +25,25 @@ body {
 	padding-bottom: 20px;
 }
 
+footer {
+	// For stacking columns with some space in between on mobile devices
+	div {
+		margin-bottom: 15px;
+	}
+}
+
+// Fix for this Angular-Bootstrap issue: https://github.com/angular-ui/bootstrap/issues/5474
+.collapsing.in-remove-active {
+    overflow: hidden;
+}
+
 /*** Utilities **/
 .transparent {
 	opacity: 0;
+}
+
+.semi-transparent {
+	opacity: 0.5;
 }
 
 .italic {
@@ -38,6 +54,24 @@ body {
 	color: $oc-gray-0;
 }
 
+// Loading glyphicon (e.g. for buttons)
+.glyphicon.spinning {
+    animation: spin 1s infinite ease;
+    -webkit-animation: spin-webkit 1s infinite ease;
+	margin-left: 5px;
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg); }
+    to { transform: scale(1) rotate(360deg); }
+}
+
+@-webkit-keyframes spin-webkit {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+
+/*** Modals ***/
 // Modal window background
 .modal {
     display: block; // Hidden by default
@@ -326,5 +360,9 @@ label {
 
 	#landingJumbotron {
 		background: transparent;
+
+		a[role='button'] {
+			margin-bottom: 15px;
+		}
 	}
 }

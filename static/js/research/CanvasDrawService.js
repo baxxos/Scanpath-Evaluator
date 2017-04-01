@@ -1,16 +1,37 @@
 angular.module('gazerApp').service('CanvasDrawService', function() {
+	// For self-referencing later
 	var self = this;
+
+	/*** UTILITIES ***/
+	var getRandomInt = function(minimum, maximum) {
+		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+	};
+
+	// Function returns a circle positioned in the center of the target AOI with a slight random offset
+	var getFixationCircleCoords = function(targetAoi, fontSize, fixationRadius, minCircleRadius) {
+		var xCoord = targetAoi.x + (targetAoi.xLen / 2) + getRandomInt(-fontSize / 2, fontSize / 2);
+		var yCoord = targetAoi.y + (targetAoi.yLen / 2) + getRandomInt(-fontSize / 2, fontSize / 2);
+
+		return {
+			x: xCoord,
+			y: yCoord,
+			// Minimum readable circle size radius must be at least equal to the half of the font size
+			r: (fixationRadius >= (minCircleRadius) ? fixationRadius : (minCircleRadius))
+		};
+	};
 
 	/*** BASIC DRAWINGS ***/
 	// Handles drawing of basic geometric shapes onto the canvas
-	this.drawCircle = function(ctx, coords, strokeColor, lineWidth, fillColor) {
+	this.drawCircle = function(ctx, coords, strokeColor, lineWidth, fillColor, alpha) {
         ctx.beginPath();
         ctx.arc(coords.x, coords.y, coords.r, 0, 2*Math.PI, false);
 
 		// Optional: fill the circle area
 		if(fillColor) {
+			ctx.globalAlpha = alpha;
 			ctx.fillStyle = fillColor;
         	ctx.fill();
+			ctx.globalAlpha = 1.0;  // The alpha needs to be reset so other drawings are not affected
 		}
 
         ctx.lineWidth = lineWidth;
@@ -143,14 +164,11 @@ angular.module('gazerApp').service('CanvasDrawService', function() {
 			// Normalize the values by previously computed ratio
 			fixationRadius /= sizeRatio;
 
-			var fixationCircle = {
-				x: drawnAois[fixation[0]].x + (drawnAois[fixation[0]].xLen / 2),
-				y: drawnAois[fixation[0]].y + (drawnAois[fixation[0]].yLen / 2),
-				// Minimum readable circle size radius must be at least equal to the half of the font size
-				r: (fixationRadius >= (minCircleRadius) ? fixationRadius : (minCircleRadius))
-			};
+			var fixationCircle = getFixationCircleCoords(
+				drawnAois[fixation[0]], canvasInfo.fontSize, fixationRadius, minCircleRadius
+			);
 
-			self.drawCircle(ctx, fixationCircle, '#000', canvasInfo.lineWidth / 2, '#44f');
+			self.drawCircle(ctx, fixationCircle, '#000', canvasInfo.lineWidth / 2, '#44f', 0.95);
 
 			// Draw a label (centering is based on the fontSize and stroke line width)
 			ctx.fillStyle = '#fff';

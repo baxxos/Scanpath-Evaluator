@@ -85,9 +85,13 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				else {
 					console.error(response.data.message);
 				}
+				// Enable the submit button regardless of the result
+				setSubmitBtnDisabled(false);
 			},
 			function(data) {
 				console.error('Failed to get common scanpath response from the server.', data);
+				// Enable the submit button regardless of the response
+				setSubmitBtnDisabled(false);
 			}
 		);
     };
@@ -132,9 +136,13 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				else {
 					console.error(response.data.message);
 				}
+				// Enable the submit button regardless of the result
+				setSubmitBtnDisabled(false);
 			},
 			function(data) {
 				console.error('Failed to get common scanpath response from the server.', data);
+				// Enable the submit button regardless of the response
+				setSubmitBtnDisabled(false);
 			}
 		);
     };
@@ -155,9 +163,11 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	$scope.getTableDetails = function() {
 		// TODO store these variables in a $scope.userInputs along with all other user inputs
 		if ($scope.customScanpath && $scope.customScanpathText) {
+			setSubmitBtnDisabled(true);
 			getCustomScanpathDetails($scope.customScanpathText);
 		}
 		else if($scope.commonScanpathAlg) {
+			setSubmitBtnDisabled(true);
 			getCommonScanpathDetails($scope.commonScanpathAlg);
 		}
 	};
@@ -251,11 +261,22 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 				mostSimilarVal: actScanpath.minSimilarity.value,
 				leastSimilarTo: actScanpath.maxSimilarity.identifier,
 				leastSimilarVal: actScanpath.maxSimilarity.value,
-				simToCommon: actScanpath.simToCommon ? actScanpath.simToCommon : 'N/A'
+				simToCommon: actScanpath.simToCommon ? actScanpath.simToCommon : 'N/A',
+				fixations: actScanpath.fixations.toString()
 			});
 		}
 
 		return exportArray;
+	};
+
+	var setSubmitBtnDisabled = function(val) {
+		if(val != undefined) {
+			$scope.isProcessing = val;
+			$scope.submitBtnText = (val ? 'Processing' : 'Submit');
+		}
+		else {
+			console.error('Submit button value is undefined.')
+		}
 	};
 
 	/*** CANVAS CONTROLS ***/
@@ -375,6 +396,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		// Hide the zoomed in (modal) canvas element and AOI legend
 		$scope.showCanvasModal = false;
 		$scope.showAoiLegend = false;
+		// Disable user inputs while waiting for AJAX response
+		$scope.isProcessing = false;
+		$scope.submitBtnText = 'Submit';
 
 		// Initialize the canvas elements
 		initCanvasDefault('scanpathCanvas');

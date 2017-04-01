@@ -42,7 +42,12 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()">Submit</button>
+    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()" ng-disabled="isProcessing">
+        {{ submitBtnText }}
+        <span ng-show="isProcessing">
+            <span class="glyphicon glyphicon-refresh spinning" ng-show="isProcessing"></span>
+        </span>
+    </button>
 </form>
 <hr />
 
@@ -55,9 +60,10 @@
             <div class="col-md-12">
                 <h4>Common scanpath:</h4>
                 <p>
-                    <span ng-hide="task.commonScanpath.fixations">Not available</span>
+                    <span ng-hide="task.commonScanpath.fixations.length">Not available</span>
                     <span ng-repeat="fixation in task.commonScanpath.fixations track by $index">
-                        {{ fixation[0] }} <sup>{{ fixation[1] }}</sup>
+                        {{ fixation[0] }}
+                        <sup ng-class="{'semi-transparent': fixation[1] == 0}">{{ fixation[1] }}</sup>
                     </span>
                 </p>
 
