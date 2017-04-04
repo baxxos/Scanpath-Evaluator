@@ -1,12 +1,12 @@
 from __future__ import division
-from DatasetTask import DatasetTask
 from Environment import Environment
 from stringEditAlgs import *
 
+import math
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
-my_env = Environment(0.5, 60, 1920, 1080, 17)
+recording_env = Environment(0.5, 60, 1920, 1080, 17)
 
 
 def createSequences(Participants, myAoIs, errorRateArea):
@@ -20,27 +20,22 @@ def createSequences(Participants, myAoIs, errorRateArea):
         prev_duration = 0
         prev_total_duration = 0
         for fixation in Participants[participant_id]:
-            temp_aoi = []
+            temp_aoi = ''
             temp_duration = 0
             for act_aoi in myAoIs:
                 if float(fixation[3]) >= (act_aoi[1] - errorRateArea) and \
                         float(fixation[3]) < ((act_aoi[1] - errorRateArea) + (act_aoi[2] + 2 * errorRateArea)) and \
                         float(fixation[4]) >= (act_aoi[3] - errorRateArea) and \
                         float(fixation[4]) < ((act_aoi[3] - errorRateArea) + (act_aoi[4] + 2 * errorRateArea)):
-                    # temp_aoi.append(act_aoi[5])
-                    # Workaround due to the poor quality legacy code - we need to know total area for each temp_aoi
-                    # ['header', '0', '1864', '0', '90', 'Aa'] -> ['Aa', 1864 * 90]
-                    temp_aoi.append([act_aoi[5], act_aoi[4] * act_aoi[2]])
+                    temp_aoi += act_aoi[5]
                     temp_duration = int(fixation[2])
 
             distanceList = []
 
             if len(temp_aoi) > 1:
-                temp_aoi.sort(key=lambda x: x[1])
-                temp_aoi = temp_aoi[0][0]
-                # The code below was supposed to solve the cases when a fixation points to two AOIs at the same time
-                # However, it was causing STA to run extremely slow so we just pick the smaller AOI
-                # This is mainly useful for hierarchy AOIs but not so much for overlapping ones
+                temp_aoi = get_closer_aoi(fixation, myAoIs, temp_aoi)
+                # The code below was supposed to solve the cases when a fixation points to two AOIs at the same time.
+                # However, it was causing STA to run extremely slow so we just pick the AOI that is closer.
                 """
                 for m in temp_aoi:
                     for n in range(0, len(myAoIs)):
@@ -76,9 +71,40 @@ def createSequences(Participants, myAoIs, errorRateArea):
     return Sequences
 
 
+def get_closer_aoi(fixation, all_aois, possible_aois):
+    """
+        Function helps with solving the cases when a fixation points to two AOIs at the same time - it returns
+        the closer one based on distance to the corners of the 2 target AOIs.
+    """
+    sums_of_distances = {}
+    for target_aoi in possible_aois:
+        for curr_aoi in all_aois:
+            if target_aoi == curr_aoi[5]:
+                # Sum distance of all 4 corners
+                temp_distance = []
+
+                # up, left
+                temp_distance.append(math.sqrt(pow(float(fixation[3]) - float(curr_aoi[1]), 2) +
+                                               pow(float(fixation[4]) - float(curr_aoi[3]), 2)))
+                # up right
+                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1]) + float(curr_aoi[2])), 2) +
+                                               pow(float(fixation[4]) - float(curr_aoi[3]), 2)))
+                # down left
+                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1])), 2) +
+                                               pow(float(fixation[4]) - (float(curr_aoi[3]) + float(curr_aoi[4])), 2)))
+                # down, right
+                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1]) + float(curr_aoi[2])), 2) +
+                                               pow(float(fixation[4]) - (float(curr_aoi[3]) + float(curr_aoi[4])), 2)))
+                # Push the current aoi to the list
+                sums_of_distances[target_aoi] = sum(temp_distance)
+                break
+    # return key of minimal value in dictionary
+    return min(sums_of_distances, key=sums_of_distances.get)
+
+
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences(dataset_task):
-    my_error_rate_area = my_env.get_error_rate_area()
+    my_error_rate_area = recording_env.get_error_rate_area()
     my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
 
     keys = my_sequences.keys()
@@ -118,7 +144,7 @@ def run_custom(dataset_task, custom_scanpath):
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
-    scanpath_strs = convert_to_strs(formatted_sequences)
+    scanpath_strs = convert_to_str_array(formatted_sequences)
 
     custom_scanpath_arr = []
     for i in range(0, len(custom_scanpath)):

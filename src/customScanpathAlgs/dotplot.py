@@ -1,5 +1,4 @@
 from dotplotUtil import *
-from scanpathUtils import *
 from stringEditAlgs import calc_similarity_to_common
 from operator import itemgetter
 

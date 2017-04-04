@@ -261,7 +261,7 @@ def run_sta(dataset_task):
     formatted_sequences = dataset_task.format_sequences(mySequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
-    scanpath_strs = convert_to_strs(formatted_sequences)
+    scanpath_strs = convert_to_str_array(formatted_sequences)
 
     common_scanpath = getAbstractedSequence(commonSequence)
     common_scanpath_str = ''

@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
 from database import Base, session
 from Dataset import Dataset
-from stringEditAlgs import convert_to_strs, calc_mutual_similarity
+from stringEditAlgs import convert_to_str_array, calc_mutual_similarity
 from config import config
 
 
@@ -205,7 +205,7 @@ class DatasetTask(Base):
 
     def calc_edit_distances(self, scanpaths):
         # Store scanpaths as an array of string-converted original scanpaths
-        scanpath_strs = convert_to_strs(scanpaths)
+        scanpath_strs = convert_to_str_array(scanpaths)
 
         # Calculate the edit distances
         # The order of records in scanpaths and scanpath_strs must be the same!

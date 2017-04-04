@@ -1,14 +1,14 @@
 from __future__ import division
 
 
-def convert_to_strs(scanpaths):
+def convert_to_str_array(scanpaths):
     """
     Converts the dict-formatted scanpaths into an array of strings for similarity calculations.
-        From: [{'fixations': [['A', '150'], ['B', '750'], ['C', '300']], 'identifier': '02'}, ..]
-        To: [{'raw_str': 'ABC', 'identifier': '02'}, {'raw_str': 'AC', 'identifier': '03'}, .. ]
+
+    From: [{'fixations': [['A', '150'], ['B', '750'], ['C', '300']], 'identifier': '02'}, ..]
+    To: [{'raw_str': 'ABC', 'identifier': '02'}, {'raw_str': 'AC', 'identifier': '03'}, .. ]
      """
 
-    # TODO store scanpaths in a dict of dicts instead of current array form - no searching by ids (time benefit)
     scanpath_strs = []
     # Extract scanpaths as raw string sequences with identifiers
     for act_scanpath in scanpaths:
@@ -22,6 +22,28 @@ def convert_to_strs(scanpaths):
         }
         # Push the object to the array
         scanpath_strs.append(temp_scanpath)
+
+    return scanpath_strs
+
+
+def convert_to_str_dict(scanpaths):
+    """
+    Converts the dict-formatted scanpaths into an dict of keys/strings for similarity calculations.
+    Should be faster than converting to array since we don't need to iterate for identifiers later.
+
+    From: [{'fixations': [['A', '150'], ['B', '750'], ['C', '300']], 'identifier': '02'}, ..]
+    To: {'02': 'ABC', '03': 'AC', .. }
+     """
+
+    scanpath_strs = []
+    # Extract scanpaths as raw string sequences with identifiers
+    for act_scanpath in scanpaths:
+        act_scanpath_str = ''
+        for fixation in act_scanpath['fixations']:
+            act_scanpath_str += fixation[0]
+
+        # Push the key/value to the dict
+        scanpath_strs[act_scanpath['identifier']] = act_scanpath_str
 
     return scanpath_strs
 

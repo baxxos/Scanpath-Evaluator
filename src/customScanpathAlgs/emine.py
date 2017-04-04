@@ -9,7 +9,7 @@ def run_emine(dataset_task):
     formatted_sequences = dataset_task.format_sequences(my_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)
-    scanpath_strs = convert_to_strs(formatted_sequences)
+    scanpath_strs = convert_to_str_array(formatted_sequences)
     scanpath_strs_set = copy.deepcopy(scanpath_strs)
 
     # For determining levenshtein distance we need a pure string version of the common scanpath ('ABC')

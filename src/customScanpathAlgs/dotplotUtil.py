@@ -45,28 +45,25 @@ def createSequencesBasedOnVisualElements(my_dataset):
 
 
 def getCloserAOI(Participants_pos, myAoIs, tempAoI):
-    min_distamce =9999
-    closest_AOI = ""
-    temp_distannce = []
     sums_of_distances = {}
     for m in range(0, len(tempAoI)):
         for n in range(0, len(myAoIs)):
             if tempAoI[m] == myAoIs[n][5]:
-                temp_distannce = []
+                temp_distance = []
                 # sum distance of all 4 corners
                 # up, left
-                temp_distannce.append(sqrt(pow(float(Participants_pos[3]) - float(myAoIs[n][1]), 2) +
+                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - float(myAoIs[n][1]), 2) +
                                            pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
                 # up right
-                temp_distannce.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
+                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
                                            pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
                 # down left
-                temp_distannce.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1])), 2) +
+                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1])), 2) +
                                            pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
                 # down, right
-                temp_distannce.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
+                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
                                            pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
-                sums_of_distances[tempAoI[m]] = sum(temp_distannce)
+                sums_of_distances[tempAoI[m]] = sum(temp_distance)
                 break
     # return key of minimal value in dictionary
     return min(sums_of_distances, key=sums_of_distances.get)
