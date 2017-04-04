@@ -2,7 +2,8 @@ from flask import Flask, render_template, request
 from User import User
 from Dataset import Dataset
 from DatasetTask import DatasetTask
-from scanpathAlgs import run_sta, run_custom, run_emine, get_task_data
+from scanpathUtils import run_custom, get_task_data
+from customScanpathAlgs import sta, emine, dotplot
 from database import session
 from config import config
 from sqlalchemy import exc, orm
@@ -288,7 +289,7 @@ def get_sta_common():
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(run_sta(task))
+        return handle_success(sta.run_sta(task))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -310,7 +311,29 @@ def get_emine_common():
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(run_emine(task))
+        return handle_success(emine.run_emine(task))
+    except KeyError:
+        return handle_error('Task ID is missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        traceback.print_exc()
+        return handle_error()
+
+
+@app.route('/dotplot', methods=['POST'])
+def get_dotplot_common():
+    # Look for the task identifier in request URL
+    try:
+        json_data = json.loads(request.data)
+        task_id = json_data['taskId']
+
+        # Load additional required data and perform run_sta
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+        task.exclude_participants(json_data['excludedScanpaths'])
+
+        return handle_success(dotplot.run_dotplot(task))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
