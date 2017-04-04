@@ -3,7 +3,8 @@ from __future__ import division
 
 def convert_to_str_array(scanpaths):
     """
-    Converts the dict-formatted scanpaths into an array of strings for similarity calculations.
+    Converts the dict-formatted scanpaths into an array of strings for similarity calculations. Even though an array is
+    not good for searching scanpath by IDs (O(n) time), it provides an easy way to get the size, n-th element or index.
 
     From: [{'fixations': [['A', '150'], ['B', '750'], ['C', '300']], 'identifier': '02'}, ..]
     To: [{'raw_str': 'ABC', 'identifier': '02'}, {'raw_str': 'AC', 'identifier': '03'}, .. ]
@@ -26,33 +27,11 @@ def convert_to_str_array(scanpaths):
     return scanpath_strs
 
 
-def convert_to_str_dict(scanpaths):
-    """
-    Converts the dict-formatted scanpaths into an dict of keys/strings for similarity calculations.
-    Should be faster than converting to array since we don't need to iterate for identifiers later.
-
-    From: [{'fixations': [['A', '150'], ['B', '750'], ['C', '300']], 'identifier': '02'}, ..]
-    To: {'02': 'ABC', '03': 'AC', .. }
-     """
-
-    scanpath_strs = []
-    # Extract scanpaths as raw string sequences with identifiers
-    for act_scanpath in scanpaths:
-        act_scanpath_str = ''
-        for fixation in act_scanpath['fixations']:
-            act_scanpath_str += fixation[0]
-
-        # Push the key/value to the dict
-        scanpath_strs[act_scanpath['identifier']] = act_scanpath_str
-
-    return scanpath_strs
-
-
 def calc_similarity(scanpath1, scanpath2):
-    """ Calculates similarity between two scanpath strings """
+    """ Calculates similarity between two scanpath strings represented as percentage. """
 
     # Calculate the similarity value based on the edit distance of given scanpaths
-    edit_distance = levenshtein(scanpath1, scanpath2)
+    edit_distance = get_edit_distance(scanpath1, scanpath2)
     similarity = 1 - (edit_distance / (len(scanpath1) if len(scanpath1) > len(scanpath2) else len(scanpath2)))
 
     # Return similarity as percentage
@@ -60,39 +39,40 @@ def calc_similarity(scanpath1, scanpath2):
 
 
 def calc_mutual_similarity(scanpath_strs):
-    """ Calculates mutual similarity between all scanpaths of the array. """
+    """ Calculates mutual similarity between all scanpaths of the formatted array. """
 
     for i_first in range(0, len(scanpath_strs)):
         # Each scanpath has a similarity object - similarity[id] represents
         # the level of similarity to the scanpath identified by id
+        scanpath1 = scanpath_strs[i_first]
 
         # If the similarity object of first scanpath does not exist yet - create it
-        if not scanpath_strs[i_first].get('similarity'):
-            scanpath_strs[i_first]['similarity'] = {}
+        if not scanpath1.get('similarity'):
+            scanpath1['similarity'] = {}
 
         for i_second in range(i_first + 1, len(scanpath_strs)):
+            scanpath2 = scanpath_strs[i_second]
+
             # Get the IDs of the current scanpath pair
-            identifier_first = scanpath_strs[i_first]['identifier']
-            identifier_second = scanpath_strs[i_second]['identifier']
+            identifier_first = scanpath1['identifier']
+            identifier_second = scanpath2['identifier']
 
             # Performance boost: skip if the similarity between current scanpath pair has already been calculated
-            if scanpath_strs[i_first].get('similarity') and \
-                    scanpath_strs[i_first]['similarity'].get(identifier_second) and \
-                    scanpath_strs[i_second].get('similarity') and \
-                    scanpath_strs[i_second]['similarity'].get(identifier_first):
+            if scanpath1.get('similarity') and scanpath1['similarity'].get(identifier_second) and \
+                    scanpath2.get('similarity') and scanpath2['similarity'].get(identifier_first):
                 continue
 
-            similarity = calc_similarity(scanpath_strs[i_first]['raw_str'], scanpath_strs[i_second]['raw_str'])
+            similarity = calc_similarity(scanpath1['raw_str'], scanpath2['raw_str'])
 
             # Set the similarity for the first scanpath
-            scanpath_strs[i_first]['similarity'][identifier_second] = similarity
+            scanpath1['similarity'][identifier_second] = similarity
 
             # If the similarity object of second scanpath does not exist yet - create it
-            if not scanpath_strs[i_second].get('similarity'):
-                scanpath_strs[i_second]['similarity'] = {}
+            if not scanpath2.get('similarity'):
+                scanpath2['similarity'] = {}
 
             # Set the same similarity as above for the second scanpath
-            scanpath_strs[i_second]['similarity'][identifier_first] = similarity
+            scanpath2['similarity'][identifier_first] = similarity
 
 
 def calc_similarity_to_common(scanpath_strs, scanpath_common):
@@ -114,6 +94,7 @@ def calc_similarity_to_common(scanpath_strs, scanpath_common):
 
 def get_most_similar_pair(scanpath_strs):
     """ Method looks for the most similar pair of scanpath strings in the given set. """
+
     most_similar_pair = [scanpath_strs[0], scanpath_strs[0], -1]
 
     for scanpath in scanpath_strs:
@@ -167,6 +148,7 @@ def clear_mutual_similarity(scanpath_strs):
 
 def get_longest_common_substring(s1, s2):
     # Source: https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Longest_common_substring
+
     m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
     longest, x_longest = 0, 0
     for x in xrange(1, 1 + len(s1)):
@@ -181,10 +163,11 @@ def get_longest_common_substring(s1, s2):
     return s1[x_longest - longest: x_longest]
 
 
-def levenshtein(s1, s2):
+def get_edit_distance(s1, s2):
     # Source: https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
+
     if len(s1) < len(s2):
-        return levenshtein(s2, s1)
+        return get_edit_distance(s2, s1)
 
     # len(s1) >= len(s2)
     if len(s2) == 0:

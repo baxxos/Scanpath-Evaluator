@@ -12,7 +12,7 @@ def run_emine(dataset_task):
     scanpath_strs = convert_to_str_array(formatted_sequences)
     scanpath_strs_set = copy.deepcopy(scanpath_strs)
 
-    # For determining levenshtein distance we need a pure string version of the common scanpath ('ABC')
+    # For determining get_edit_distance distance we need a pure string version of the common scanpath ('ABC')
     common_scanpath_str = ''
 
     # Process until there is only 1 (common) scanpath left in the set
