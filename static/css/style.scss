@@ -141,6 +141,10 @@ select, optgroup {
 	font-size: $text-size-default;
     border: 1px solid rgb(204, 204, 204);
     border-radius: 4px;
+
+	option {
+		font-size: $text-size-default;
+	}
 }
 
 optgroup {
@@ -155,6 +159,11 @@ optgroup {
 }
 
 /*** Task related elements ***/
+#scanpathAlgDescription > p {
+	// Remove the huge default margin since the paragraph is positioned in a Bootstrap 'well' element
+	margin-bottom: 0px;
+}
+
 #scanpathTableWrapper {
 	max-height: 500px;
 	overflow: auto;
@@ -257,6 +266,7 @@ optgroup {
 #scanpathTableControls {
 	.btn-group {
 		margin-right: 15px;
+		margin-bottom: 10px;
 	}
 }
 

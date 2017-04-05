@@ -6,48 +6,75 @@
 <!-- Input calculation parameters -->
 <h3>Common scanpath</h3>
 <p>
-    In order to reengineer web pages based on eyetracking, we first need to aggregate, analyse and understand how
-    a group of people’s eyetracking data can be combined to create a common scanpath (namely, eye movement sequence)
-    in terms of visual elements.
+    A common scanpath represents the result of combining a set of several individual scanpaths into one
+    which reflects their characteristics the most.
 </p>
 
 <form class="form-vertical">
     <div class="form-group">
-        <label for="selectAlgorithm">Algorithm for common scanpath comptutation:</label>
-        <select id="selectAlgorithm" class="form-control" ng-model="commonScanpathAlg" ng-disabled="customScanpath">
-            <option value="">Choose an algorithm..</option>
-            <optgroup label="Custom algorithms">
-                <option value="sta">Scanpath trend analysis</option>
-                <option value="emine">eMINE</option>
-                <option value="dotplot">Dotplot</option>
-            </optgroup>
-            <optgroup label="String-edit algorithms">
-                <option>Longest common subsequence</option>
-                <option>Shortest common supersequence</option>
-            </optgroup>
+        <label for="selectAlgorithm">Algorithm for the common scanpath computation:</label>
+        <select id="selectAlgorithm" class="form-control"
+                ng-model="userInputs.commonScanpathAlg" ng-disabled="userInputs.isCustomScanpath">
+            <option value="" class="italic">Choose an algorithm..</option>
+            <option value="sta">Scanpath Trend Analysis</option>
+            <option value="emine">eMINE</option>
+            <option value="dotplot">Dotplot</option>
         </select>
+    </div>
+
+    <div uib-collapse="!guiParams.showAlgDesc">
+        <div class="italic well well-sm text-justify" id="scanpathAlgDescription"
+             ng-switch="userInputs.commonScanpathAlg" ng-class="{'semi-transparent': userInputs.isCustomScanpath}">
+            <p ng-switch-when="sta">
+                <a href="http://dl.acm.org/citation.cfm?id=2970818">Scanpath Trend Analysis</a> (STA) does not only
+                consider the visual elements visited by all users, but also considers the visual elements visited by
+                the majority in any order. It generates a trending scanpath that addresses the reductionist problem
+                by preventing the loss of commonly visited visual elements. The STA algorithm usually generates a common
+                scanpath significantly more similar to the inputted scanpaths compared to other existing work.
+                Moreover, this algorithm does consider fixation durations in its computations.
+            </p>
+            <p ng-switch-when="emine">
+                The <a href="http://link.springer.com/chapter/10.1007/978-3-319-08245-5_10">eMINE</a> common scanpath
+                algorithm was proposed in order to address the problem of existing techniques being too reductionist.
+                It relies mostly on evaluating the longest common subsequences of the most similar scanpath pairs from
+                the set. However, it does not consider fixation durations in its computations.
+            </p>
+            <p ng-switch-when="dotplot">
+                The <a href="https://arxiv.org/pdf/0909.2000.pdf">Dotplot</a> algorithm was originally developed for the
+                purpose of comparing two biological sequences. However, due to the high similarity of DNA and eye movement
+                sequences, it was possible to <a href="http://dl.acm.org/citation.cfm?id=1743721">modify</a> it to
+                provide common scanpath instead. This algorithm does not consider fixation durations in its
+                computations.
+            </p>
+            <p ng-switch-default>
+                Select an algorithm to see its description.
+            </p>
+        </div>
     </div>
 
     <div class="checkbox">
         <label>
-            <input type="checkbox" ng-model="customScanpath">
+            <input type="checkbox" ng-model="userInputs.isCustomScanpath">
             I want to provide my own common scanpath
         </label>
     </div>
 
-    <div class="form-group" ng-show="customScanpath">
+    <div class="form-group" uib-collapse="!userInputs.isCustomScanpath">
         <label for="customScanpathText">Enter the expected common scanpath</label>
         <div>
-            <input class="form-control" type="text" ng-model="customScanpathText"
+            <input class="form-control" id="customScanpathText" type="text" ng-model="userInputs.customScanpathText"
                    maxlength="40" placeholder="A B C D..">
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()" ng-disabled="isProcessing">
-        {{ submitBtnText }}
-        <span ng-show="isProcessing">
-            <span class="glyphicon glyphicon-refresh spinning" ng-show="isProcessing"></span>
+    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()" ng-disabled="guiParams.isProcessing">
+        {{ guiParams.submitBtnText }}
+        <span ng-show="guiParams.isProcessing">
+            <span class="glyphicon glyphicon-refresh spinning"></span>
         </span>
+    </button>
+    <button class="btn btn-default" ng-click="toggleAlgDescription()">
+        {{ guiParams.algDescText }}
     </button>
 </form>
 <hr />
@@ -57,7 +84,7 @@
     <div class="col-md-6">
         <h3>Results overview</h3>
         <!-- Calculated common scanpath -->
-        <div class="row" ng-show="!customScanpath">
+        <div class="row" ng-show="!userInputs.isCustomScanpath">
             <div class="col-md-12">
                 <h4>Common scanpath:</h4>
                 <p>
@@ -78,7 +105,7 @@
             </div>
         </div>
         <!-- Custom common scanpath -->
-        <div class="row" ng-show="customScanpath">
+        <div class="row" ng-show="userInputs.isCustomScanpath">
             <div class="col-md-12">
                 <h3>Custom scanpath:</h3>
                 <p>
@@ -102,12 +129,14 @@
             <div class="col-md-12">
                 <h3>Display controls:</h3>
                 <button class="btn btn-default" ng-click="viewCanvasAsImage()">View as image</button>
-                <button class="btn btn-default" ng-click="showAoiLegend = !showAoiLegend">AOI legend</button>
+                <button class="btn btn-default" ng-click="guiParams.showAoiLegend = !guiParams.showAoiLegend">
+                    AOI legend
+                </button>
                 <button class="btn btn-default" ng-click="clearFixations()">Clear results</button>
             </div>
         </div>
         <!-- AOI legend -->
-        <div class="row" uib-collapse="!showAoiLegend" id="aoiLegend">
+        <div class="row" uib-collapse="!guiParams.showAoiLegend" id="aoiLegend">
             <div class="col-md-12">
                 <div class="well well-sm">
                     <ul>
@@ -126,7 +155,7 @@
                     ng-click="toggleCanvasModal()"></canvas>
     </div>
     <!-- The modal background - clicking toggles the canvas modal again -->
-    <div class="modal" ng-click="toggleCanvasModal()" ng-show="showCanvasModal">
+    <div class="modal" ng-click="toggleCanvasModal()" ng-show="guiParams.showCanvasModal">
         <!-- Modal content - force to do nothing on ng-click (else it gets toggled 2 times resulting in nothing) -->
         <div class="modal-content row" ng-click="$event.stopPropagation()">
             <div id="canvasWrapperModal" class="col-md-12 text-center">
@@ -159,23 +188,28 @@
                     </tr>
                 </thead>
                 <tbody ng-repeat="scanpath in task.scanpaths | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
-                       ng-class="{'row-container-expanded': expanded[scanpath.identifier]}">
+                       ng-class="{'row-container-expanded': expandedRows[scanpath.identifier]}">
                     <tr ng-class="{'row-selected': task.individualScanpath.identifier == scanpath.identifier, 'row-excluded': scanpath.excluded}">
                         <td class="userScanpathId"
-                            ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]">
+                            ng-click="expandedRows[scanpath.identifier] = !expandedRows[scanpath.identifier]">
                             {{ scanpath.identifier }}
                         </td>
                         <td class="col-md-2">
+                            <!-- Include the scanpath in the common scanpath calculations -->
                             <span class="glyphicon glyphicon-ok control-include" title="This scanpath is included"
                                   ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}">
                             </span>
+                            <!-- Exclude the scanpath from the common scanpath calculations -->
                             <span class="glyphicon glyphicon-remove control-exclude" title="This scanpath is excluded"
                                   ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}">
                             </span>
+                            <!-- Draw the scanpath on the canvas -->
                             <span class="glyphicon glyphicon-picture control-visualize" title="Visualize this scanpath"
                                   ng-click="drawIndividualScanpath(scanpath)"></span>
+                            <!-- See the scanpath details -->
                             <span class="glyphicon glyphicon-menu-down control-expand" title="View scanpath fixations"
-                                  ng-click="expanded[scanpath.identifier] = !expanded[scanpath.identifier]"></span>
+                                  ng-click="expandedRows[scanpath.identifier] = !expandedRows[scanpath.identifier]">
+                            </span>
                         </td>
                         <td>{{ scanpath.fixations.length }}</td>
                         <td>{{ scanpath.maxSimilarity.identifier }}</td>
@@ -187,7 +221,7 @@
                         </td>
                         <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
                     </tr>
-                    <tr ng-if="expanded[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
+                    <tr ng-if="expandedRows[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
                         <td colspan="42" class="userScanpathFixations">
                             <span ng-repeat="fixation in scanpath.fixations track by $index">
                                 {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>

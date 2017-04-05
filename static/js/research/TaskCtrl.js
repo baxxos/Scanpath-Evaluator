@@ -150,25 +150,25 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
     /*** VIEW-HANDLING METHODS ***/
 	$scope.toggleAllRows = function(toggleValue) {
 		if(toggleValue == false) {
-			$scope.expanded = {};
+			$scope.expandedRows = {};
 		}
 		else {
 			for (var i = 0; i < $scope.task.scanpaths.length; i++) {
 				var id = $scope.task.scanpaths[i].identifier;
-				$scope.expanded[id] = true;
+				$scope.expandedRows[id] = true;
 			}
 		}
 	};
 
+	// Performs the common/custom scanpath calculation based on the selected algorithm
 	$scope.getTableDetails = function() {
-		// TODO store these variables in a $scope.userInputs along with all other user inputs
-		if ($scope.customScanpath && $scope.customScanpathText) {
+		if ($scope.userInputs.isCustomScanpath && $scope.userInputs.customScanpathText) {
 			setSubmitBtnDisabled(true);
-			getCustomScanpathDetails($scope.customScanpathText);
+			getCustomScanpathDetails($scope.userInputs.customScanpathText);
 		}
-		else if($scope.commonScanpathAlg) {
+		else if($scope.userInputs.commonScanpathAlg) {
 			setSubmitBtnDisabled(true);
-			getCommonScanpathDetails($scope.commonScanpathAlg);
+			getCommonScanpathDetails($scope.userInputs.commonScanpathAlg);
 		}
 	};
 
@@ -269,10 +269,16 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 		return exportArray;
 	};
 
+	// Shows/hides the selected algorithm description panel
+	$scope.toggleAlgDescription = function() {
+		$scope.guiParams.showAlgDesc = !$scope.guiParams.showAlgDesc;
+		$scope.guiParams.algDescText = ($scope.guiParams.showAlgDesc ? 'Hide' : 'Show') + ' description';
+	};
+
 	var setSubmitBtnDisabled = function(val) {
 		if(val != undefined) {
-			$scope.isProcessing = val;
-			$scope.submitBtnText = (val ? 'Processing' : 'Submit');
+			$scope.guiParams.isProcessing = val;
+			$scope.guiParams.submitBtnText = (val ? 'Processing' : 'Submit');
 		}
 		else {
 			console.error('Submit button value is undefined.')
@@ -354,9 +360,9 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 	};
 
 	$scope.toggleCanvasModal = function() {
-		$scope.showCanvasModal = !$scope.showCanvasModal;
+		$scope.guiParams.showCanvasModal = !$scope.guiParams.showCanvasModal;
 
-		if($scope.showCanvasModal == true) {
+		if($scope.guiParams.showCanvasModal == true) {
 			// Redraw the modal canvas when the element is revealed and its true size is known
 			var fixations = undefined;
 
@@ -393,22 +399,37 @@ angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http
 			// Remember last user action to determine modal canvas content
 			lastAction: ''
 		};
-		// Hide the zoomed in (modal) canvas element and AOI legend
-		$scope.showCanvasModal = false;
-		$scope.showAoiLegend = false;
-		// Disable user inputs while waiting for AJAX response
-		$scope.isProcessing = false;
-		$scope.submitBtnText = 'Submit';
+
+		// Variables controlling hide/show/content properties of some GUI elements
+		$scope.guiParams = {
+			// Disable user inputs while waiting for AJAX response
+			isProcessing: false,
+			// Hide the zoomed in (modal) canvas element and AOI legend
+			showCanvasModal: false,
+			// Misc
+			submitBtnText: 'Submit',
+			algDescText: 'Show description',
+			showAoiLegend: false,
+			showAlgDesc: false
+		};
+
+		// User ng-model inputs grouped together in one object
+		$scope.userInputs = {
+			// Initializing to false/undef to get rid of IDE 'unresolved variable' warnings
+			isCustomScanpath: false,  // User wants to provide his own common scanpath
+			customScanpathText: undefined,  // Users own common scanpath content
+			commonScanpathAlg: undefined  // Algorithm selected for common scanpath calculation (val = AJAX url)
+		};
 
 		// Initialize the canvas elements
 		initCanvasDefault('scanpathCanvas');
 		initCanvasModal('scanpathCanvasModal');
 
-		// Get the basic scanpath data
+		// Get the basic scanpath data (mutual similarity etc.)
 		$scope.getTaskScanpaths();
 
 		// Scanpath table rows expanding/collapsing controls
-		$scope.expanded = {};
+		$scope.expandedRows = {};
 	};
 	// Perform view initialization
 	initController();
