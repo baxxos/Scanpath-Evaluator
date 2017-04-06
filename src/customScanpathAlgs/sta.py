@@ -107,7 +107,7 @@ def getNumberDurationOfAoIs(Sequences):
                 duration = duration + sum([int(w[2]) for w in Sequences[keys[y]] if w[0:2] == AoIs[x]])
                 flagCounter = flagCounter + 1
 
-        if flagCounter >= len(keys) / 2:
+        if flagCounter > len(keys) / 2:
             AoIcount.append([AoIs[x], counter, duration, True])
         else:
             AoIcount.append([AoIs[x], counter, duration, False])

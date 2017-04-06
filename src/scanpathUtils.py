@@ -1,8 +1,9 @@
 from __future__ import division
-from Environment import Environment
-from stringEditAlgs import *
 
 import math
+
+from models.Environment import Environment
+from stringEditAlgs import *
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed

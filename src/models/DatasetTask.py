@@ -1,10 +1,12 @@
-from os import listdir, path
 from datetime import datetime
+from os import listdir, path
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
-from database import Base, session
-from Dataset import Dataset
-from stringEditAlgs import convert_to_str_array, calc_mutual_similarity
+
 from config import config
+from database import Base, session
+from models.Dataset import Dataset
+from stringEditAlgs import convert_to_str_array, calc_mutual_similarity
 
 
 class DatasetTask(Base):

@@ -6,6 +6,7 @@ import string
 import shutil
 
 
+# Utility methods to handle directory/file deletions even if they don't exist
 def silent_dir_remove(path):
     try:
         shutil.rmtree(path)
@@ -22,7 +23,7 @@ def silent_file_remove(path):
         traceback.print_exc()
 
 
-def create_task_folder(dataset, task, file_regions, file_scanpaths):
+def create_task_folders(dataset, task, file_aois, file_scanpaths, file_bg_image):
     os.makedirs(os.path.join(
         config['DATASET_FOLDER'],
         config['DATASET_PREFIX'] + str(dataset.id),
@@ -41,25 +42,52 @@ def create_task_folder(dataset, task, file_regions, file_scanpaths):
         config['SCANPATHS_FILE_RAW'])
     )
 
-    # Format the newly created file and remove the original one
+    # Select the columns we wish to keep after formatting
     keep = ['ParticipantName', 'FixationIndex', 'GazeEventDuration', 'GazeEventDuration', 'FixationPointX (MCSpx)',
             'FixationPointY (MCSpx)', 'MediaName']
+
+    # Format the newly created file according to selected columns and remove the original one
     format_scanpaths(keep, path_file_scanpaths)
 
     # Save the unformatted AOIs file (to be deleted after formatting)
-    path_file_regions = os.path.join(
+    path_file_aois = os.path.join(
         config['DATASET_FOLDER'],
         config['DATASET_PREFIX'] + str(dataset.id),
         config['TASK_PREFIX'] + str(task.id)
     )
 
-    file_regions.save(os.path.join(
-        path_file_regions,
+    file_aois.save(os.path.join(
+        path_file_aois,
         config['AOIS_FILE_RAW'])
     )
 
     # Format the newly created file and remove the original one
-    format_aois(path_file_regions)
+    format_aois(path_file_aois)
+
+    # Create the static images folder for the new dataset task
+    create_task_img_folder(dataset, task, file_bg_image)
+
+
+def create_task_img_folder(dataset, task, file_bg_image):
+    # Create subdirectory for this task in the static images directory
+    os.makedirs(os.path.join(
+        'static', 'images', 'datasets',
+        config['DATASET_PREFIX'] + str(dataset.id),
+        config['TASK_PREFIX'] + str(task.id))
+    )
+
+    # Save the background image without any modifications
+    path_file_image = os.path.join(
+        'static', 'images', 'datasets',
+        config['DATASET_PREFIX'] + str(dataset.id),
+        config['TASK_PREFIX'] + str(task.id)
+    )
+
+    file_bg_image.save(os.path.join(
+        path_file_image,
+        # Save the background image with name specified in the config while keeping the original extension
+        config['BG_IMG_FILE']) + os.path.splitext(file_bg_image.filename)[-1]
+    )
 
 
 def format_scanpaths(keep_cols, file_path):

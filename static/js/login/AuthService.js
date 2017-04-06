@@ -2,7 +2,7 @@ angular.module('gazerApp').service('AuthenticationService', AuthenticationServic
 
 function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 	// Method accepts login credentials and functions which will be executed after receiving a response
-	this.login = function(email, password, callback_success, callback_failed) {
+	this.login = function(email, password, callbackSuccess, callbackFailed, callbackTimeout) {
 		$http({
 			method: 'POST',
 			url: 'api/user/auth',
@@ -13,13 +13,16 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 		}).then(
 			function(response) {
 				if(response.data.success == true) {
-					callback_success(response);
+					callbackSuccess(response);
 				}
 				else {
-					callback_failed(response)
+					callbackFailed(response)
 				}
 			},
 			function(response) {
+				if(callbackTimeout) {
+					callbackTimeout(response);
+				}
 				console.error('Server error: no response to the authorization request.')
 			}
 		);

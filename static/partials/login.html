@@ -1,5 +1,25 @@
 <div class="container">
     <div class="col-md-6 col-md-offset-3">
+        <!-- Form error -->
+        <div class="panel panel-danger" ng-show="errors.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Failed to log in:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="error in errors">{{ error }}</p>
+            </div>
+        </div>
+
+        <!-- Warning message -->
+        <div class="panel panel-warning" ng-show="warnings.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Failed to log in:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="warning in warnings">{{ warning }}</p>
+            </div>
+        </div>
+
         <div class="panel panel-primary text-left" id="login-panel-main">
             <div class="panel-heading">
                 <h3 class="panel-title">Please log in or <a href="#/register">register</a></h3>
@@ -27,14 +47,15 @@
                 </form>
                 <div class="text-center">
                     <hr />
-                    <!-- <div class="g-signin2" id="googleLoginBtn"></div> -->
+                    <!--
                     <button class="btn">
                         <img src="https://developers.google.com/identity/images/g-logo.png" width="20">
                         Log in with Google
                     </button>
+                    -->
                 </div>
                 <div class="text-center" id="register-prompt">
-                    <a href="#/register">Don't have an account yet? Create one now!</a>
+                    <a href="#/register">Don't have an account yet? Create one now.</a>
                 </div>
             </div>
         </div>

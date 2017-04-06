@@ -1,5 +1,4 @@
-<h2>Task overview: </h2>
-<p>Task ID: {{ task.id }}</p>
+<h2>Task overview</h2>
 <p>Number of scanpaths in this task: {{ task.scanpaths.length }}</p>
 <hr />
 
@@ -91,7 +90,7 @@
                     <span ng-hide="task.commonScanpath.fixations.length">Not available</span>
                     <span ng-repeat="fixation in task.commonScanpath.fixations track by $index">
                         {{ fixation[0] }}
-                        <sup ng-class="{'semi-transparent': fixation[1] == 0}">{{ fixation[1] }}</sup>
+                        <sup ng-show="fixation[1] > 0">{{ fixation[1] }}</sup>
                     </span>
                 </p>
 

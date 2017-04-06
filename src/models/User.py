@@ -1,11 +1,12 @@
+import json
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from database import Base, session
-from Dataset import Dataset
-from DatasetTask import DatasetTask
 
-import json
+from database import Base, session
+from models.Dataset import Dataset
+from models.DatasetTask import DatasetTask
 
 
 class User(Base):

@@ -19,8 +19,12 @@
             <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
             <td>{{ task.description }}</td>
             <td>
-                <button class="btn btn-primary btn-xs">Edit</button>
-                <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">Delete</button>
+                <button class="btn btn-primary btn-xs">
+                    <span class="glyphicon glyphicon-edit"></span> Edit
+                </button>
+                <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">
+                    <span class="glyphicon glyphicon-trash"></span> Delete
+                </button>
             </td>
         </tr>
     </table>
@@ -36,7 +40,7 @@
                     <h4 class="panel-title">Success:</h4>
                 </div>
                 <div class="panel-body">
-                    <p>Your task was created successfully.
+                    <p>Your new dataset task was created successfully.
                         <span ng-show="taskNew.redirect">You will be redirected to the new task overview automatically
                         in 5 seconds.</span>
                     </p>
@@ -68,140 +72,7 @@
         </div>
     </div>
 
-    <div class="row">
-        <form class="col-md-12" name="taskForm" ng-show="showTaskForm" ng-submit="submitTask()">
-            <div class="panel panel-primary text-left" id="new-task-panel">
-                <div class="panel-heading">
-                    Add a new task to the dataset
-                </div>
-
-                <div class="panel-body text-left">
-                    <div class="col-md-6">
-                        <!-- Task name -->
-                        <div class="form-group">
-                            <div class="input-group">
-                                <label for="dataset_name">
-                                    Name:<span class="input-required">*</span>
-                                </label>
-                                <input type="text" class="form-control" placeholder="myTask"
-                                   id="task_name" maxlength="100" ng-model="taskNew.name" required>
-                            </div>
-                        </div>
-
-                        <!-- Task URL -->
-                        <div class="form-group">
-                            <div class="input-group">
-                                <label for="dataset_url">
-                                    Task URL:<span class="input-required">*</span>
-                                </label>
-                                <input type="url" class="form-control" id="dataset_url" maxlength="100" required
-                                       placeholder="http://myurl.com" ng-model="taskNew.url">
-                            </div>
-                        </div>
-
-                        <!-- Task description (opt) -->
-                        <div class="form-group">
-                            <div class="input-group">
-                                <label for="dataset_desc">
-                                    Description:
-                                </label>
-                                <input type="text" class="form-control" id="dataset_desc" maxlength="100"
-                                       placeholder="Short description of the new task" ng-model="taskNew.description">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
-                                Submit
-                            </button>
-                            <button class="btn btn-default" ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <p class="fake-label">
-                                    File containing scanpath data:<span class="input-required">*</span>
-                                </p>
-                                <label class="btn btn-default">
-                                    Select File
-                                    <input type="file" accept=".txt" ng-model="taskNew.fileScanpaths" ngf-select=""
-                                           ngf-model-invalid="taskNew.errFileScanpaths" ngf-max-size="100MB" required>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                <p class="fake-label">Selected file:</p>
-                                <p>
-                                    {{ taskNew.fileScanpaths.name }}
-                                    {{ taskNew.errFileScanpaths.name }}
-                                </p>
-                                <p>
-                                    <span class="label label-danger" ng-show="taskNew.errFileScanpaths">
-                                        {{ concatFileErrors(taskNew.errFileScanpaths) }}
-                                    </span>
-
-                                    <span class="label label-warning" ng-show="taskNew.uploadState == 1">
-                                        Uploading..
-                                    </span>
-                                    <span class="label label-success" ng-show="taskNew.uploadState == 2">
-                                        Done
-                                    </span>
-                                    <span class="label label-danger" ng-show="taskNew.uploadState == -1">
-                                        Failed
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <p class="fake-label">
-                                    File containing AOI data:<span class="input-required">*</span>
-                                </p>
-                                <label class="btn btn-default">
-                                    Select File
-                                    <input type="file" accept=".txt" ng-model="taskNew.fileRegions" ngf-select=""
-                                           ngf-model-invalid="taskNew.errFileRegions" ngf-max-size="10MB" required>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                <p class="fake-label">Selected file:</p>
-                                <p>
-                                    {{ taskNew.fileRegions.name }}
-                                    {{ taskNew.errFileRegions.name }}
-                                </p>
-                                <p>
-                                    <span class="label label-danger" ng-show="taskNew.errFileRegions">
-                                        {{ concatFileErrors(taskNew.errFileRegions) }}
-                                    </span>
-                                    <span class="label label-warning" ng-show="taskNew.uploadState == 1">
-                                        Uploading..
-                                    </span>
-                                    <span class="label label-success" ng-show="taskNew.uploadState == 2">
-                                        Done
-                                    </span>
-                                    <span class="label label-danger" ng-show="taskNew.uploadState == -1">
-                                        Failed
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+    <div class="row" ng-include="'static/partials/research.taskNew.html'"></div>
 
     <div class="row" ng-show="!showTaskForm">
         <div class="col-md-12">

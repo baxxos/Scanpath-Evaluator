@@ -1,14 +1,13 @@
 angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, Upload) {
-	/*
-	 * NEW TASK (FORM) RELATED METHODS
-	 */
+	/*** NEW TASK (FORM) RELATED METHOD ***/
 	var isTaskFormValid = function() {
 		// Check required inputs
 		return (
 			$scope.taskNew.name &&
 			$scope.taskNew.url &&
 			$scope.taskNew.fileScanpaths &&
-			$scope.taskNew.fileRegions
+			$scope.taskNew.fileRegions &&
+			$scope.taskNew.fileBgImage
 		);
 	};
 
@@ -34,6 +33,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		$scope.showTaskForm = !$scope.showTaskForm;
 	};
 
+	// Method handles the missing required inputs alerts (most browsers do this automatically though)
 	var showUserErrors = function() {
 		$scope.taskNew.errors = [];
 
@@ -45,6 +45,9 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		}
 		if(!$scope.taskNew.fileRegions) {
 			$scope.taskNew.errors.push('AOI file is missing!');
+		}
+		if(!$scope.taskNew.fileBgImage) {
+			$scope.taskNew.errors.push('Background image is missing!');
 		}
 	};
 
@@ -68,9 +71,10 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 
 		var fileScanpaths = $scope.taskNew.fileScanpaths;
 		var fileRegions = $scope.taskNew.fileRegions;
+		var fileBgImage = $scope.taskNew.fileBgImage;
 
-		fileScanpaths.progress = 0;
-		fileRegions.progress = 0;
+		// fileScanpaths.progress = 0;
+		// fileRegions.progress = 0;
 
 		// Disable control buttons during the upload and notify the user about uploading start
 		$scope.taskNew.uploadState = 1;
@@ -87,7 +91,8 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 				// Uploaded files
 				files: {
 					fileScanpaths: fileScanpaths,
-					fileRegions: fileRegions
+					fileRegions: fileRegions,
+					fileBgImage: fileBgImage
 				}
 			}
 		}).then(
@@ -158,9 +163,7 @@ angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope
 		}
 	};
 
-	/*
-	 * ACT DATASET RELATED METHODS
-	 */
+	/*** ACT DATASET RELATED METHODS ***/
 	var loadDataset = function(datasetId) {
 		$http({
 			method: 'GET',

@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request
-from User import User
-from Dataset import Dataset
-from DatasetTask import DatasetTask
-from scanpathUtils import run_custom, get_task_data
-from customScanpathAlgs import sta, emine, dotplot
-from database import session
-from config import config
-from sqlalchemy import exc, orm
-from passlib.hash import sha256_crypt
-
-import os
 import json
+import os
 import traceback
 import fileFormat
+
+from flask import Flask, render_template, request
+from passlib.hash import sha256_crypt
+from sqlalchemy import exc, orm
+
+from config import config
+from customScanpathAlgs import sta, emine, dotplot
+from database import session
+from models.Dataset import Dataset
+from models.DatasetTask import DatasetTask
+from models.User import User
+from scanpathUtils import run_custom, get_task_data
 
 app = Flask(__name__)
 app.debug = True
@@ -185,6 +186,7 @@ def add_dataset_task():
             # Multipart forms don't support nested objects - therefore the retarded key names
             file_scanpaths = request.files['files[fileScanpaths]']
             file_regions = request.files['files[fileRegions]']
+            file_bg_image = request.files['files[fileBgImage]']
 
             # Find parent dataset and create new task instance
             dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
@@ -202,7 +204,7 @@ def add_dataset_task():
             dataset.tasks.append(task)
             session.commit()
 
-            fileFormat.create_task_folder(dataset, task, file_regions, file_scanpaths)
+            fileFormat.create_task_folders(dataset, task, file_regions, file_scanpaths, file_bg_image)
 
             return handle_success({
                 'id': task.id
@@ -231,8 +233,16 @@ def del_dataset_task():
         json_data = json.loads(request.data)
         task = session.query(DatasetTask).filter(DatasetTask.id == json_data['taskId']).one()
 
+        # Remove the dataset
         fileFormat.silent_dir_remove(os.path.join(
             config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(task.dataset_id),
+            config['TASK_PREFIX'] + str(task.id))
+        )
+
+        # Remove the dataset visuals from static folder
+        fileFormat.silent_dir_remove(os.path.join(
+            'static', 'images', 'datasets',
             config['DATASET_PREFIX'] + str(task.dataset_id),
             config['TASK_PREFIX'] + str(task.id))
         )
