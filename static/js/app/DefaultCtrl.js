@@ -1,5 +1,5 @@
 // Default controller is defined as ng-controller on the body element of index.html
-angular.module('gazerApp').controller('DefaultCtrl', function($scope, $rootScope, $state, AuthenticationService){
+angular.module('ScanpathEvaluator').controller('DefaultCtrl', function($scope, $rootScope, $state, AuthenticationService){
 	// Used for excluding breadcrumbs in particular states
 	$scope.isBreadcrumbAreaDisplayed = function() {
 		var excluded_states = ['login', 'register', 'index'];

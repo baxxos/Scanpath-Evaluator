@@ -1,5 +1,5 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('gazerApp').controller('TaskCtrl', function($scope, $state, $http, $window, CanvasDrawService) {
+angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $state, $http, $window, CanvasDrawService) {
 	/*** DATA-HANDLING METHODS ***/
 	$scope.getTaskScanpaths = function() {
 		$http({

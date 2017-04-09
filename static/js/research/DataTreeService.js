@@ -1,4 +1,4 @@
-angular.module('gazerApp').service('DataTreeService', function($http) {
+angular.module('ScanpathEvaluator').service('DataTreeService', function($http) {
     // For self-reference in callbacks
     var DataTreeService = this;
     // Data tree object watched by dependent controllers

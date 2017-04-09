@@ -1,5 +1,5 @@
 // Serves for pushing the scanpaths with undefined common similarity values to the bottom of the table when sorting
-angular.module('gazerApp').filter('UndefToEnd', function() {
+angular.module('ScanpathEvaluator').filter('UndefToEnd', function() {
     return function (array, key) {
         // Column in which we want to push undefined values to the bottom when sorting by it
         var target_key = 'simToCommon';

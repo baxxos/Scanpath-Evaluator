@@ -3,10 +3,23 @@
 <p>Created at: {{ dataset.date_created }}</p>
 <p>Updated at: {{ dataset.date_updated }}</p>
 
+<button class="btn btn-xs btn-primary">
+    <span class="glyphicon glyphicon-edit"></span> Edit dataset
+</button>
+<button class="btn btn-xs btn-danger">
+    <span class="glyphicon glyphicon-trash"></span> Delete dataset
+</button>
+
 <hr />
 
-<h4>Dataset tasks:</h4>
+<h4>Dataset tasks</h4>
 <section>
+    <p>
+        Eye tracking datasets usually consist of several tasks where each task might contain several screen
+        recordings required in order to complete it. In order to simplify things, we flattened this hierarchy by one
+        level and datasets here include only one-screen tasks. However, more complex tasks can still be uploaded -
+        screen by screen, identified by a common name prefix or by entering a reasonable description.
+    </p>
     <table class="table table-hover table-responsive" id="tasksTable">
         <thead>
             <tr>
@@ -20,10 +33,10 @@
             <td>{{ task.description }}</td>
             <td>
                 <button class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-edit"></span> Edit
+                    <span class="glyphicon glyphicon-edit"></span> Edit task
                 </button>
                 <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">
-                    <span class="glyphicon glyphicon-trash"></span> Delete
+                    <span class="glyphicon glyphicon-trash"></span> Delete task
                 </button>
             </td>
         </tr>
@@ -72,12 +85,14 @@
         </div>
     </div>
 
-    <div class="row" ng-include="'static/partials/research.taskNew.html'"></div>
+    <div class="row" ng-include="'static/partials/research/taskNew.html'"></div>
 
     <div class="row" ng-show="!showTaskForm">
         <div class="col-md-12">
-            <button class="btn btn-primary" ng-click="toggleTaskForm()">New task</button>
-            <button class="btn btn-danger">Delete all</button>
+            <button class="btn btn-success" ng-click="toggleTaskForm()">
+                <span class="glyphicon glyphicon-plus"></span> Add task
+            </button>
+
         </div>
     </div>
 </section>

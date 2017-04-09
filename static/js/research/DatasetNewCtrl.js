@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('DatasetFormCtrl', function($scope, $rootScope, $state, $http, $timeout, DataTreeService) {
+angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope, $rootScope, $state, $http, $timeout, DataTreeService) {
     var isFormValid = function() {
         // Check required inputs, no other requirements
         return $scope.datasetNew.name;

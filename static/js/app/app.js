@@ -1,9 +1,9 @@
 // ngAnimate and ngTouch provide basic animations e.g. on a collapsing element
 // ui.router defines routes and states (app.config.js) - these are then used in ncy-angular-breadcrumb
 // ui.bootstrap to prevent full jQuery import in bootstrapJS
-// TODO migrate to Angular 1.6.x and update ui-bootstrap/router as well
+// TODO migrate to Angular 1.6.x
 angular.module(
-	'gazerApp',
+	'ScanpathEvaluator',
 	[
 		'ngAnimate', 'ngTouch', 'ui.router', 'ui.bootstrap', 'ncy-angular-breadcrumb',
 		'angularBootstrapNavTree', 'ngCookies', 'ngFileUpload', 'ngSanitize', 'ngCsv'
@@ -11,7 +11,7 @@ angular.module(
 );
 
 // Default app initialization (globals, rootScope etc.)
-angular.module('gazerApp').run(function($rootScope, $cookies, $state, $http) {
+angular.module('ScanpathEvaluator').run(function($rootScope, $cookies, $state, $http) {
 	// Keep user logged on after page refresh
 	$rootScope.globals = $cookies.getObject('globals') || {};
 

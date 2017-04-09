@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('LoginCtrl', function($scope, $state, AuthenticationService) {
+angular.module('ScanpathEvaluator').controller('LoginCtrl', function($scope, $state, AuthenticationService) {
     var isLoginFormValid = function() {
 		// Check required form inputs
 		return (

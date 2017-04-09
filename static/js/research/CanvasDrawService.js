@@ -1,4 +1,4 @@
-angular.module('gazerApp').service('CanvasDrawService', function() {
+angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 	// For self-referencing later
 	var self = this;
 

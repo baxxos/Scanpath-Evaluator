@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="gazerApp">
+<html lang="en" ng-app="ScanpathEvaluator">
 <head>
+    <!-- For relative paths -->
     <base href="/">
+    <!-- Metadata -->
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Michal Melúch">
+    <meta name="keywords" content="scanpath, eye tracking, scanpaths, common scanpath, user experience">
+    <meta name="description" content="Online eye tracking data evaluation service.">
     <title>Personalized gaze visualization</title>
     <!-- Bootstrap minified CSS -->
     <link rel="stylesheet"
@@ -17,7 +23,7 @@
 </head>
 <body ng-controller="DefaultCtrl" ng-class="{'landingHeroImage': isHomePage()}">
     <!-- Top navigation bar area -->
-    <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common.nav.html'"></nav>
+    <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common/nav.html'"></nav>
 
     <!-- Breadcrumbs panel -->
     <section class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></section>
@@ -26,7 +32,7 @@
     <section ui-view></section>
 
     <!-- Bottom footer area -->
-    <footer ng-include="'static/partials/common.footer.html'"></footer>
+    <footer ng-include="'static/partials/common/footer.html'"></footer>
 </body>
     <!-- CDN Angular libraries -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular.min.js"></script>
@@ -76,7 +82,7 @@
     <script type="text/javascript" src="static/js/login/LoginCtrl.js"></script>
     <script type="text/javascript" src="static/js/register/RegisterCtrl.js"></script>
     <script type="text/javascript" src="static/js/research/DatasetCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/DatasetFormCtrl.js"></script>
+    <script type="text/javascript" src="static/js/research/DatasetNewCtrl.js"></script>
     <script type="text/javascript" src="static/js/research/TaskCtrl.js"></script>
     <script type="text/javascript" src="static/js/research/SidebarCtrl.js"></script>
 </html>

@@ -1,4 +1,4 @@
-angular.module('gazerApp').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, Upload) {
+angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $rootScope, $http, $state, $timeout, DataTreeService, Upload) {
 	/*** NEW TASK (FORM) RELATED METHOD ***/
 	var isTaskFormValid = function() {
 		// Check required inputs

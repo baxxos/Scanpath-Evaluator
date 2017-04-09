@@ -1,4 +1,4 @@
-angular.module('gazerApp').service('AuthenticationService', AuthenticationService);
+angular.module('ScanpathEvaluator').service('AuthenticationService', AuthenticationService);
 
 function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 	// Method accepts login credentials and functions which will be executed after receiving a response

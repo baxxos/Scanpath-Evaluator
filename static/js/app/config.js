@@ -1,7 +1,7 @@
 'use strict';
 
 // State machine for named states based on URL and (currently) unnamed corresponding views
-angular.module('gazerApp')
+angular.module('ScanpathEvaluator')
 	.config(['$stateProvider', '$urlRouterProvider', '$locationProvider',
 		function($stateProvider, $urlRouterProvider) {
 			$stateProvider
@@ -37,14 +37,14 @@ angular.module('gazerApp')
 					views: {
 						'@': {
 							controller: 'DefaultCtrl',
-							templateUrl: 'static/partials/research.layout.html'
+							templateUrl: 'static/partials/research/layout.html'
 						},
 						'left@research' : {
 							controller: 'SidebarCtrl',
-							templateUrl: 'static/partials/research.sidebar.html'
+							templateUrl: 'static/partials/research/sidebar.html'
 						},
 						'right@research' : {
-							templateUrl: 'static/partials/research.static.html'
+							templateUrl: 'static/partials/research/static.html'
 						}
 					},
 					ncyBreadcrumb: {
@@ -57,7 +57,7 @@ angular.module('gazerApp')
 					url: '/dataset/:id',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research.dataset.html',
+							templateUrl: 'static/partials/research/dataset.html',
 							controller: 'DatasetCtrl'
 						}
 					},
@@ -70,8 +70,8 @@ angular.module('gazerApp')
 					url: '/dataset-new',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research.datasetNew.html',
-							controller: 'DatasetFormCtrl'
+							templateUrl: 'static/partials/research/datasetNew.html',
+							controller: 'DatasetNewCtrl'
 						}
 					},
 					ncyBreadcrumb: {
@@ -84,7 +84,7 @@ angular.module('gazerApp')
 					url: '/task/:id',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research.task.html',
+							templateUrl: 'static/partials/research/task.html',
 							controller: 'TaskCtrl'
 						}
 					},

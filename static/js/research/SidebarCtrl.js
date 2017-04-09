@@ -1,5 +1,5 @@
 // Handles all sidebar related actions
-angular.module('gazerApp').controller('SidebarCtrl', function($scope, $rootScope, DataTreeService) {
+angular.module('ScanpathEvaluator').controller('SidebarCtrl', function($scope, $rootScope, DataTreeService) {
     var initController = function() {
         $scope.navTreeData = [];
 
