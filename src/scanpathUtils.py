@@ -105,6 +105,8 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
 
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences(dataset_task):
+    """ Returns the sequences as a dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. } """
+
     my_error_rate_area = recording_env.get_error_rate_area()
     my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
 
