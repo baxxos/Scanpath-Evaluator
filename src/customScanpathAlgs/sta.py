@@ -271,6 +271,7 @@ def run_sta(dataset_task):
         common_scanpath_str += fixation[0]
 
     res_data = {
+        'identifier': 'sta',
         'fixations': common_scanpath,
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }

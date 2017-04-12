@@ -50,6 +50,10 @@ footer {
 	font-style: italic;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 .text-white {
 	color: $oc-gray-0;
 }
@@ -317,10 +321,6 @@ optgroup {
 }
 
 /*** Dataset related screens **/
-#dataset-name-heading {
-	font-weight: bold;
-}
-
 #new-task-panel {
 	.input-group {
 		width: 100%;

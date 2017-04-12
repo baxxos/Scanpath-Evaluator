@@ -1,4 +1,4 @@
-<h2>Task overview</h2>
+<h3>Dataset task: <span class="bold">{{ task.name ? task.name : 'N/A' }}</span></h3>
 <p>Number of scanpaths in this task: {{ task.scanpaths.length }}</p>
 <hr />
 
@@ -51,6 +51,13 @@
         </div>
     </div>
 
+    <div>
+        <p class="italic">
+            To cross-compare all available algorithms,
+            <a ng-href="#/research/task/{{ task.id }}/alg-compare">click here</a>
+        </p>
+    </div>
+
     <div class="checkbox">
         <label>
             <input type="checkbox" ng-model="userInputs.isCustomScanpath">
@@ -66,7 +73,8 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary" ng-click="getTableDetails()" ng-disabled="guiParams.isProcessing">
+    <button type="submit" class="btn btn-primary" ng-click="getScanpathTableData()"
+            ng-disabled="guiParams.isProcessing">
         {{ guiParams.submitBtnText }}
         <span ng-show="guiParams.isProcessing">
             <span class="glyphicon glyphicon-refresh spinning"></span>
@@ -196,11 +204,11 @@
                         <td class="col-md-2">
                             <!-- Include the scanpath in the common scanpath calculations -->
                             <span class="glyphicon glyphicon-ok control-include" title="This scanpath is included"
-                                  ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}">
+                                  ng-click="toggleRowExcluded(scanpath)" ng-class="{'hidden': scanpath.excluded}">
                             </span>
                             <!-- Exclude the scanpath from the common scanpath calculations -->
                             <span class="glyphicon glyphicon-remove control-exclude" title="This scanpath is excluded"
-                                  ng-click="toggleScanpathExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}">
+                                  ng-click="toggleRowExcluded(scanpath)" ng-class="{'hidden': !scanpath.excluded}">
                             </span>
                             <!-- Draw the scanpath on the canvas -->
                             <span class="glyphicon glyphicon-picture control-visualize" title="Visualize this scanpath"
@@ -234,10 +242,10 @@
         <div id="scanpathTableControls">
             <!-- Include/exclude scanpaths from calculations -->
             <div class="btn-group">
-                <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllScanpathsValue(false)">
+                <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllRowsExcludedValue(false)">
                     Enable all
                 </button>
-                <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllScanpathsValue(true)">
+                <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllRowsExcludedValue(true)">
                     Disable all
                 </button>
             </div>

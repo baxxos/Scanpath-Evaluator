@@ -1,0 +1,168 @@
+<!-- Input calculation parameters -->
+<h2>Algorithm cross-comparison</h2>
+<p>
+    To directly compare results of all available common scanpath identification algorithms, click the submit button.
+</p>
+<p class="italic">
+    Please note that running several complex algorithms on a larger dataset can take a while.
+</p>
+
+<button type="submit" class="btn btn-primary" ng-click="getAlgTableData()" ng-disabled="guiParams.isProcessing">
+    {{ guiParams.submitBtnText }}
+    <span ng-show="guiParams.isProcessing">
+        <span class="glyphicon glyphicon-refresh spinning"></span>
+    </span>
+</button>
+<hr />
+
+<!-- Dataset overview -->
+<div class="row">
+    <div class="col-md-6">
+        <h3>Results overview</h3>
+        <!-- Calculated common scanpath -->
+        <div class="row" ng-show="!userInputs.isCustomScanpath">
+            <div class="col-md-12">
+                <h4>Average similarity to the produced common scanpath:</h4>
+                <p>
+                    <span ng-show="task.avgTotalSimilarity > 0">
+                        {{ task.avgTotalSimilarity | number: 2 }}%
+                    </span>
+                    <span ng-hide="task.avgTotalSimilarity">N/A</span>
+                </p>
+
+                <h4>Average length of the produced common scanpaths:</h4>
+                <p>
+                    <span ng-show="task.avgTotalLength > 0">
+                        {{ task.avgTotalLength | number: 1 }} fixation(s)
+                    </span>
+                    <span ng-hide="task.avgTotalLength">N/A</span>
+                </p>
+            </div>
+        </div>
+        <!-- Display controls -->
+        <div class="row" id="displayControls">
+            <div class="col-md-12">
+                <h3>Display controls:</h3>
+                <button class="btn btn-default" ng-click="viewCanvasAsImage()">View as image</button>
+                <button class="btn btn-default" ng-click="guiParams.showAoiLegend = !guiParams.showAoiLegend">
+                    AOI legend
+                </button>
+                <button class="btn btn-default" ng-click="clearFixations()">Clear results</button>
+            </div>
+        </div>
+        <!-- AOI legend -->
+        <div class="row" uib-collapse="!guiParams.showAoiLegend" id="aoiLegend">
+            <div class="col-md-12">
+                <div class="well well-sm">
+                    <ul>
+                        <li ng-repeat="aoi in task.aois">
+                            {{ aoi[5] }} - {{ aoi[0] }} <span class="aoiFullName">({{ aoi[2] }} x {{ aoi[4] }})</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dataset visuals -->
+    <div id="canvasWrapper" class="col-md-6 text-center">
+            <!-- TODO transparency used just for easy animation but animating ng-show is also possible -->
+            <canvas id="scanpathCanvas" ng-class="{'transparent': !task.visuals.main}"
+                    ng-click="toggleCanvasModal()"></canvas>
+    </div>
+    <!-- The modal background - clicking toggles the canvas modal again -->
+    <div class="modal" ng-click="toggleCanvasModal()" ng-show="guiParams.showCanvasModal">
+        <!-- Modal content - force to do nothing on ng-click (else it gets toggled 2 times resulting in nothing) -->
+        <div class="modal-content row" ng-click="$event.stopPropagation()">
+            <div id="canvasWrapperModal" class="col-md-12 text-center">
+                <div class="text-right">
+                    <span class="modal-close" ng-click="toggleCanvasModal()">&times;</span>
+                </div>
+                <canvas id="scanpathCanvasModal"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default" id="scanpathTableWrapper">
+            <!-- Results table heading -->
+            <div class="panel-heading">Available algorithms</div>
+            <!-- Results table overview content -->
+            <table class="table table-hover table-responsive" id="scanpathTable">
+                <thead>
+                    <tr>
+                        <th ng-click="setSort('identifier')">Name</th>
+                        <th>Controls</th>
+                        <th ng-click="setSort('fixations.length')">Scanpath length</th>
+                        <th ng-click="setSort('simToCommon')">Similarity to common</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="algResult in task.algResults | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
+                       ng-class="{'row-container-expanded': expandedRows[algResult.identifier]}">
+                    <tr ng-class="{'row-selected': task.individualScanpath.identifier == algResult.identifier, 'row-excluded': algResult.excluded}">
+                        <td class="userScanpathId"
+                            ng-click="expandedRows[algResult.identifier] = !expandedRows[algResult.identifier]">
+                            <span class="glyphicon glyphicon-asterisk" ng-style="{'color': algResult.color}"></span>
+                            {{ algResult.identifier }}
+                        </td>
+                        <td class="col-md-2">
+                            <!-- Include the scanpath in the common scanpath calculations -->
+                            <span class="glyphicon glyphicon-ok control-include" title="This algorithm is included"
+                                  ng-click="toggleRowExcluded(algResult)" ng-class="{'hidden': algResult.excluded}">
+                            </span>
+                            <!-- Exclude the scanpath from the common scanpath calculations -->
+                            <span class="glyphicon glyphicon-remove control-exclude" title="This algorithm is excluded"
+                                  ng-click="toggleRowExcluded(algResult)" ng-class="{'hidden': !algResult.excluded}">
+                            </span>
+                            <!-- Draw the scanpath on the canvas -->
+                            <span class="glyphicon glyphicon-picture control-visualize" title="Visualize common scanpath"
+                                  ng-click="drawIndividualScanpath(algResult)" ng-show="algResult.fixations.length > 0">
+                            </span>
+                            <!-- See the scanpath details -->
+                            <span class="glyphicon glyphicon-menu-down control-expand" title="View common scanpath fixations"
+                                  ng-click="expandedRows[algResult.identifier] = !expandedRows[algResult.identifier]">
+                            </span>
+                        </td>
+                        <td>{{ algResult.fixations.length }}</td>
+                        <td ng-show="algResult.simToCommon > 0">
+                            {{ algResult.simToCommon | number: 2 }}%
+                        </td>
+                        <td ng-hide="algResult.simToCommon > 0">N/A</td>
+                    </tr>
+                    <tr ng-if="expandedRows[algResult.identifier]" ng-class="{'row-excluded': algResult.excluded}">
+                        <td colspan="42" class="userScanpathFixations">
+                            <span ng-repeat="fixation in algResult.fixations track by $index">
+                                {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Scanpath table control panel -->
+        <div id="scanpathTableControls">
+            <!-- Include/exclude scanpaths from calculations -->
+            <div class="btn-group">
+                <button class="btn btn-success btn-sm" id="enableAllButton" ng-click="setAllRowsExcludedValue(false)">
+                    Enable all
+                </button>
+                <button class="btn btn-danger btn-sm" id="disableAllButton" ng-click="setAllRowsExcludedValue(true)">
+                    Disable all
+                </button>
+            </div>
+            <!-- Expand/collapse advanced scanpath data -->
+            <div class="btn-group">
+                <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(true)">Expand all</button>
+                <button class="btn btn-primary btn-sm" ng-click="toggleAllRows(false)">Collapse all</button>
+            </div>
+            <!-- Utility functions -->
+            <div class="btn-group">
+                <button class="btn btn-default btn-sm" ng-csv="getTableExport()" csv-label="true"
+                        filename="scanpathsExport.csv">
+                    CSV export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

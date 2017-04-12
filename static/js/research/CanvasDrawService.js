@@ -7,10 +7,28 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 	};
 
+	var getRandomCoordsOffset = function(maxOffset) {
+		return {
+			x: getRandomInt(-maxOffset, maxOffset),
+			y: getRandomInt(-maxOffset, maxOffset)
+		};
+	};
+
+	// Provides basic canvas setup/config object, can be later customized in the controller
+	this.getDefaultCanvasInfo = function() {
+		return {
+			fontSize: 36,
+			lineWidth: 8,
+			scale: 1,
+			aois: {}, // Serves for accessing the aois after drawing (common scanpath displaying, centering labels etc.)
+			aoisModal: {}
+		};
+	};
+
 	// Function returns a circle positioned in the center of the target AOI with a slight random offset
-	var getFixationCircleCoords = function(targetAoi, fontSize, fixationRadius, minCircleRadius) {
-		var xCoord = targetAoi.x + (targetAoi.xLen / 2) + getRandomInt(-fontSize / 2, fontSize / 2);
-		var yCoord = targetAoi.y + (targetAoi.yLen / 2) + getRandomInt(-fontSize / 2, fontSize / 2);
+	var getFixationCircleCoords = function(targetAoi, coordsOffset, fixationRadius, minCircleRadius) {
+		var xCoord = targetAoi.x + (targetAoi.xLen / 2) + coordsOffset.x;
+		var yCoord = targetAoi.y + (targetAoi.yLen / 2) + coordsOffset.y;
 
 		return {
 			x: xCoord,
@@ -85,7 +103,7 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 		ctx.fillText(aoiBox.name, aoiBox.x + (aoiBox.xLen / 2) , aoiBox.y + (aoiBox.yLen / 2));
 	};
 
-	this.drawSaccade = function(ctx, canvasInfo, aois, prevFixation, actFixation) {
+	this.drawSaccade = function(ctx, canvasInfo, aois, prevFixation, actFixation, prevOffset, currOffset) {
 		// Draw a line connecting each pair of fixations in the given scanpath
 		// Passed fixations are formatted as: [["E", 500], ["C", 350] ... ]
 
@@ -97,16 +115,19 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 
 		// Line from the center of the previous fixation
 		var lineFrom = {
-			x: aois[prevFixation[0]].x + (aois[prevFixation[0]].xLen / 2),
-			y: aois[prevFixation[0]].y + (aois[prevFixation[0]].yLen / 2)
+			x: aois[prevFixation[0]].x + (aois[prevFixation[0]].xLen / 2) + prevOffset.x,
+			y: aois[prevFixation[0]].y + (aois[prevFixation[0]].yLen / 2) + prevOffset.y
 		};
 		// Line to the center of the current fixation
 		var lineTo = {
-			x: aois[actFixation[0]].x + (aois[actFixation[0]].xLen / 2),
-			y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2)
+			x: aois[actFixation[0]].x + (aois[actFixation[0]].xLen / 2) + currOffset.x,
+			y: aois[actFixation[0]].y + (aois[actFixation[0]].yLen / 2) + currOffset.y
 		};
 
 		self.drawLine(ctx, lineFrom, lineTo, '#000', canvasInfo.lineWidth / 2);
+
+		// Saccade drawn successfully
+		return true;
 	};
 
 	this.drawAois = function(canvas, ctx, canvasInfo, backgroundImg, aoiData) {
@@ -119,8 +140,8 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 		// Data from backed is formatted as: ['aoiName', xFrom, xLen, yFrom, yLen, 'aoiShortName']
 		aoiData.forEach(function(actAoi, index) {
 			var aoiBox = {
-				x: (actAoi[1] * canvasInfo.scale) + canvasInfo.offset,
-				y: (actAoi[3] * canvasInfo.scale) + canvasInfo.offset,
+				x: (actAoi[1] * canvasInfo.scale),
+				y: (actAoi[3] * canvasInfo.scale),
 				xLen: actAoi[2] * canvasInfo.scale,
 				yLen: actAoi[4] * canvasInfo.scale,
 				name: actAoi[5],
@@ -128,7 +149,7 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 			};
 
 			// Draw the AOI box
-			self.drawRect(ctx, aoiBox, canvasInfo.colors[index], canvasInfo.lineWidth);
+			self.drawRect(ctx, aoiBox, canvasInfo.aoiColors[index], canvasInfo.lineWidth);
 			// Draw the AOI label
 			self.drawLabel(ctx, canvasInfo, aoiBox);
 			// Remember the current AOI data for later access
@@ -138,11 +159,17 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 		return aoiCanvasData;
 	};
 
-	this.drawFixations = function(canvas, ctx, canvasInfo, drawnAois, scanpath) {
+	this.drawFixations = function(canvas, ctx, canvasInfo, drawnAois, scanpath, fixationColor) {
+		// Initialize the offsets array with 1 coords-offset element (for the first fixation)
+		var centerOffsets = [getRandomCoordsOffset(canvasInfo.fontSize / 2)];
+
 		for(var i = 1; i < scanpath.length; i++) {
+			// Assign a random offset to the current fixation and push it into the array to use it later
+			centerOffsets.push(getRandomCoordsOffset(canvasInfo.fontSize / 2));
+
 			// Fix for user-submitted common scanpath - the AOI might not be in the actual aoi set
-			if(self.drawSaccade(
-				ctx, canvasInfo, drawnAois, scanpath[i - 1], scanpath[i]) === false) {
+			if(!self.drawSaccade(
+				ctx, canvasInfo, drawnAois, scanpath[i - 1], scanpath[i], centerOffsets[i - 1], centerOffsets[i])) {
 				return false;
 			}
         }
@@ -165,10 +192,10 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 			fixationRadius /= sizeRatio;
 
 			var fixationCircle = getFixationCircleCoords(
-				drawnAois[fixation[0]], canvasInfo.fontSize, fixationRadius, minCircleRadius
+				drawnAois[fixation[0]], centerOffsets[index], fixationRadius, minCircleRadius
 			);
 
-			self.drawCircle(ctx, fixationCircle, '#000', canvasInfo.lineWidth / 2, '#44f', 0.95);
+			self.drawCircle(ctx, fixationCircle, '#000', canvasInfo.lineWidth / 2, fixationColor, 0.95);
 
 			// Draw a label (centering is based on the fontSize and stroke line width)
 			ctx.fillStyle = '#fff';
@@ -179,5 +206,8 @@ angular.module('ScanpathEvaluator').service('CanvasDrawService', function() {
 				fixationCircle.y + (canvasInfo.fontSize / 2) - ctx.lineWidth
 			);
 		});
+
+		// Fixations drawn successfully
+		return true;
     };
 });

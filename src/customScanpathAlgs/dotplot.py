@@ -429,6 +429,7 @@ def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
         })
 
     res_data = {
+        'identifier': 'dotplot',
         'fixations': common_scanpath,
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }

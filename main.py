@@ -13,7 +13,7 @@ from database import session
 from models.Dataset import Dataset
 from models.DatasetTask import DatasetTask
 from models.User import User
-from scanpathUtils import run_custom, get_task_data
+from scanpathUtils import run_custom, run_empty, get_task_data
 
 app = Flask(__name__)
 app.debug = True
@@ -344,6 +344,32 @@ def get_dotplot_common():
         task.exclude_participants(json_data['excludedScanpaths'])
 
         return handle_success(dotplot.run_dotplot(task))
+    except KeyError:
+        return handle_error('Task ID is missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect task ID')
+    except:
+        traceback.print_exc()
+        return handle_error()
+
+
+@app.route('/alg-compare', methods=['POST'])
+def get_alg_comparison():
+    # Look for the task identifier in request URL
+    try:
+        json_data = json.loads(request.data)
+        task_id = json_data['taskId']
+
+        # Load additional required data and perform run_sta
+        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task.load_data()
+
+        # Check for any excluded algorithms and push the rest into the results array
+        return handle_success([
+            sta.run_sta(task) if 'sta' not in json_data['excludedAlgs'] else run_empty('sta'),
+            dotplot.run_dotplot(task) if 'dotplot' not in json_data['excludedAlgs'] else run_empty('dotplot'),
+            emine.run_emine(task) if 'emine' not in json_data['excludedAlgs'] else run_empty('emine')
+        ])
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:

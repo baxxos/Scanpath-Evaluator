@@ -52,6 +52,7 @@ def run_emine(dataset_task):
         common_scanpath_arr.append([common_scanpath_str[i], 0])
 
     res_data = {
+        'identifier': 'emine',
         'fixations': common_scanpath_arr,
         'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }

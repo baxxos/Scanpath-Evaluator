@@ -62,7 +62,7 @@ angular.module('ScanpathEvaluator')
 						}
 					},
 					ncyBreadcrumb: {
-						label: 'Dataset details',
+						label: 'Dataset detail',
 						parent: 'research'
 					}
 				})
@@ -89,8 +89,22 @@ angular.module('ScanpathEvaluator')
 						}
 					},
 					ncyBreadcrumb: {
-						label: 'Task details',
+						label: 'Task detail',
 						parent: 'research'
+					}
+				})
+				// State which performs a run of all common scanpath algorithms on a chosen dataset task
+				.state('research.task.compare', {
+					url: '/alg-compare',
+					views: {
+						'right@research': {
+							templateUrl: 'static/partials/research/algCompare.html',
+							controller: 'AlgCompareCtrl'
+						}
+					},
+					ncyBreadcrumb: {
+						label: 'Algorithm comparison',
+						parent: 'research.task'
 					}
 				});
 			// Set default fallback URL

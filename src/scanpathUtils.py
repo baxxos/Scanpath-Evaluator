@@ -121,8 +121,9 @@ def get_raw_sequences(dataset_task):
     return my_sequences
 
 
-# Alter the sequences from their default format to the desired format used on client-side
 def get_task_data(dataset_task):
+    """ Alters the sequences from their default format to the desired format used on client-side. """
+
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
@@ -132,17 +133,17 @@ def get_task_data(dataset_task):
     formatted_sequences = dataset_task.calc_min_similarity(formatted_sequences)
 
     # Return necessary dataset info which will be processed and rendered on the client side
-    ret_dataset = {
+    return {
+        'name': dataset_task.name,
         'scanpaths': formatted_sequences,
         'visuals': dataset_task.visuals,
         'aois': dataset_task.aois
     }
 
-    return ret_dataset
 
-
-# Reversed common scanpath algorithm - the "common" scanpath is known from the start
 def run_custom(dataset_task, custom_scanpath):
+    """ Reversed common scanpath algorithm - the "common" scanpath is known from the start. """
+
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
@@ -154,9 +155,26 @@ def run_custom(dataset_task, custom_scanpath):
         custom_scanpath_arr.append([custom_scanpath[i], 0])
 
     res_data = {
+        'identifier': 'custom',
         'fixations': custom_scanpath_arr,
         'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath)
     }
 
     return res_data
+
+
+def run_empty(alg_name):
+    """
+    Generates an empty (dummy) scanpath algorithm result. Used for excluding selected algorithms during
+     algorithm cross-comparisons.
+    """
+
+    return {
+        'identifier': alg_name,
+        'fixations': [],
+        'similarity': {},
+        'excluded': True
+    }
+
+
 
