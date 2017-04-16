@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 
-from database import Base, session
+from database import Base, db_session
 from models.Dataset import Dataset
 from models.DatasetTask import DatasetTask
 
@@ -32,7 +32,7 @@ class User(Base):
 
     def get_data_tree_json(self):
         # Load datasets owned by current user
-        my_datasets = session.query(Dataset).filter(Dataset.user_id == self.id)
+        my_datasets = db_session.query(Dataset).filter(Dataset.user_id == self.id)
         data_tree = []
 
         for dataset in my_datasets:
@@ -43,7 +43,7 @@ class User(Base):
             })
 
             # Load tasks owned by current dataset
-            my_tasks = session.query(DatasetTask).filter(DatasetTask.dataset_id == dataset.id)
+            my_tasks = db_session.query(DatasetTask).filter(DatasetTask.dataset_id == dataset.id)
 
             for task in my_tasks:
                 data_tree[len(data_tree) - 1]['children'].append({

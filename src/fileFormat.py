@@ -43,7 +43,7 @@ def create_task_folders(dataset, task, file_aois, file_scanpaths, file_bg_image)
     )
 
     # Select the columns we wish to keep after formatting
-    keep = ['ParticipantName', 'FixationIndex', 'GazeEventDuration', 'GazeEventDuration', 'FixationPointX (MCSpx)',
+    keep = ['ParticipantName', 'FixationIndex', 'GazeEventType', 'GazeEventDuration', 'FixationPointX (MCSpx)',
             'FixationPointY (MCSpx)', 'MediaName']
 
     # Format the newly created file according to selected columns and remove the original one
@@ -207,9 +207,7 @@ def format_aois(file_path):
                         str(y_size) + sep +
                         act_aoi['shortName'] + '\n')
 
-                    # Two-character AOIs turned out to be a trouble later
-                    # string.uppercase[name_it % len(string.uppercase)] +
-                    # string.lowercase[name_it / len(string.lowercase)] + '\n'
+                    # Two-character AOIs turned out to be a trouble later'
                     name_it += 1
 
                     # Skip last vertex (unnecessary) and move to the next AOI

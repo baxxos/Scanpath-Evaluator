@@ -4,7 +4,7 @@ from os import listdir, path
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
 
 from config import config
-from database import Base, session
+from database import Base, db_session
 from models.Dataset import Dataset
 from stringEditAlgs import convert_to_str_array, calc_mutual_similarity
 
@@ -51,7 +51,7 @@ class DatasetTask(Base):
 
     def load_data(self):
         # Get parent dataset name
-        dataset = session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
+        dataset = db_session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
 
         # Construct path to scanpath data based on config file - e.g. 'datasets/d1/t1/scanpaths/'
         file_path_scanpaths = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
@@ -81,7 +81,6 @@ class DatasetTask(Base):
     def load_participants(self, file_path_scanpaths):
         try:
             with open(file_path_scanpaths, 'r') as fr:
-                file_data = []
                 # Skip the first line of scanpath file (table header)
                 next(fr)
                 # Read the rest of the file by lines
@@ -101,9 +100,6 @@ class DatasetTask(Base):
 
                             # Write the the line data into the data object (under user ID key)
                             self.participants[participant_identifier].append(line_cols[1:])
-
-                            # Read the rest of the data in columns by splitting it by tab character
-                            file_data.append(act_line.split('\t'))
                     except:
                         print "Invalid data format - line will be skipped"
                         continue

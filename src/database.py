@@ -14,4 +14,4 @@ Base.metadata.create_all(engine)
 
 # Construct session manager
 Session = sessionmaker(bind=engine)
-session = Session()
+db_session = Session()

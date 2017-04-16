@@ -10,17 +10,17 @@ from stringEditAlgs import *
 recording_env = Environment(0.5, 60, 1920, 1080, 17)
 
 
-def createSequences(Participants, myAoIs, errorRateArea):
+def createSequences(participants, myAoIs, errorRateArea):
     # LEGACY CODE downloaded from the STA research paper
     Sequences = {}
-    for participant_id in Participants:
+    for participant_id in participants:
         # An individual sequence/scanpath
         sequence = ''
         # For simplifying/normalizing the scanpaths ('AAABBBC' -> 'ABC')
         prev_aoi = ''
         prev_duration = 0
         prev_total_duration = 0
-        for fixation in Participants[participant_id]:
+        for fixation in participants[participant_id]:
             temp_aoi = ''
             temp_duration = 0
             for act_aoi in myAoIs:

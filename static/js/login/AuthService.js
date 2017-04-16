@@ -33,12 +33,13 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 
 		$rootScope.globals.currentUser = {
 			id: id,
-			email: email,
-			authdata: authdata
+			email: email
+			//authdata: authdata
 		};
 
-		// Set default auth header for http requests
-		$http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
+		// Set default auth header used for for all HTTP requests after logging in.
+		// This was replaced by client cookies and sessions provided by Flask
+		// $http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
 
 		// Store user details in globals cookie that keeps user logged in for 1 day (or until they logout)
 		var cookieExp = new Date();
@@ -47,6 +48,19 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 	};
 
 	this.clearCredentials = function() {
+		$http({
+			method: 'POST',
+			url: 'api/user/logout',
+			data: {}
+		}).then(
+			function(response) {
+				console.log(response)
+			},
+			function(response) {
+				console.log(response)
+			}
+		);
+
 		// Invalidate global user objects and remove cookies
 		$rootScope.globals.currentUser = false;
 		$cookies.remove('globals');

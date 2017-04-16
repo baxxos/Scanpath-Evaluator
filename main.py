@@ -3,23 +3,36 @@ import os
 import traceback
 import fileFormat
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
+from datetime import timedelta
 
 from config import config
 from customScanpathAlgs import sta, emine, dotplot
-from database import session
+from database import db_session
 from models.Dataset import Dataset
 from models.DatasetTask import DatasetTask
 from models.User import User
 from scanpathUtils import run_custom, run_empty, get_task_data
 
+# App configuration
 app = Flask(__name__)
+app.secret_key = os.urandom(24).encode('hex')
 app.debug = True
 
 
-# TODO consider prefixing Angular directives with 'data-ng' prefix to ensure valid HTML and reduce IDE warnings
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(hours=12)
+
+
+def is_user_logged_in():
+    return 'user' in session
+
+
+# Response methods
 def handle_error(message='Internal database error - try again later.'):
     return json.dumps({
         'success': False,
@@ -34,6 +47,7 @@ def handle_success(load=None):
     })
 
 
+# Routing methods
 @app.route('/')
 def redirect_index():
     return render_template('index.html')
@@ -47,12 +61,15 @@ def authenticate():
         email = json_data['email']
         password = json_data['password']
     except KeyError:
-        return handle_error('User auth data invalid.')
+        return handle_error('Failed to login - user auth data invalid.')
 
     # Query the database for an user matching the info from the request
     try:
-        user = session.query(User).filter(User.email == email).one()
+        user = db_session.query(User).filter(User.email == email).one()
+
         if sha256_crypt.verify(password, user.password):
+            session['user'] = user.id
+
             return handle_success({
                 'id': user.id
             })
@@ -60,9 +77,17 @@ def authenticate():
             return handle_error('Invalid user credentials - try again.')
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try again.')
-    except Exception as e:
-        print e.message
+    except:
+        traceback.print_exc()
         return handle_error()
+
+
+@app.route('/api/user/logout', methods=['POST'])
+def logout_user():
+    # Drop the current session and notify the user
+    session.pop('user', None)
+    session.clear()
+    return handle_success()
 
 
 @app.route('/api/user/add', methods=['POST'])
@@ -81,12 +106,12 @@ def add_user():
 
     try:
         # Commit DB changes
-        session.add(user)
-        session.commit()
+        db_session.add(user)
+        db_session.commit()
 
         return handle_success()
     except exc.IntegrityError:
-        session.rollback()
+        db_session.rollback()
         return handle_error('Integrity error: e-mail address is already taken.')
     except:
         traceback.print_exc()
@@ -97,11 +122,14 @@ def add_user():
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
 
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     try:
         json_data = json.loads(request.data)
         user_id = json_data['userId']
 
-        user = session.query(User).filter(User.id == user_id).one()
+        user = db_session.query(User).filter(User.id == user_id).one()
     except KeyError:
         return handle_error('User ID is missing')
     except orm.exc.NoResultFound:
@@ -115,8 +143,11 @@ def get_data_tree():
 
 @app.route('/api/dataset', methods=['GET'])
 def get_dataset():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     try:
-        dataset = session.query(Dataset).filter(Dataset.id == request.args.get('id')).one()
+        dataset = db_session.query(Dataset).filter(Dataset.id == request.args.get('id')).one()
         return handle_success(dataset.to_json())
     except orm.exc.NoResultFound:
         return handle_error('Invalid dataset ID.')
@@ -126,14 +157,17 @@ def get_dataset():
 
 @app.route('/api/dataset/add', methods=['POST'])
 def add_dataset():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     try:
         json_data = json.loads(request.data)
 
         dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=json_data['userId'])
 
         # Commit DB changes
-        session.add(dataset)
-        session.commit()
+        db_session.add(dataset)
+        db_session.commit()
 
         # Reflect the changes on the server side - create a new folder named after dataset PK
         os.makedirs(os.path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id)))
@@ -155,6 +189,9 @@ def add_dataset():
 def get_dataset_task():
     """ Returns JSON formatted task data (individual scanpaths, visuals, similarities etc.) """
 
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Look for the task identifier in request URL
     try:
         task_id = request.args.get('taskId')
@@ -164,7 +201,7 @@ def get_dataset_task():
 
     # Load additional required data and return task info
     try:
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
         return handle_success(get_task_data(task))
@@ -177,6 +214,9 @@ def get_dataset_task():
 
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     try:
         # Handle request data
         try:
@@ -189,7 +229,7 @@ def add_dataset_task():
             file_bg_image = request.files['files[fileBgImage]']
 
             # Find parent dataset and create new task instance
-            dataset = session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
+            dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
             task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
                                dataset_id=dataset.id)
         except KeyError:
@@ -202,7 +242,7 @@ def add_dataset_task():
         try:
             # Commit DB changes
             dataset.tasks.append(task)
-            session.commit()
+            db_session.commit()
 
             fileFormat.create_task_folders(dataset, task, file_regions, file_scanpaths, file_bg_image)
 
@@ -211,8 +251,8 @@ def add_dataset_task():
             })
         except ValueError:
             # Try to delete any data previously created
-            session.delete(task)
-            session.commit()
+            db_session.delete(task)
+            db_session.commit()
 
             fileFormat.silent_dir_remove(os.path.join(
                 config['DATASET_FOLDER'],
@@ -229,9 +269,12 @@ def add_dataset_task():
 
 @app.route('/api/task', methods=['DELETE'])
 def del_dataset_task():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     try:
         json_data = json.loads(request.data)
-        task = session.query(DatasetTask).filter(DatasetTask.id == json_data['taskId']).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == json_data['taskId']).one()
 
         # Remove the dataset
         fileFormat.silent_dir_remove(os.path.join(
@@ -248,8 +291,8 @@ def del_dataset_task():
         )
 
         # Commit changes to the DB
-        session.delete(task)
-        session.commit()
+        db_session.delete(task)
+        db_session.commit()
 
         return handle_success()
     except KeyError:
@@ -263,6 +306,9 @@ def del_dataset_task():
 @app.route('/custom', methods=['POST'])
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Check if the request data contains the custom scanpath
     try:
         json_data = json.loads(request.data)
@@ -271,7 +317,7 @@ def get_similarity_to_custom():
 
         # Verify the custom scanpath formatting - only letters describing AOIs
         if str(custom_scanpath).isalpha():
-            task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+            task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
             task.load_data()
             task.exclude_participants(json_data['excludedScanpaths'])
 
@@ -289,13 +335,16 @@ def get_similarity_to_custom():
 
 @app.route('/sta', methods=['POST'])
 def get_sta_common():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
         # Load additional required data and perform run_sta
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
@@ -311,13 +360,16 @@ def get_sta_common():
 
 @app.route('/emine', methods=['POST'])
 def get_emine_common():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
         # Load additional required data and perform run_sta
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
@@ -333,13 +385,16 @@ def get_emine_common():
 
 @app.route('/dotplot', methods=['POST'])
 def get_dotplot_common():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
         # Load additional required data and perform run_sta
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
@@ -355,13 +410,16 @@ def get_dotplot_common():
 
 @app.route('/alg-compare', methods=['POST'])
 def get_alg_comparison():
+    if not is_user_logged_in():
+        return handle_error('Unauthorized access')
+
     # Look for the task identifier in request URL
     try:
         json_data = json.loads(request.data)
         task_id = json_data['taskId']
 
         # Load additional required data and perform run_sta
-        task = session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
         # Check for any excluded algorithms and push the rest into the results array
