@@ -9,7 +9,7 @@ from sqlalchemy import exc, orm
 from datetime import timedelta
 
 from config import config
-from customScanpathAlgs import sta, emine, dotplot
+from scanpathAlgs import sta, emine, dotplot
 from database import db_session
 from models.Dataset import Dataset
 from models.DatasetTask import DatasetTask
@@ -32,6 +32,10 @@ def is_user_logged_in():
     return 'user' in session
 
 
+def is_user_authorized(user_id):
+    return is_user_logged_in() and (session['user'] == user_id)
+
+
 # Response methods
 def handle_error(message='Internal database error - try again later.'):
     return json.dumps({
@@ -45,6 +49,10 @@ def handle_success(load=None):
         'success': True,
         'load': load if load is not None else ''
     })
+
+
+def handle_unauthorized():
+    return handle_error('Unauthorized access')
 
 
 # Routing methods
@@ -118,20 +126,20 @@ def add_user():
         return handle_error()
 
 
-@app.route('/api/user/get_data_tree', methods=['POST'])
+@app.route('/api/user/get_data_tree', methods=['GET'])
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
 
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     try:
-        json_data = json.loads(request.data)
-        user_id = json_data['userId']
+        user_id = request.args.get('userId', type=int)
+
+        if not is_user_authorized(user_id):
+            return handle_unauthorized()
 
         user = db_session.query(User).filter(User.id == user_id).one()
-    except KeyError:
-        return handle_error('User ID is missing')
     except orm.exc.NoResultFound:
         return handle_error('Unknown user ID')
 
@@ -144,26 +152,39 @@ def get_data_tree():
 @app.route('/api/dataset', methods=['GET'])
 def get_dataset():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     try:
-        dataset = db_session.query(Dataset).filter(Dataset.id == request.args.get('id')).one()
-        return handle_success(dataset.to_json())
+        dataset_id = request.args.get('datasetId', type=int)
+        user_id = request.args.get('userId', type=int)
+
+        dataset = db_session.query(Dataset).filter(Dataset.id == dataset_id).one()
+
+        if not is_user_authorized(user_id) or dataset.user_id != user_id:
+            return handle_unauthorized()
+        else:
+            return handle_success(dataset.to_json())
     except orm.exc.NoResultFound:
         return handle_error('Invalid dataset ID.')
     except:
         return handle_error()
 
 
-@app.route('/api/dataset/add', methods=['POST'])
+@app.route('/api/dataset', methods=['POST'])
 def add_dataset():
+    """ Creates a new dataset instance owned by currently logged in user """
+
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     try:
         json_data = json.loads(request.data)
+        user_id = json_data['userId']
 
-        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=json_data['userId'])
+        if not is_user_authorized(user_id):
+            return handle_unauthorized()
+
+        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=user_id)
 
         # Commit DB changes
         db_session.add(dataset)
@@ -185,26 +206,28 @@ def add_dataset():
         return handle_error()
 
 
-@app.route('/get_task_data', methods=['GET'])
+@app.route('/api/task', methods=['GET'])
 def get_dataset_task():
     """ Returns JSON formatted task data (individual scanpaths, visuals, similarities etc.) """
 
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
-    # Look for the task identifier in request URL
+    # Load request arguments and return task info
     try:
-        task_id = request.args.get('taskId')
-    except:
-        traceback.print_exc()
-        return handle_error('Task ID is missing')
+        task_id = request.args.get('taskId', type=int)
+        user_id = request.args.get('userId', type=int)
 
-    # Load additional required data and return task info
-    try:
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
-        return handle_success(get_task_data(task))
+        # Check if the task belongs to a dataset owned by the user ID specified in the GET request
+        dataset = db_session.query(Dataset).filter(Dataset.id == task.dataset_id).one()
+
+        if not is_user_authorized(user_id) or dataset.user_id != user_id:
+            return handle_unauthorized()
+        else:
+            return handle_success(get_task_data(task))
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
@@ -215,7 +238,7 @@ def get_dataset_task():
 @app.route('/api/task/add', methods=['POST'])
 def add_dataset_task():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     try:
         # Handle request data
@@ -230,7 +253,9 @@ def add_dataset_task():
 
             # Find parent dataset and create new task instance
             dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
-            task = DatasetTask(name=json_data['name'], url=json_data['url'], description=json_data['description'],
+            task = DatasetTask(name=json_data['name'],
+                               url=json_data['url'] if 'url' in json_data else 'N/A',
+                               description=json_data['description'],
                                dataset_id=dataset.id)
         except KeyError:
             traceback.print_exc()
@@ -270,7 +295,7 @@ def add_dataset_task():
 @app.route('/api/task', methods=['DELETE'])
 def del_dataset_task():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     try:
         json_data = json.loads(request.data)
@@ -307,7 +332,7 @@ def del_dataset_task():
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     # Check if the request data contains the custom scanpath
     try:
@@ -336,7 +361,7 @@ def get_similarity_to_custom():
 @app.route('/sta', methods=['POST'])
 def get_sta_common():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     # Look for the task identifier in request URL
     try:
@@ -361,7 +386,7 @@ def get_sta_common():
 @app.route('/emine', methods=['POST'])
 def get_emine_common():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     # Look for the task identifier in request URL
     try:
@@ -386,7 +411,7 @@ def get_emine_common():
 @app.route('/dotplot', methods=['POST'])
 def get_dotplot_common():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     # Look for the task identifier in request URL
     try:
@@ -411,7 +436,7 @@ def get_dotplot_common():
 @app.route('/alg-compare', methods=['POST'])
 def get_alg_comparison():
     if not is_user_logged_in():
-        return handle_error('Unauthorized access')
+        return handle_unauthorized()
 
     # Look for the task identifier in request URL
     try:

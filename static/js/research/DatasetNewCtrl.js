@@ -23,7 +23,7 @@ angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope
         }
 
         $http({
-            url: 'api/dataset/add',
+            url: 'api/dataset',
             method: 'POST',
             data: {
                 userId: $rootScope.globals.currentUser.id,

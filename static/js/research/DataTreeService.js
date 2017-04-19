@@ -9,8 +9,8 @@ angular.module('ScanpathEvaluator').service('DataTreeService', function($http) {
     this.updateNavTreeData = function(userId) {
         $http({
 			url: '/api/user/get_data_tree',
-			method: 'POST',
-			data: {
+			method: 'GET',
+			params: {
 				userId: userId
 			}
 		}).then(

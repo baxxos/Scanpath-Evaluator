@@ -1,12 +1,13 @@
 // Handles all scanpath data related actions such as AJAX calls etc.
-angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope, $state, $http, $window, CanvasDrawService) {
+angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope, $rootScope, $state, $http, $window, CanvasDrawService) {
 	/*** DATA-HANDLING METHODS (mostly don't modify the $scope) ***/
-	$scope.getTaskData = function() {
+	$scope.getTaskData = function(taskId, userId) {
 		$http({
-			url: 'get_task_data',
+			url: 'api/task',
 			method: 'GET',
 			params: {
-				taskId: $scope.task.id
+				taskId: taskId,
+				userId: userId
 			}
 		}).then(
 			function(response) {
@@ -413,7 +414,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 		initCanvasModal('scanpathCanvasModal');
 
 		// Get the basic scanpath data (mutual similarity etc.)
-		$scope.getTaskData();
+		$scope.getTaskData($scope.task.id, $rootScope.globals.currentUser.id);
 
 		// Scanpath table rows expanding/collapsing controls
 		$scope.expandedRows = {};

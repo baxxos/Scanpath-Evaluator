@@ -1,0 +1,11 @@
+FullName	XFrom	XSize	YFrom	YSize	ShortName
+header	0	976	0	75	A
+top-menu-home	0	130	80	40	B
+top-menu-lang	135	95	80	40	C
+top-menu-home-url	230	65	80	40	D
+top-menu-signin	705	150	80	40	E
+top-menu-mail	860	120	80	40	F
+left-featured	0	200	125	240	G
+left-sites	0	200	370	625	H
+center-panel	205	400	125	830	I
+right-panel	615	360	125	830	J

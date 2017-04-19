@@ -4,7 +4,6 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		// Check required inputs
 		return (
 			$scope.taskNew.name &&
-			$scope.taskNew.url &&
 			$scope.taskNew.fileScanpaths &&
 			$scope.taskNew.fileRegions &&
 			$scope.taskNew.fileBgImage
@@ -37,8 +36,8 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	var showUserErrors = function() {
 		$scope.taskNew.errors = [];
 
-		if(!$scope.taskNew.name || !$scope.taskNew.url) {
-			$scope.taskNew.errors.push('A required field is missing!');
+		if(!$scope.taskNew.name) {
+			$scope.taskNew.errors.push('Task name is missing!');
 		}
 		if(!$scope.taskNew.fileScanpaths) {
 			$scope.taskNew.errors.push('Scanpaths file is missing!');
@@ -104,7 +103,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					// Update navigation view
 					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
-					loadDataset($scope.dataset.id);
+					loadDataset($scope.dataset.id, $rootScope.globals.currentUser.id);
 
 					// Feedback to user & re-enable control buttons
 					$scope.taskNew.uploadState = 2;
@@ -153,7 +152,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					// Update navigation view
 					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
-					loadDataset($scope.dataset.id);
+					loadDataset($scope.dataset.id, $rootScope.globals.currentUser.id);
 				},
 				function(response) {
 					alert('No response from the server');
@@ -164,26 +163,35 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	};
 
 	/*** ACT DATASET RELATED METHODS ***/
-	var loadDataset = function(datasetId) {
+	var loadDataset = function(datasetId, userId) {
 		$http({
 			method: 'GET',
 			url: '/api/dataset',
 			params: {
-			   id: datasetId
+				datasetId: datasetId,
+				userId: userId
 			}
 		}).then(
 			function(response) {
 				if(response.data.success == true && response.data.load) {
-				   $scope.dataset = response.data.load;
+					$scope.dataset = response.data.load;
+
+					// Convert the DB string timestamp into a JavaScript object
+					$scope.dataset.date_created = formatDatasetDate($scope.dataset.date_created);
+					$scope.dataset.date_updated = formatDatasetDate($scope.dataset.date_updated);
 				}
 				else {
-				   console.error(response.data.message);
+					console.error(response.data.message);
 				}
 			},
 			function(response) {
 			   console.error('There was no response to from the server to the dataset load request.');
 			}
 		);
+	};
+
+	var formatDatasetDate = function(dateString) {
+		return Date.parse(dateString);
 	};
 
 	var initController = function() {
@@ -200,7 +208,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 
 		// Get basic dataset information and fill $scope.dataset object
 		if($state.params.id) {
-			loadDataset($state.params.id);
+			loadDataset($state.params.id, $rootScope.globals.currentUser.id);
 		}
 	};
 

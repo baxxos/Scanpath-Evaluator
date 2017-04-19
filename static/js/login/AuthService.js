@@ -1,6 +1,6 @@
 angular.module('ScanpathEvaluator').service('AuthenticationService', AuthenticationService);
 
-function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
+function AuthenticationService($http, $state, $rootScope, $cookies, DataTreeService) {
 	// Method accepts login credentials and functions which will be executed after receiving a response
 	this.login = function(email, password, callbackSuccess, callbackFailed, callbackTimeout) {
 		$http({
@@ -54,10 +54,10 @@ function AuthenticationService($http, $rootScope, $cookies, DataTreeService) {
 			data: {}
 		}).then(
 			function(response) {
-				console.log(response)
+				$state.go('login');
 			},
 			function(response) {
-				console.log(response)
+				console.error(response);
 			}
 		);
 

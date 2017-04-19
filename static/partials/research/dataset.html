@@ -1,7 +1,7 @@
 <h3>Dataset: <span class="bold">{{ dataset.name }}</span></h3>
 <h4>{{ dataset.description }}</h4>
-<p>Created at: {{ dataset.date_created }}</p>
-<p>Updated at: {{ dataset.date_updated }}</p>
+<p>Created at: {{ dataset.date_created | date:'dd.MM.yyyy HH:mm:ss'}}</p>
+<p>Updated at: {{ dataset.date_updated | date:'dd.MM.yyyy HH:mm:ss'}}</p>
 
 <button class="btn btn-xs btn-primary">
     <span class="glyphicon glyphicon-edit"></span> Edit dataset

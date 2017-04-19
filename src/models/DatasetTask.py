@@ -19,7 +19,7 @@ class DatasetTask(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String)
-    url = Column(String, nullable=False)
+    url = Column(String)
     dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='CASCADE'), nullable=False)
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
@@ -86,20 +86,18 @@ class DatasetTask(Base):
                 # Read the rest of the file by lines
                 for act_line in fr:
                     try:
-                        # If the page name argument matches the page name specified in file
-                        if act_line.index(str(self.url)) > 0:
-                            # Remove trailing newline and split the line into columns
-                            act_line = act_line.rstrip()
-                            line_cols = act_line.split('\t')
+                        # Remove trailing newline and split the line into columns
+                        act_line = act_line.rstrip()
+                        line_cols = act_line.split('\t')
 
-                            # Subtract the user identifier from the act line
-                            participant_identifier = line_cols[0]
+                        # Subtract the user identifier from the act line
+                        participant_identifier = line_cols[0]
 
-                            if participant_identifier not in self.participants:
-                                self.participants[participant_identifier] = []
+                        if participant_identifier not in self.participants:
+                            self.participants[participant_identifier] = []
 
-                            # Write the the line data into the data object (under user ID key)
-                            self.participants[participant_identifier].append(line_cols[1:])
+                        # Write the the line data into the data object (under user ID key)
+                        self.participants[participant_identifier].append(line_cols[1:])
                     except:
                         print "Invalid data format - line will be skipped"
                         continue

@@ -7,12 +7,26 @@ from stringEditAlgs import *
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
-recording_env = Environment(0.5, 60, 1920, 1080, 17)
+recording_env = Environment(0.5, 60, 1280, 1024, 17)
 
 
 def createSequences(participants, myAoIs, errorRateArea):
+    """
+    Default method for converting raw sequence data loaded from a CSV-ish file into a temporary string representation:
+    Input:
+        {
+            'ID02': [
+                ['0.0', 'Fixation', '150', '557', '40', 'http://ncc.metu.edu.tr/'],
+                ['1.0', 'Fixation', '600', '478', '159', 'http://ncc.metu.edu.tr/'],
+                ['2.0', 'Fixation', '300', '499', '300', 'http://ncc.metu.edu.tr/']
+                ],
+            'ID03': ...
+        }
+    Output: { 'ID02': 'A-150.B-600.C-300.', 'ID03': ... }
+     """
+
     # LEGACY CODE downloaded from the STA research paper
-    Sequences = {}
+    my_sequences = {}
     for participant_id in participants:
         # An individual sequence/scanpath
         sequence = ''
@@ -67,16 +81,17 @@ def createSequences(participants, myAoIs, errorRateArea):
                 prev_aoi = temp_aoi[0][0]
                 prev_duration = temp_duration
 
-        Sequences[participant_id] = sequence
+        my_sequences[participant_id] = sequence
 
-    return Sequences
+    return my_sequences
 
 
 def get_closer_aoi(fixation, all_aois, possible_aois):
     """
-        Function helps with solving the cases when a fixation points to two AOIs at the same time - it returns
-        the closer one based on distance to the corners of the 2 target AOIs.
+    Function helps with solving the cases when a fixation points to two AOIs at the same time - it returns
+    the closer one based on distance to the corners of the 2 target AOIs.
     """
+
     sums_of_distances = {}
     for target_aoi in possible_aois:
         for curr_aoi in all_aois:
@@ -105,7 +120,9 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
 
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences(dataset_task):
-    """ Returns the sequences as a dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. } """
+    """
+    Converts the string represented sequences to a sensible dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. }
+    """
 
     my_error_rate_area = recording_env.get_error_rate_area()
     my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
@@ -166,7 +183,7 @@ def run_custom(dataset_task, custom_scanpath):
 def run_empty(alg_name):
     """
     Generates an empty (dummy) scanpath algorithm result. Used for excluding selected algorithms during
-     algorithm cross-comparisons.
+    algorithm cross-comparisons.
     """
 
     return {
