@@ -7,7 +7,6 @@ import copy
 
 dotplot_max_aois = 100
 dotplot_error_rate_area = 0
-dotplot_aoi_range = 300
 
 
 # CODE ORIGIN: https://github.com/Groosling/DP_features_and_scanpaths
@@ -157,6 +156,7 @@ def createSequencesBasedOnDistances(my_dataset):
     Args:
         my_dataset: dataset
     """
+    aoi_range = 300
     sequences = {}
     participants = my_dataset.participants
     myAoIs = my_dataset.aois
@@ -166,7 +166,7 @@ def createSequencesBasedOnDistances(my_dataset):
         for z in range(0, min(len(participants[keys[y]]) - 1, dotplot_max_aois)):
            tempdist = calculateDistance(int(float(participants[keys[y]][z][3])), int(float(participants[keys[y]][z][4])),
                                         int(float(participants[keys[y]][z + 1][3])), int(float(participants[keys[y]][z + 1][4])))
-           sequence = sequence + getAOIBasedOnRange(tempdist, dotplot_aoi_range) + "-" + str(int(float(participants[keys[y]][z + 1][1])) - int(float(participants[keys[y]][z][1]))) + "."
+           sequence = sequence + getAOIBasedOnRange(tempdist, aoi_range) + "-" + str(int(float(participants[keys[y]][z + 1][1])) - int(float(participants[keys[y]][z][1]))) + "."
         sequences[keys[y]] = sequence
     return sequences
 
@@ -195,6 +195,7 @@ def createSequencesBasedOnFixatonDurations(my_dataset):
     Args:
         my_dataset: dataset
     """
+    aoi_range = 100
     sequences = {}
     participants = my_dataset.participants
     myAoIs = my_dataset.aois
@@ -202,7 +203,7 @@ def createSequencesBasedOnFixatonDurations(my_dataset):
     for y in range(0, len(keys)):
         sequence = ""
         for z in range(0, min(len(participants[keys[y]]) - 1, dotplot_max_aois)):
-           sequence = sequence + getAOIBasedOnRange(int(participants[keys[y]][z][2]), dotplot_aoi_range) +\
+           sequence = sequence + getAOIBasedOnRange(int(participants[keys[y]][z][2]), aoi_range) +\
                       "-" + participants[keys[y]][z][2] + "."
         sequences[keys[y]] = sequence
     return sequences
@@ -234,6 +235,7 @@ def createSequencesBasedOnRelativeAngle(my_dataset):
     Args:
         my_dataset: dataset
     """
+    aoi_range = 30
     sequences = {}
     participants = my_dataset.participants
     myAoIs = my_dataset.aois
@@ -251,7 +253,7 @@ def createSequencesBasedOnRelativeAngle(my_dataset):
                                    int(float(participants[keys[y]][z + 2][3])), int(float(participants[keys[y]][z + 2][4])))
             angle = calculateAngle(vec1, vec2)
             # duration is calculated as sum of both sacades durations
-            sequence = sequence + getAOIBasedOnRange(angle, dotplot_aoi_range) + "-" + str(int(float(participants[keys[y]][z + 2][1])) - int(float(participants[keys[y]][z][1]))) + "."
+            sequence = sequence + getAOIBasedOnRange(angle, aoi_range) + "-" + str(int(float(participants[keys[y]][z + 2][1])) - int(float(participants[keys[y]][z][1]))) + "."
         sequences[keys[y]] = sequence
     return sequences
 
@@ -262,6 +264,7 @@ def createSequencesBasedOnAbsoluteAngle(my_dataset):
     Args:
         my_dataset: dataset
     """
+    aoi_range = 30
     sequences = {}
     participants = my_dataset.participants
     myAoIs = my_dataset.aois
@@ -276,7 +279,7 @@ def createSequencesBasedOnAbsoluteAngle(my_dataset):
             vec2 = calculateVector(0, 0, 1, 0)
             angle = calculateAngle(vec1, vec2)
             # duration is calculated as sum of both sacades durations
-            sequence = sequence + getAOIBasedOnRange(angle, dotplot_aoi_range) + "-" + str(int(float(participants[keys[y]][z + 1][1])) - int(float(participants[keys[y]][z][1]))) + "."
+            sequence = sequence + getAOIBasedOnRange(angle, aoi_range) + "-" + str(int(float(participants[keys[y]][z + 1][1])) - int(float(participants[keys[y]][z][1]))) + "."
         sequences[keys[y]] = sequence
     return sequences
 

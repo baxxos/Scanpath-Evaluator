@@ -237,7 +237,7 @@ def format_from_array(path_file_scanpaths, path_file_aois, path_file_formatted):
         with open(path_file_scanpaths, 'r') as fr_scanpaths:
             # Write table headers divided by separator (except for the last one)
             for index, column in enumerate(file_header):
-                fw.write(column if index == (len(file_header) - 1) else column + sep)
+                fw.write(column + '\n' if index == (len(file_header) - 1) else column + sep)
 
             # Set IDs for participants
             participant_id = 1
