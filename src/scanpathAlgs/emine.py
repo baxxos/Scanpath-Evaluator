@@ -3,6 +3,18 @@ from scanpathUtils import *
 import copy
 
 
+def simplify_scanpath(scanpath):
+    res_str = ''
+
+    for i in range(0, len(scanpath)):
+        if i == 0:
+            res_str += scanpath[i]
+        elif i > 0 and scanpath[i] != scanpath[i - 1]:
+            res_str += scanpath[i]
+
+    return res_str
+
+
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
 def run_emine(dataset_task):
     my_sequences = get_raw_sequences(dataset_task)
@@ -21,13 +33,13 @@ def run_emine(dataset_task):
         if len(scanpath_strs_set) > 1:
             calc_mutual_similarity(scanpath_strs_set)
         else:
-            common_scanpath_str = scanpath_strs_set[0]['raw_str']
+            common_scanpath_str = simplify_scanpath(scanpath_strs_set[0]['raw_str'])
             break
 
         # Get the two most similar scanpaths
         most_similar_pair = get_most_similar_pair(scanpath_strs_set)
 
-        lcs = get_longest_common_substring(
+        lcs = get_longest_common_subsequence(
             most_similar_pair[0]['raw_str'],
             most_similar_pair[1]['raw_str'],
         )

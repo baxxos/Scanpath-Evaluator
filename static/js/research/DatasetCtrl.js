@@ -79,7 +79,8 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		$scope.taskNew.uploadState = 1;
 
 		Upload.upload({
-			url: '/api/task/add',
+			url: '/api/task',
+			method: 'POST',
 			data: {
 				datasetId: $state.params.id,
 				name: $scope.taskNew.name,
@@ -140,10 +141,10 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	$scope.deleteTask = function(task) {
 		var confirmed = confirm('Are you sure you want to delete task named "' + task.name + '"?');
 
-		if(confirmed == true) {
+		if(confirmed) {
 			$http({
-				method: 'DELETE',
 				url: 'api/task',
+				method: 'DELETE',
 				data: {
 					taskId: task.id
 				}
@@ -162,14 +163,38 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		}
 	};
 
-	/*** ACT DATASET RELATED METHODS ***/
+	/*** CURRENT DATASET RELATED METHODS ***/
+	$scope.deleteDataset = function(dataset) {
+		var confirmed = confirm('Are you sure you want to delete dataset named "' + dataset.name + '"?');
+
+		if(confirmed) {
+			$http({
+				url: 'api/dataset',
+				method: 'DELETE',
+				data: {
+					datasetId: dataset.id
+				}
+			}).then(
+				function(response) {
+					// Update navigation view
+					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
+					// Update current screen
+					$state.go('research');
+				},
+				function(response) {
+					alert('No response from the server');
+					console.error('There was no response to from the server to the dataset delete request.');
+				}
+			)
+		}
+	};
+
 	var loadDataset = function(datasetId, userId) {
 		$http({
 			method: 'GET',
 			url: '/api/dataset',
 			params: {
-				datasetId: datasetId,
-				userId: userId
+				datasetId: datasetId
 			}
 		}).then(
 			function(response) {

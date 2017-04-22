@@ -6,8 +6,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 			url: 'api/task',
 			method: 'GET',
 			params: {
-				taskId: taskId,
-				userId: userId
+				taskId: taskId
 			}
 		}).then(
 			function(response) {

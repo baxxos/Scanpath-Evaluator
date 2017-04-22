@@ -200,7 +200,6 @@ def calculateTotalNumberDurationofFixationsandNSV(AoIList, Sequences):
                     duration += Sequences[keys[y]][k][3]
                     totalNSV += Sequences[keys[y]][k][4]
                     flag += 1
-
         if flag >= len(Sequences):
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [True]
         else:
@@ -216,7 +215,7 @@ def getValueableAoIs(AoIList):
         if myAoIdetail[5] == True:
             commonAoIs.append(myAoIdetail)
 
-    minValue = commonAoIs[0][4]
+    minValue = commonAoIs[0][4] if len(commonAoIs) > 0 else 0
     for AoIdetails in commonAoIs:
         if minValue > AoIdetails[4]:
             minValue = AoIdetails[4]

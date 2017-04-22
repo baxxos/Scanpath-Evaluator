@@ -6,8 +6,7 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 			url: 'api/task',
 			method: 'GET',
 			params: {
-				taskId: taskId,
-				userId: userId
+				taskId: taskId
 			}
 		}).then(
 			function(response) {

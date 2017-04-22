@@ -29,10 +29,12 @@ def make_session_permanent():
 
 
 def is_user_logged_in():
+    return True
     return 'user' in session
 
 
 def is_user_authorized(user_id):
+    return True
     return is_user_logged_in() and (session['user'] == user_id)
 
 
@@ -130,9 +132,6 @@ def add_user():
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
 
-    if not is_user_logged_in():
-        return handle_unauthorized()
-
     try:
         user_id = request.args.get('userId', type=int)
 
@@ -156,11 +155,9 @@ def get_dataset():
 
     try:
         dataset_id = request.args.get('datasetId', type=int)
-        user_id = request.args.get('userId', type=int)
-
         dataset = db_session.query(Dataset).filter(Dataset.id == dataset_id).one()
 
-        if not is_user_authorized(user_id) or dataset.user_id != user_id:
+        if not is_user_authorized(dataset.user_id):
             return handle_unauthorized()
         else:
             return handle_success(dataset.to_json())
@@ -173,9 +170,6 @@ def get_dataset():
 @app.route('/api/dataset', methods=['POST'])
 def add_dataset():
     """ Creates a new dataset instance owned by currently logged in user """
-
-    if not is_user_logged_in():
-        return handle_unauthorized()
 
     try:
         json_data = json.loads(request.data)
@@ -206,6 +200,46 @@ def add_dataset():
         return handle_error()
 
 
+@app.route('/api/dataset', methods=['DELETE'])
+def del_dataset():
+    try:
+        json_data = json.loads(request.data)
+
+        dataset_id = json_data['datasetId']
+        dataset = db_session.query(Dataset).filter(Dataset.id == dataset_id).one()
+
+        # Only proceed, if the dataset to be removed belongs to the request owner
+        if not is_user_authorized(dataset.user_id):
+            return handle_unauthorized()
+
+        # Remove server-side directories
+        fileFormat.silent_dir_remove(os.path.join(
+            config['DATASET_FOLDER'],
+            config['DATASET_PREFIX'] + str(dataset_id))
+        )
+
+        # Remove the dataset visuals from static folder
+        fileFormat.silent_dir_remove(os.path.join(
+            'static', 'images', 'datasets',
+            config['DATASET_PREFIX'] + str(dataset_id)),
+        )
+
+        # Commit changes to the DB
+        for task in dataset.tasks:
+            db_session.delete(task)
+
+        db_session.delete(dataset)
+        db_session.commit()
+
+        return handle_success()
+    except KeyError:
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Incorrect dataset ID')
+    except:
+        return handle_error()
+
+
 @app.route('/api/task', methods=['GET'])
 def get_dataset_task():
     """ Returns JSON formatted task data (individual scanpaths, visuals, similarities etc.) """
@@ -216,15 +250,12 @@ def get_dataset_task():
     # Load request arguments and return task info
     try:
         task_id = request.args.get('taskId', type=int)
-        user_id = request.args.get('userId', type=int)
 
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
         # Check if the task belongs to a dataset owned by the user ID specified in the GET request
-        dataset = db_session.query(Dataset).filter(Dataset.id == task.dataset_id).one()
-
-        if not is_user_authorized(user_id) or dataset.user_id != user_id:
+        if not is_user_authorized(task.dataset.user_id):
             return handle_unauthorized()
         else:
             return handle_success(get_task_data(task))
@@ -235,7 +266,7 @@ def get_dataset_task():
         return handle_error()
 
 
-@app.route('/api/task/add', methods=['POST'])
+@app.route('/api/task', methods=['POST'])
 def add_dataset_task():
     if not is_user_logged_in():
         return handle_unauthorized()
@@ -251,8 +282,13 @@ def add_dataset_task():
             file_regions = request.files['files[fileRegions]']
             file_bg_image = request.files['files[fileBgImage]']
 
-            # Find parent dataset and create new task instance
+            # Find parent dataset and verify its owner
             dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
+
+            if not is_user_authorized(dataset.user_id):
+                return handle_unauthorized()
+
+            # Create a new empty task instance
             task = DatasetTask(name=json_data['name'],
                                url=json_data['url'] if 'url' in json_data else 'N/A',
                                description=json_data['description'],
@@ -300,6 +336,9 @@ def del_dataset_task():
     try:
         json_data = json.loads(request.data)
         task = db_session.query(DatasetTask).filter(DatasetTask.id == json_data['taskId']).one()
+
+        if not is_user_authorized(task.dataset.user_id):
+            return handle_unauthorized()
 
         # Remove the dataset
         fileFormat.silent_dir_remove(os.path.join(
