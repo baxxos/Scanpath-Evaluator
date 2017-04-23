@@ -53,7 +53,7 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 	var getCommonScanpathDetails = function(algorithm) {
 		// The algorithm specifies url to be used from the backend API - e.g. '/sta' or '/emine'
 		$http({
-			url: '/' + algorithm,
+			url: '/api/scanpath/' + algorithm,
 			method: 'POST',
 			data: {
 				taskId: $scope.task.id,
@@ -102,7 +102,7 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 		customScanpathStr = customScanpathStr.replace(/\s/g, "");
 
 		$http({
-			url: '/custom',
+			url: '/api/scanpath/custom',
 			method: 'POST',
 			data: {
 				customScanpath: customScanpathStr,

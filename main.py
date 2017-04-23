@@ -374,7 +374,7 @@ def del_dataset_task():
         return handle_error()
 
 
-@app.route('/custom', methods=['POST'])
+@app.route('/api/scanpath/custom', methods=['POST'])
 def get_similarity_to_custom():
     # TODO consider fixations length [A, B] -> fixation == 50ms, [AAABB] = [A(150), B(100)]
     if not is_user_logged_in():
@@ -404,7 +404,7 @@ def get_similarity_to_custom():
         return handle_error()
 
 
-@app.route('/sta', methods=['POST'])
+@app.route('/api/scanpath/sta', methods=['POST'])
 def get_sta_common():
     if not is_user_logged_in():
         return handle_unauthorized()
@@ -429,7 +429,7 @@ def get_sta_common():
         return handle_error()
 
 
-@app.route('/emine', methods=['POST'])
+@app.route('/api/scanpath/emine', methods=['POST'])
 def get_emine_common():
     if not is_user_logged_in():
         return handle_unauthorized()
@@ -454,7 +454,7 @@ def get_emine_common():
         return handle_error()
 
 
-@app.route('/dotplot', methods=['POST'])
+@app.route('/api/scanpath/dotplot', methods=['POST'])
 def get_dotplot_common():
     if not is_user_logged_in():
         return handle_unauthorized()
@@ -479,7 +479,7 @@ def get_dotplot_common():
         return handle_error()
 
 
-@app.route('/alg-compare', methods=['POST'])
+@app.route('/api/scanpath/alg-compare', methods=['POST'])
 def get_alg_comparison():
     if not is_user_logged_in():
         return handle_unauthorized()

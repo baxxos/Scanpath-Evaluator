@@ -124,7 +124,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 		setSubmitBtnDisabled(true);
 
 		$http({
-			url: '/alg-compare',
+			url: '/api/scanpath/alg-compare',
 			method: 'POST',
 			data: {
 				taskId: $scope.task.id,
