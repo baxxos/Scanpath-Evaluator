@@ -1,6 +1,6 @@
 angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope, $rootScope, $state, $http, $timeout, DataTreeService) {
     var isFormValid = function() {
-        // Check required inputs, no other requirements
+        // Check required inputs, no other requirements so far
         return $scope.datasetNew.name;
     };
 
@@ -29,8 +29,9 @@ angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope
                 userId: $rootScope.globals.currentUser.id,
                 name: $scope.datasetNew.name,
                 userEmail: $rootScope.globals.currentUser.email,
-                // Optional attributes, replace 'undefined' by 'null' to ensure valid JSON object
-                description: ($scope.datasetNew.description ? $scope.datasetNew.description : null)
+                // Optional attributes, replace 'undefined' by 'null' to ensure a valid JSON object
+                description: ($scope.datasetNew.description ? $scope.datasetNew.description : null),
+                recEnvironment: $scope.datasetNew.recEnvironment
             }
         }).then(
             function(response) {
@@ -64,10 +65,14 @@ angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope
 
     var initController = function() {
         $scope.datasetNew = {
+            // GUI parameters
             success: false,
             redirect: true,
+            recEnvCollapsed: true,
             errors: [],
-            warnings: []
+            warnings: [],
+            // Recording environment details (screen resolution etc.)
+            recEnvironment: {}
         };
     };
 

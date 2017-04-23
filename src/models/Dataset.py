@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -17,6 +17,12 @@ class Dataset(Base):
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    # Recording environment attributes
+    screen_res_x = Column(Integer)
+    screen_res_y = Column(Integer)
+    screen_size = Column(Numeric)
+    accuracy_degree = Column(Numeric)
+    tracker_distance = Column(Numeric)
 
     # Reference to the dataset tasks owned by this dataset
     tasks = relationship('DatasetTask', backref='dataset', cascade='all, delete-orphan', passive_deletes=True)

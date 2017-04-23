@@ -13,19 +13,19 @@ angular.module('ScanpathEvaluator').controller('SidebarCtrl', function($scope, $
             function(data) {
                 $scope.navTreeData = [];
 
-                for(var dataset_iter = 0; dataset_iter < data.length; dataset_iter++) {
+                for(var datasetIter = 0; datasetIter < data.length; datasetIter++) {
                     // Compose dataset object in the format suitable for nav tree
                     var formatted_dataset = {
-                        'label': data[dataset_iter].label,
-                        'href': '#/research/dataset/' + data[dataset_iter].id,
+                        'label': data[datasetIter].label,
+                        'href': '#/research/dataset/' + data[datasetIter].id,
                         'children': []
                     };
 
-                    for (var task_iter = 0; task_iter < data[dataset_iter].children.length; task_iter++) {
+                    for (var taskIter = 0; taskIter < data[datasetIter].children.length; taskIter++) {
                         // Compose task object in the format suitable for nav tree
                         var formatted_task = {
-                            'label': data[dataset_iter].children[task_iter].label,
-                            'href': '#/research/task/' + data[dataset_iter].children[task_iter].id
+                            'label': data[datasetIter].children[taskIter].label,
+                            'href': '#/research/task/' + data[datasetIter].children[taskIter].id
                         };
                         formatted_dataset.children.push(formatted_task);
                     }

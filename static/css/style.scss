@@ -327,6 +327,14 @@ optgroup {
 	}
 }
 
+#datasetNewEnvironment {
+	cursor: pointer;
+
+	#envHeadingText:hover {
+		text-decoration: underline;
+	}
+}
+
 // Dataset - new task form
 .fake-label {
 	margin: 0 0 5px 0;

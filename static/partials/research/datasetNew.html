@@ -1,9 +1,26 @@
 <div class="row">
     <section class="col-md-6">
         <h3>Adding new datasets</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci alias amet assumenda
-        consectetur dignissimos eaque facere maiores necessitatibus rerum, vero! Consectetur consequatur
-        earum eveniet ipsum libero maxime nobis rem vitae!</p>
+        <p>
+            For each new dataset, you must specify at least its name.
+            Other attributes will be set to their default values if left blank.
+        </p>
+        <h4>Basic attributes</h4>
+        <p>
+            Much like comments in programming, a meaningful dataset name and description can help you
+            remember useful details later.
+        </p>
+        <h4>Recording environment details</h4>
+        <p>
+            Recording environment details help us determine the error rate area when composing individual scanpath
+            sequences. The error rate area is computed from <span class="bold">screen resolution</span>, diagonal
+            <span class="bold">screen size</span>, eye tracker <span class="bold">degree of accuracy</span> and
+            <span class="bold">distance</span> from participants.
+        </p>
+        <p>
+            If you leave these fields blank, the error rate area will be set to zero. Please, fill in all the
+            environment attributes or none - anything in-between is useless for error rate calculation.
+        </p>
     </section>
 
     <section class="col-md-6">
@@ -46,31 +63,96 @@
         <!-- Form area -->
         <div class="panel panel-primary text-left" id="new-dataset-panel">
             <div class="panel-heading">
-                <h3 class="panel-title">New dataset - basic information</h3>
+                <h3 class="panel-title">New dataset details</h3>
             </div>
 
             <div class="panel-body text-left">
                 <form ng-submit="submitDataset()">
+                    <!-- Basic dataset attributes -->
+                    <h4>Basic attributes</h4>
                     <div class="form-group">
                         <div class="input-group">
-                            <label for="dataset_name">
+                            <label for="datasetName">
                                 Name:<span class="input-required">*</span>
                             </label>
                             <input type="text" class="form-control" placeholder="datasetNamedWhatever"
-                               id="dataset_name" maxlength="100" ng-model="datasetNew.name" required>
+                               id="datasetName" maxlength="100" ng-model="datasetNew.name" required>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="input-group">
-                            <label for="dataset_desc">
+                            <label for="datasetDesc">
                                 Description:
                             </label>
-                            <input type="text" class="form-control" id="dataset_desc" maxlength="100"
+                            <input type="text" class="form-control" id="datasetDesc" maxlength="100"
                                    placeholder="Short description of the new dataset" ng-model="datasetNew.description">
                         </div>
                     </div>
 
+                    <hr />
+                    <!-- Recording environment details -->
+                    <h4 id="datasetNewEnvironment" ng-click="datasetNew.recEnvCollapsed = !datasetNew.recEnvCollapsed">
+                            <span class="glyphicon glyphicon-collapse-down" ng-show="datasetNew.recEnvCollapsed"></span>
+                            <span class="glyphicon glyphicon-collapse-up" ng-show="!datasetNew.recEnvCollapsed"></span>
+                            <span id="envHeadingText">Recording environment details</span>
+                    </h4>
+                    <div uib-collapse="datasetNew.recEnvCollapsed">
+                        <!-- Recording environment details - SCREEN -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenSize">
+                                    Screen diagonal size (inch):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenSize" min="0" max="100"
+                                       placeholder="17" step="any" ng-model="datasetNew.recEnvironment.screenSize">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenResX">
+                                    Horizontal screen resolution (px):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenResX" min="0" max="5000"
+                                       placeholder="1920" ng-model="datasetNew.recEnvironment.screenResX">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenResY">
+                                    Vertical screen resolution (px):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenResY" min="0" max="3500"
+                                       placeholder="1080" ng-model="datasetNew.recEnvironment.screenResY">
+                            </div>
+                        </div>
+
+                        <!-- Recording environment details - EYE TRACKER -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetAccDegree">
+                                    Eye tracker accuracy degree (decimal):
+                                </label>
+                                <input type="number" class="form-control" id="datasetAccDegree" min="0" max="10"
+                                       placeholder="0.5" step="any" ng-model="datasetNew.recEnvironment.accDegree">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetTackerDistance">
+                                    Eye tracker distance from participants (cm):
+                                </label>
+                                <input type="number" class="form-control" id="datasetTackerDistance" min="0" max="1000"
+                                       placeholder="60" step="any" ng-model="datasetNew.recEnvironment.trackerDistance">
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <!-- Redirect & submit -->
                     <div class="form-group">
                         <div class="checkbox">
                             <label>

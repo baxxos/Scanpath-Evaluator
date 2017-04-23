@@ -24,18 +24,9 @@ class DatasetTask(Base):
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
 
-    def __init__(self, **kwargs):
-        # ORM init
-        super(DatasetTask, self).__init__(**kwargs)
-
-        # Data holding objects
-        self.participants = {}
-        self.aois = []
-        self.visuals = {}
-
     @orm.reconstructor
     def __init_on_load__(self):
-        # Data holding objects - gets fired after the init method. Not sure if still needed
+        # Data holding objects - gets fired after the init method.
         self.participants = {}
         self.aois = []
         self.visuals = {}

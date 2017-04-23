@@ -7,7 +7,6 @@ from stringEditAlgs import *
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
 # Environment in which the eye tracking experiment was performed
-recording_env = Environment(0.5, 60, 1280, 1024, 17)
 
 
 def createSequences(participants, myAoIs, errorRateArea):
@@ -117,14 +116,26 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
     # return key of minimal value in dictionary
     return min(sums_of_distances, key=sums_of_distances.get)
 
-
+import traceback
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences(dataset_task):
     """
     Converts the string represented sequences to a sensible dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. }
     """
 
-    my_error_rate_area = recording_env.get_error_rate_area()
+    # Try to set error rate area (set to 0 if any parameters are missing)
+    try:
+        my_error_rate_area = Environment(
+            eyetracker_accuracy=float(dataset_task.dataset.accuracy_degree),
+            eyetracker_distance=float(dataset_task.dataset.tracker_distance),
+            screen_res_x=dataset_task.dataset.screen_res_x,
+            screen_res_y=dataset_task.dataset.screen_res_y,
+            screen_size_diagonal=float(dataset_task.dataset.screen_size)
+        ).get_error_rate_area()
+    except:
+        traceback.print_exc()
+        my_error_rate_area = 0
+
     my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
 
     keys = my_sequences.keys()

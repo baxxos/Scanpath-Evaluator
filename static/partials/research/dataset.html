@@ -1,3 +1,4 @@
+<!-- Dataset info -->
 <h3>Dataset: <span class="bold">{{ dataset.name }}</span></h3>
 <h4>{{ dataset.description }}</h4>
 <p>Created at: {{ dataset.date_created | date:'dd.MM.yyyy HH:mm:ss'}}</p>
@@ -10,10 +11,13 @@
     <span class="glyphicon glyphicon-trash"></span> Delete dataset
 </button>
 
+<!-- Edit dataset form -->
+
 <hr />
 
-<h4>Dataset tasks</h4>
+<!-- Dataset overview -->
 <section>
+    <h4>Dataset tasks</h4>
     <p>
         Eye tracking datasets usually consist of several tasks where each task might contain several screen
         recordings required in order to complete it. In order to simplify things, we flattened this hierarchy by one
@@ -44,55 +48,57 @@
 </section>
 
 <!-- New dataset task form area -->
-<section>
-    <div class="row">
-        <div class="col-md-12">
-            <!-- Success message -->
-            <div class="panel panel-success" ng-show="taskNew.success">
-                <div class="panel-heading">
-                    <h4 class="panel-title">Success:</h4>
-                </div>
-                <div class="panel-body">
-                    <p>Your new dataset task was created successfully.
-                        <span ng-show="taskNew.redirect">You will be redirected to the new task overview automatically
-                        in 5 seconds.</span>
-                    </p>
-                    <p ng-show="taskNew.redirect">If you want to continue now
-                        <a ng-href="#/research/task/{{ taskNew.id }}">click here</a>.
-                    </p>
-                </div>
+<div class="row">
+    <div class="col-md-12">
+        <!-- Success message -->
+        <div class="panel panel-success" ng-show="taskNew.success">
+            <div class="panel-heading">
+                <h4 class="panel-title">Success:</h4>
             </div>
-
-            <!-- Form error -->
-            <div class="panel panel-danger" ng-show="taskNew.errors.length">
-                <div class="panel-heading">
-                    <h4 class="panel-title">Please review following errors:</h4>
-                </div>
-                <div class="panel-body">
-                    <p ng-repeat="error in taskNew.errors">{{ error }}</p>
-                </div>
+            <div class="panel-body">
+                <p>Your new dataset task was created successfully.
+                    <span ng-show="taskNew.redirect">You will be redirected to the new task overview automatically
+                    in 5 seconds.</span>
+                </p>
+                <p ng-show="taskNew.redirect">If you want to continue now
+                    <a ng-href="#/research/task/{{ taskNew.id }}">click here</a>.
+                </p>
             </div>
+        </div>
 
-            <!-- Warning message -->
-            <div class="panel panel-warning" ng-show="taskNew.warnings.length">
-                <div class="panel-heading">
-                    <h4 class="panel-title">Your request could not be performed:</h4>
-                </div>
-                <div class="panel-body">
-                    <p ng-repeat="warning in taskNew.warnings">{{ warning }}</p>
-                </div>
+        <!-- Form error -->
+        <div class="panel panel-danger" ng-show="taskNew.errors.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Please review following errors:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="error in taskNew.errors">{{ error }}</p>
+            </div>
+        </div>
+
+        <!-- Warning message -->
+        <div class="panel panel-warning" ng-show="taskNew.warnings.length">
+            <div class="panel-heading">
+                <h4 class="panel-title">Your request could not be performed:</h4>
+            </div>
+            <div class="panel-body">
+                <p ng-repeat="warning in taskNew.warnings">{{ warning }}</p>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="row" ng-include="'static/partials/research/taskNew.html'"></div>
+<div class="row">
+    <form class="col-md-12" name="taskForm" ng-show="showTaskForm" ng-submit="submitTask()">
+        <div ng-include="'static/partials/research/taskNew.html'"></div>
+    </form>
+</div>
 
-    <div class="row" ng-show="!showTaskForm">
-        <div class="col-md-12">
-            <button class="btn btn-success" ng-click="toggleTaskForm()">
-                <span class="glyphicon glyphicon-plus"></span> Add task
-            </button>
+<div class="row" ng-show="!showTaskForm">
+    <div class="col-md-12">
+        <button class="btn btn-success" ng-click="toggleTaskForm()">
+            <span class="glyphicon glyphicon-plus"></span> Add task
+        </button>
 
-        </div>
     </div>
-</section>
+</div>

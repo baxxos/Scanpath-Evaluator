@@ -1,4 +1,4 @@
-from pylab import *
+from math import radians, tan, sqrt
 
 
 class Environment:

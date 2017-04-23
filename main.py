@@ -178,7 +178,14 @@ def add_dataset():
         if not is_user_authorized(user_id):
             return handle_unauthorized()
 
-        dataset = Dataset(name=json_data['name'], description=json_data['description'], user_id=user_id)
+        dataset = Dataset(
+            name=json_data['name'], description=json_data['description'], user_id=user_id,
+            accuracy_degree=json_data['recEnvironment'].get('accDegree'),
+            screen_size=json_data['recEnvironment'].get('screenSize'),
+            screen_res_x=json_data['recEnvironment'].get('screenResX'),
+            screen_res_y=json_data['recEnvironment'].get('screenResY'),
+            tracker_distance=json_data['recEnvironment'].get('trackerDistance')
+        )
 
         # Commit DB changes
         db_session.add(dataset)
