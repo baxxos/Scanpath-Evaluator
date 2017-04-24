@@ -36,8 +36,8 @@ class DatasetTask(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'date_created': str(self.date_created),
-            'date_updated': str(self.date_updated)
+            'dateCreated': str(self.date_created),
+            'dateUpdated': str(self.date_updated)
         }
 
     def load_data(self):

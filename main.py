@@ -6,7 +6,7 @@ import fileFormat
 from flask import Flask, render_template, request, session
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from config import config
 from scanpathAlgs import sta, emine, dotplot
@@ -17,6 +17,7 @@ from models.User import User
 from scanpathUtils import run_custom, run_empty, get_task_data
 
 # App configuration
+# TODO error/exception logging & unit tests
 app = Flask(__name__)
 app.secret_key = os.urandom(24).encode('hex')
 app.debug = True
@@ -145,6 +146,7 @@ def get_data_tree():
     try:
         return user.get_data_tree_json()
     except:
+        traceback.print_exc()
         return handle_error('Failed to obtain user data tree structure')
 
 
@@ -164,12 +166,13 @@ def get_dataset():
     except orm.exc.NoResultFound:
         return handle_error('Invalid dataset ID.')
     except:
+        traceback.print_exc()
         return handle_error()
 
 
 @app.route('/api/dataset', methods=['POST'])
 def add_dataset():
-    """ Creates a new dataset instance owned by currently logged in user """
+    """ Creates a new dataset instance owned by the currently logged in user """
 
     try:
         json_data = json.loads(request.data)
@@ -204,11 +207,48 @@ def add_dataset():
     except orm.exc.NoResultFound:
         return handle_error('Invalid user credentials - try logging in again.')
     except:
+        traceback.print_exc()
+        return handle_error()
+
+
+@app.route('/api/dataset', methods=['PUT'])
+def edit_dataset():
+    """ Updates an existing dataset instance, if owned by the currently logged in user """
+
+    try:
+        json_data = json.loads(request.data)
+        dataset = db_session.query(Dataset).filter(Dataset.id == json_data['id']).one()
+
+        if not is_user_authorized(dataset.user_id):
+            return handle_unauthorized()
+
+        # Update all attributes of the mapped object
+        dataset.name = json_data['name']
+        dataset.date_updated = datetime.now()
+        dataset.description = json_data['description']
+        dataset.accuracy_degree = json_data['recEnvironment'].get('accDegree')
+        dataset.screen_size = json_data['recEnvironment'].get('screenSize')
+        dataset.screen_res_x = json_data['recEnvironment'].get('screenResX')
+        dataset.screen_res_y = json_data['recEnvironment'].get('screenResY')
+        dataset.tracker_distance = json_data['recEnvironment'].get('trackerDistance')
+
+        # Commit DB changes
+        db_session.commit()
+
+        return handle_success()
+    except KeyError:
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try logging in again.')
+    except:
+        traceback.print_exc()
         return handle_error()
 
 
 @app.route('/api/dataset', methods=['DELETE'])
 def del_dataset():
+    """ Deletes an existing dataset instance, if owned by the currently logged in user"""
+
     try:
         json_data = json.loads(request.data)
 

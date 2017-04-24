@@ -34,12 +34,23 @@ class Dataset(Base):
         for task in self.tasks:
             tasks_json.append(task.to_json())
 
+        # Recording environment data in a separate object
+        rec_environment = {
+            'screenResX': self.screen_res_x,
+            'screenResY': self.screen_res_y,
+            # Decimal type is not a valid JSON value
+            'screenSize': float(self.screen_size),
+            'accDegree': float(self.accuracy_degree),
+            'trackerDistance': float(self.tracker_distance)
+        }
+
         return {
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'date_created': str(self.date_created),
-            'date_updated': str(self.date_updated),
+            'dateCreated': str(self.date_created),
+            'dateUpdated': str(self.date_updated),
+            'recEnvironment': rec_environment,
             'tasks': tasks_json
         }
 

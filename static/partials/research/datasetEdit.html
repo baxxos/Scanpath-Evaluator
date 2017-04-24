@@ -1,0 +1,127 @@
+<!-- Form error -->
+<div class="panel panel-danger" ng-show="guiParams.datasetFormErrors.length">
+    <div class="panel-heading">
+        <h4 class="panel-title">Please review following errors:</h4>
+    </div>
+    <div class="panel-body">
+        <p ng-repeat="error in guiParams.datasetFormErrors">{{ error }}</p>
+    </div>
+</div>
+
+<!-- Form area -->
+<div class="panel panel-primary text-left" id="editDatasetPanel">
+    <div class="panel-heading">
+        <h3 class="panel-title">Edit dataset details</h3>
+    </div>
+
+    <div class="panel-body text-left">
+        <form ng-submit="submitDataset()">
+            <div class="row">
+                <!-- Basic dataset attributes -->
+                <div class="col-md-6">
+                    <h4>Basic attributes</h4>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="datasetName">
+                                Name:<span class="input-required">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="datasetName" maxlength="100"
+                                   ng-value="dataset.name" ng-model="editedDataset.name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label for="datasetDesc">
+                                Description:
+                            </label>
+                            <input type="text" class="form-control" id="datasetDesc" maxlength="100"
+                                   ng-value="dataset.description" ng-model="editedDataset.description">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Recording environment details -->
+                    <h4 id="datasetEditEnvironment" ng-click="guiParams.recEnvCollapsed = !guiParams.recEnvCollapsed">
+                            <span class="glyphicon glyphicon-collapse-down" ng-show="guiParams.recEnvCollapsed"></span>
+                            <span class="glyphicon glyphicon-collapse-up" ng-show="!guiParams.recEnvCollapsed"></span>
+                            <span id="envHeadingText">Recording environment details</span>
+                    </h4>
+                    <div uib-collapse="guiParams.recEnvCollapsed">
+                        <!-- Recording environment details - SCREEN -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenSize">
+                                    Screen diagonal size (inch):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenSize" min="0" max="100"
+                                       step="any" ng-value="dataset.recEnvironment.screenSize"
+                                       ng-model="editedDataset.recEnvironment.screenSize">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenResX">
+                                    Horizontal screen resolution (px):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenResX" min="0" max="5000"
+                                       ng-value="dataset.recEnvironment.screenResX"
+                                       ng-model="editedDataset.recEnvironment.screenResX">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetScreenResY">
+                                    Vertical screen resolution (px):
+                                </label>
+                                <input type="number" class="form-control" id="datasetScreenResY" min="0" max="3500"
+                                       ng-value="dataset.recEnvironment.screenResY"
+                                       ng-model="editedDataset.recEnvironment.screenResY">
+                            </div>
+                        </div>
+
+                        <!-- Recording environment details - EYE TRACKER -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetAccDegree">
+                                    Eye tracker accuracy degree (decimal):
+                                </label>
+                                <input type="number" class="form-control" id="datasetAccDegree" min="0" max="10"
+                                       step="any" ng-value="dataset.recEnvironment.accDegree"
+                                       ng-model="editedDataset.recEnvironment.accDegree">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="datasetTackerDistance">
+                                    Eye tracker distance from participants (cm):
+                                </label>
+                                <input type="number" class="form-control" id="datasetTackerDistance" min="0" max="1000"
+                                       step="any" ng-value="dataset.recEnvironment.trackerDistance"
+                                       ng-model="editedDataset.recEnvironment.trackerDistance">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Submit & cancel -->
+                <div class="col-md-12">
+                    <hr />
+                    <div class="text-left">
+                        <button class="btn btn-primary" type="submit" ng-click="updateDataset(dataset)">
+                            Save details
+                        </button>
+                        <button class="btn btn-default" type="submit" ng-click="toggleEditDatasetForm()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

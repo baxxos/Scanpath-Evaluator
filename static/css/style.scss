@@ -109,7 +109,7 @@ footer {
 }
 
 /*** Forms ***/
-#login-panel-main, #new-dataset-panel, #register_panel {
+#loginPanelMain, #newDatasetPanel, #editDatasetPanel, #registerPanel {
 	// User inputs with the same width
 	.input-group {
 		min-width: 0;
@@ -327,7 +327,7 @@ optgroup {
 	}
 }
 
-#datasetNewEnvironment {
+#datasetNewEnvironment, #datasetEditEnvironment {
 	cursor: pointer;
 
 	#envHeadingText:hover {
@@ -335,9 +335,24 @@ optgroup {
 	}
 }
 
+#datasetEditControls {
+	margin-bottom: 15px;
+}
+
 // Dataset - new task form
 .fake-label {
 	margin: 0 0 5px 0;
+}
+
+// Dataset - edit form
+#editDatasetPanel {
+	hr {
+		margin-top: 5px; // Element above already has a 15px margin
+	}
+
+	button {
+		width: auto;
+	}
 }
 
 label {
@@ -350,7 +365,7 @@ label {
 	}
 }
 
-/*** Dataset sidebar screen **/
+// Dataset sidebar screen
 // Hard coded link to add a new dataset under dataset global tree navigation
 #addTreeData {
     padding: 3px 10px;

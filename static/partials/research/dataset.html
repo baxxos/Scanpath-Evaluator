@@ -1,18 +1,22 @@
 <!-- Dataset info -->
 <h3>Dataset: <span class="bold">{{ dataset.name }}</span></h3>
 <h4>{{ dataset.description }}</h4>
-<p>Created at: {{ dataset.date_created | date:'dd.MM.yyyy HH:mm:ss'}}</p>
-<p>Updated at: {{ dataset.date_updated | date:'dd.MM.yyyy HH:mm:ss'}}</p>
+<p>Created at: {{ dataset.dateCreated | date:'dd.MM.yyyy HH:mm:ss'}}</p>
+<p>Updated at: {{ dataset.dateUpdated | date:'dd.MM.yyyy HH:mm:ss'}}</p>
 
-<button class="btn btn-xs btn-primary">
-    <span class="glyphicon glyphicon-edit"></span> Edit dataset
-</button>
-<button class="btn btn-xs btn-danger" ng-click="deleteDataset(dataset)">
-    <span class="glyphicon glyphicon-trash"></span> Delete dataset
-</button>
+<div id="datasetEditControls">
+    <button class="btn btn-xs btn-primary" ng-click="toggleEditDatasetForm()">
+        <span class="glyphicon glyphicon-edit"></span> Edit dataset
+    </button>
+    <button class="btn btn-xs btn-danger" ng-click="deleteDataset(dataset)">
+        <span class="glyphicon glyphicon-trash"></span> Delete dataset
+    </button>
+</div>
 
 <!-- Edit dataset form -->
-
+<section uib-collapse="!guiParams.showEditDatasetForm">
+    <div ng-include="'static/partials/research/datasetEdit.html'"></div>
+</section>
 <hr />
 
 <!-- Dataset overview -->
@@ -75,30 +79,19 @@
                 <p ng-repeat="error in taskNew.errors">{{ error }}</p>
             </div>
         </div>
-
-        <!-- Warning message -->
-        <div class="panel panel-warning" ng-show="taskNew.warnings.length">
-            <div class="panel-heading">
-                <h4 class="panel-title">Your request could not be performed:</h4>
-            </div>
-            <div class="panel-body">
-                <p ng-repeat="warning in taskNew.warnings">{{ warning }}</p>
-            </div>
-        </div>
     </div>
 </div>
 
 <div class="row">
-    <form class="col-md-12" name="taskForm" ng-show="showTaskForm" ng-submit="submitTask()">
+    <form class="col-md-12" name="taskForm" ng-show="guiParams.showTaskForm" ng-submit="submitTask()">
         <div ng-include="'static/partials/research/taskNew.html'"></div>
     </form>
 </div>
 
-<div class="row" ng-show="!showTaskForm">
+<div class="row" ng-show="!guiParams.showTaskForm">
     <div class="col-md-12">
         <button class="btn btn-success" ng-click="toggleTaskForm()">
             <span class="glyphicon glyphicon-plus"></span> Add task
         </button>
-
     </div>
 </div>

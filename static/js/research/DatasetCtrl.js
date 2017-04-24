@@ -13,7 +13,6 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	var resetTaskForm = function() {
 		$scope.taskNew = {
 			errors: [],
-			warnings: [],
 			success: false,
 			uploadState: 0 // System feedback to user: -1: failure, 0: default, 1: uploading, 2: success
 		};
@@ -25,11 +24,11 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	// Fix for required field missing message appearing when form was hidden without submitting
 	$scope.toggleTaskForm = function() {
 		// Do a cleanup if we are hiding the form
-		if($scope.showTaskForm) {
+		if($scope.guiParams.showTaskForm) {
 			resetTaskForm();
 		}
 		// Toggle the form controlling variable
-		$scope.showTaskForm = !$scope.showTaskForm;
+		$scope.guiParams.showTaskForm = !$scope.guiParams.showTaskForm;
 	};
 
 	// Method handles the missing required inputs alerts (most browsers do this automatically though)
@@ -64,7 +63,6 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 			return;
 		}
 		else {
-			$scope.taskNew.warnings = [];
 			$scope.taskNew.errors = [];
 		}
 
@@ -104,7 +102,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					// Update navigation view
 					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
-					loadDataset($scope.dataset.id, $rootScope.globals.currentUser.id);
+					loadDataset($scope.dataset.id);
 
 					// Feedback to user & re-enable control buttons
 					$scope.taskNew.uploadState = 2;
@@ -120,12 +118,13 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					}
 				}
 				else {
-					$scope.taskNew.warnings.push(response.data.message);
+					$scope.taskNew.errors.push(response.data.message);
 					// Feedback to user & re-enable control buttons
 					$scope.taskNew.uploadState = -1;
 				}
 			},
 			function(response) {
+				alert('No response from the server');
 				console.error('There was no response from the server to the new task request .');
 				// Feedback to user & re-enable control buttons
 				$scope.taskNew.uploadState = -1;
@@ -153,7 +152,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					// Update navigation view
 					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
 					// Update current screen
-					loadDataset($scope.dataset.id, $rootScope.globals.currentUser.id);
+					loadDataset($scope.dataset.id);
 				},
 				function(response) {
 					alert('No response from the server');
@@ -164,6 +163,40 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	};
 
 	/*** CURRENT DATASET RELATED METHODS ***/
+	$scope.updateDataset = function(dataset) {
+		var confirmed = confirm('Are you sure you want to edit this dataset?');
+
+		if(confirmed) {
+			$http({
+				url: 'api/dataset',
+				method: 'PUT',
+				data: $scope.editedDataset  // This must match the backend dataset object in terms of attributes
+			}).then(
+				function(response) {
+					if (response.data.success) {
+						// Update navigation view
+						DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
+
+						// Update current screen & notify the user
+						loadDataset($scope.dataset.id);
+						alert('Your dataset was edited successfully.');
+
+						$scope.guiParams.datasetFormErrors = [];
+						$scope.guiParams.showEditDatasetForm = false;
+					}
+					else {
+						$scope.guiParams.datasetFormErrors.push(response.data.message);
+						console.error(response.data.message);
+					}
+				},
+				function(response) {
+					alert('No response from the server');
+					console.error('There was no response to from the server to the dataset delete request.');
+				}
+			)
+		}
+	};
+
 	$scope.deleteDataset = function(dataset) {
 		var confirmed = confirm('Are you sure you want to delete dataset named "' + dataset.name + '"?');
 
@@ -178,7 +211,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 				function(response) {
 					// Update navigation view
 					DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
-					// Update current screen
+					// Redirect from the deleted dataset screen
 					$state.go('research');
 				},
 				function(response) {
@@ -189,7 +222,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		}
 	};
 
-	var loadDataset = function(datasetId, userId) {
+	var loadDataset = function(datasetId) {
 		$http({
 			method: 'GET',
 			url: '/api/dataset',
@@ -198,14 +231,18 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 			}
 		}).then(
 			function(response) {
-				if(response.data.success == true && response.data.load) {
+				if(response.data.success && response.data.load) {
 					$scope.dataset = response.data.load;
 
 					// Convert the DB string timestamp into a JavaScript object
-					$scope.dataset.date_created = formatDatasetDate($scope.dataset.date_created);
-					$scope.dataset.date_updated = formatDatasetDate($scope.dataset.date_updated);
+					$scope.dataset.dateCreated = formatDatasetDate($scope.dataset.dateCreated);
+					$scope.dataset.dateUpdated = formatDatasetDate($scope.dataset.dateUpdated);
+
+					// Set the dataset editing object attributes equal to the loaded one
+					$scope.editedDataset = angular.copy($scope.dataset);
 				}
 				else {
+					$scope.guiParams.datasetFormErrors.push(response.data.message);
 					console.error(response.data.message);
 				}
 			},
@@ -219,21 +256,34 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		return Date.parse(dateString);
 	};
 
+	$scope.toggleEditDatasetForm = function() {
+		$scope.guiParams.showEditDatasetForm = !$scope.guiParams.showEditDatasetForm;
+	};
+
 	var initController = function() {
 		// New task form related variables (from the dataset screen)
 		$scope.taskNew = {
 			errors: [],
-			warnings: [],
 			success: false,
 			uploadState: 0 // System feedback to user: -1: failure, 0: default, 1: uploading, 2: success
 		};
 
-		$scope.showTaskForm = false;
+		$scope.guiParams = {
+			// Misc params
+			showTaskForm: false,
+			recEnvCollapsed: true,
+			showEditDatasetForm: false,
+			datasetFormErrors: []
+		};
+
+		// For displaying purposes
 		$scope.dataset = {};
+		// For edit form purposes
+		$scope.editedDataset = {};
 
 		// Get basic dataset information and fill $scope.dataset object
 		if($state.params.id) {
-			loadDataset($state.params.id, $rootScope.globals.currentUser.id);
+			loadDataset($state.params.id);
 		}
 	};
 
