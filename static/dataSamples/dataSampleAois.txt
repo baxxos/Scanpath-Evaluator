@@ -1,0 +1,528 @@
+AOI name: header
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-2,55	0
+1864	0
+1864	90,4
+-2,55	90,4
+
+
+AOI name: top-menu
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-6,37	89,13
+1869,1	89,13
+1869,1	140,05
+-6,37	140,05
+
+
+AOI name: carousel
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-10,19	120,96
+1866,55	120,96
+1866,55	416,34
+-10,19	416,34
+
+
+AOI name: side-menu
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+930,73	413,8
+1222,3	413,8
+1222,3	847,97
+930,73	847,97
+
+
+AOI name: news-tp-cup
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+640,43	417,62
+932	417,62
+932	844,15
+640,43	844,15
+
+
+AOI name: news-dod
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+350,14	416,34
+641,71	416,34
+641,71	842,88
+350,14	842,88
+
+
+AOI name: down-news
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+348,86	847,97
+1222,3	847,97
+1222,3	1226,12
+348,86	1226,12
+
+
+AOI name: about-fiit
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1223,57	846,7
+1511,32	846,7
+1511,32	1229,94
+1223,57	1229,94
+
+
+AOI name: contacts
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+741,02	1229,94
+1135,72	1229,94
+1135,72	1546,97
+741,02	1546,97
+
+
+AOI name: map-location
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1526,6	1232,48
+1139,54	1232,48
+1139,54	1548,24
+1526,6	1548,24
+
+
+AOI name: logos-and-social
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+343,77	1229,94
+738,47	1229,94
+738,47	1541,88
+343,77	1541,88
+
+
+AOI name: down-menu
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-3,82	1525,32
+1864	1525,32
+1864	1911,11
+-3,82	1911,11
+
+
+AOI name: footer
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-3,82	1893,29
+1879,28	1893,29
+1879,28	1981,14
+-3,82	1981,14
+
+
+AOI name: header-links
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1334,34	1,27
+1517,69	1,27
+1517,69	86,58
+1334,34	86,58
+
+
+AOI name: header-search
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1333,07	-2,55
+1112,8	-2,55
+1112,8	91,67
+1333,07	91,67
+
+
+AOI name: header-logo
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+353,96	-1,27
+784,31	-1,27
+784,31	89,13
+353,96	89,13
+
+
+AOI name: top-menu-faculty
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+359,05	90,4
+511,84	90,4
+511,84	140,05
+359,05	140,05
+
+
+AOI name: top-menu-prospective-students
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+513,11	87,85
+695,18	87,85
+695,18	142,6
+513,11	142,6
+
+
+AOI name: top-menu-students
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+700,27	86,58
+832,69	86,58
+832,69	141,33
+700,27	141,33
+
+
+AOI name: top-menu-alumni
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+835,24	78,94
+1004,58	78,94
+1004,58	146,42
+835,24	146,42
+
+
+AOI name: top-menu-research
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1007,12	81,49
+1159,91	81,49
+1159,91	138,78
+1007,12	138,78
+
+
+AOI name: top-menu-public
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1161,18	86,58
+1334,34	86,58
+1334,34	136,24
+1161,18	136,24
+
+
+AOI name: top-menu-employees
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1520,23	90,4
+1338,16	90,4
+1338,16	138,78
+1520,23	138,78
+
+
+AOI name: down-menu-study
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+339,95	1526,6
+516,93	1526,6
+516,93	1892,01
+339,95	1892,01
+
+
+AOI name: down-menu-research
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+518,2	1525,32
+673,54	1525,32
+673,54	1892,01
+518,2	1892,01
+
+
+AOI name: down-menu-international
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+672,26	1525,32
+823,78	1525,32
+823,78	1892,01
+672,26	1892,01
+
+
+AOI name: down-menu-faculty
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+823,78	1525,32
+979,11	1525,32
+979,11	1892,01
+823,78	1892,01
+
+
+AOI name: down-menu-media
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+981,66	1524,05
+1136,99	1524,05
+1136,99	1892,01
+981,66	1892,01
+
+
+AOI name: down-menu-links
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1136,99	1525,32
+1330,52	1525,32
+1330,52	1889,47
+1136,99	1889,47
+
+
+AOI name: down-menu-accessiblity
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1331,79	1526,6
+1538,06	1526,6
+1538,06	1888,19
+1331,79	1888,19
+
+
+AOI name: main-body
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-6,1	394,39
+1862,15	394,39
+1862,15	1244,15
+-6,1	1244,15
+
+
+AOI name: Rectangle 32
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+-6,1	388,29
+339,5	388,29
+339,5	1524,69
+-6,1	1524,69
+
+
+AOI name: Polygon
+
+Number of Keyframes: 1
+Number of Vertices: 4
+
+Keyframe timestamp = 00:00:00.000
+Active: True
+
+X	Y
+
+1862,15	390,32
+1227,88	390,32
+1223,82	843,66
+1862,15	843,66
+
+

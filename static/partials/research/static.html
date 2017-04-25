@@ -1,20 +1,59 @@
-<h3>Selecting a dataset</h3>
+<h3><span class="glyphicon glyphicon-search"></span> Selecting a dataset</h3>
 <p>
     In order to view or evaluate your previously uploaded data, select a dataset or a dataset task from the
     side navigation tree.
 </p>
 
-<h3>Uploading to a dataset</h3>
+<h3><span class="glyphicon glyphicon-upload"></span> Uploading to an existing dataset</h3>
 <p>
     If you wish to upload raw eye tracking data to an already existing dataset, please select the particular dataset
     and click the '<span class="italic">Add task</span>' button under the tasks list. Fill out the form and once
     the uploading has finished, you are good to go.
 </p>
 
-<h3>Creating a new one</h3>
+<h4><span class="glyphicon glyphicon-align-justify"></span> Scanpath data</h4>
+<p>
+    Currently, the only supported input data format is the default <span class="italic">Tobii Studio</span> export.
+    In this export, the scanpath data are formatted as a <a href="/static/dataSamples/dataSampleScanpaths.tsv">
+    CSV file with tab separator</a>. Required are the following columns:
+    <span class="italic">ParticipantName</span>, <span class="italic">FixationIndex</span>,
+    <span class="italic">GazeEventType</span>, <span class="italic">GazeEventDuration</span>,
+    <span class="italic">FixationPointX (MCSpx)</span>, <span class="italic">FixationPointY (MCSpx)</span> and
+    <span class="italic">MediaName</span>.
+    However, only the first 4 listed column values are currently being used - remaining columns can contain any data.
+</p>
+<p class="italic">
+    This file is later formatted so it takes less space, but alternatively you can do the formatting on your own
+    and upload an <a href="/static/dataSamples/dataSampleScanpathsFormatted.txt">already formatted dataset</a>.
+</p>
+
+<h4><span class="glyphicon glyphicon-th-large"></span> AOI data</h4>
+<p>
+    Areas of interest data format is not really standardized in the <span class="italic">Tobii Studio export</span>,
+    so <a href="/static/dataSamples/dataSampleAois.txt">please refer to this file instead</a>. As you can see
+    in the file, areas of interest are limited to 4 vertices each, so please stick to rectangle and square shapes.
+</p>
+<!-- NOT YET IMPLEMENTED
+<p class="italic">
+    Again, AOI data are later formatted in order to speed up calculations, but alternatively you can upload an
+    <a href="/static/dataSamples/dataSampleAoisFormatted.txt">already formatted AOI file</a>.
+</p>
+-->
+
+<h4><span class="glyphicon glyphicon-picture"></span> Visual stimulus</h4>
+<p>
+    The canvas visual can be any image whose resolution
+    matches the coordinates specified in the AOI and scanpath files precisely - for example, use
+    <a href="/static/dataSamples/dataSampleVisual.png">this image</a> for the previously linked data.
+</p>
+<p>
+    Put the three files linked above together and you can create a new sample dataset task right now.
+</p>
+
+<h3><span class="glyphicon glyphicon-plus"></span> Creating new dataset</h3>
 <p>
     For evaluating new eye tracking data you need to create a dataset first. Then you can proceed to
     create the so-called '<span class="italic">dataset tasks</span>' which contain eye tracking data recorded
     from one screen. For a complex datasets consisting of multiple such screens, create several dataset tasks
-    (one screen each).
+    (each containing data from one screen).
 </p>

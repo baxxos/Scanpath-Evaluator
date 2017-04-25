@@ -57,7 +57,7 @@ angular.module('ScanpathEvaluator')
 					url: '/dataset/:datasetId',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research/dataset.html',
+							templateUrl: 'static/partials/research/dataset/dataset.html',
 							controller: 'DatasetCtrl'
 						}
 					},
@@ -70,7 +70,7 @@ angular.module('ScanpathEvaluator')
 					url: '/dataset-new',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research/datasetNew.html',
+							templateUrl: 'static/partials/research/dataset/datasetNew.html',
 							controller: 'DatasetNewCtrl'
 						}
 					},
@@ -84,7 +84,7 @@ angular.module('ScanpathEvaluator')
 					url: '/task/:taskId',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research/task.html',
+							templateUrl: 'static/partials/research/task/task.html',
 							controller: 'TaskCtrl'
 						}
 					},
@@ -98,7 +98,7 @@ angular.module('ScanpathEvaluator')
 					url: '/alg-compare',
 					views: {
 						'right@research': {
-							templateUrl: 'static/partials/research/algCompare.html',
+							templateUrl: 'static/partials/research/task/algCompare.html',
 							controller: 'AlgCompareCtrl'
 						}
 					},

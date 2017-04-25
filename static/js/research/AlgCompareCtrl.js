@@ -10,10 +10,11 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 			}
 		}).then(
 			function(response) {
+				// Update objects on the screen with response data
 				$scope.task.scanpaths = response.data.load.scanpaths;
 				$scope.task.visuals = response.data.load.visuals;
 				$scope.task.aois = response.data.load.aois;
-				$scope.task.name = response.data.load.name;
+				$scope.task.name = response.data.load.name;  // For breadcrumbs navigation
 
 				// Load the canvas background image again to get its natural resolution
 				$scope.canvasInfo.backgroundImg = new Image();

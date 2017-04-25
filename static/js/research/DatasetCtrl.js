@@ -34,6 +34,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	// Method handles the missing required inputs alerts (most browsers do this automatically though)
 	var showUserErrors = function() {
 		$scope.taskNew.errors = [];
+		$scope.taskNew.success = false;
 
 		if(!$scope.taskNew.name) {
 			$scope.taskNew.errors.push('Task name is missing!');

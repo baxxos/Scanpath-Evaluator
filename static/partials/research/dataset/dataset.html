@@ -15,7 +15,7 @@
 
 <!-- Edit dataset form -->
 <section uib-collapse="!guiParams.showEditDatasetForm">
-    <div ng-include="'static/partials/research/datasetEdit.html'"></div>
+    <div ng-include="'static/partials/research/dataset/datasetEdit.html'"></div>
 </section>
 <hr />
 
@@ -126,7 +126,7 @@
 
 <div class="row">
     <form class="col-md-12" name="taskForm" ng-show="guiParams.showTaskForm" ng-submit="submitTask()">
-        <div ng-include="'static/partials/research/taskNew.html'"></div>
+        <div ng-include="'static/partials/research/task/taskNew.html'"></div>
     </form>
 </div>
 
