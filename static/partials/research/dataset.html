@@ -36,18 +36,60 @@
                 <th>Controls</th>
             </tr>
         </thead>
-        <tr ng-repeat="task in dataset.tasks">
-            <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
-            <td>{{ task.description }}</td>
-            <td>
-                <button class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-edit"></span> Edit task
-                </button>
-                <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">
-                    <span class="glyphicon glyphicon-trash"></span> Delete task
-                </button>
-            </td>
-        </tr>
+        <!-- Task overview -->
+        <tbody ng-repeat="task in dataset.tasks"
+               ng-class="{'row-container-expanded': guiParams.expandedTaskRow == task.id}">
+            <tr>
+                <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
+                <td>{{ task.description }}</td>
+                <td>
+                    <button class="btn btn-primary btn-xs" ng-click="toggleEditTaskForm(task)">
+                        <span class="glyphicon glyphicon-edit"></span> Edit task
+                    </button>
+                    <button class="btn btn-danger btn-xs" ng-click="deleteTask(task)">
+                        <span class="glyphicon glyphicon-trash"></span> Delete task
+                    </button>
+                </td>
+            </tr>
+            <!-- Edit task form -->
+            <tr ng-show="guiParams.expandedTaskRow == task.id">
+                <td colspan="42">
+                    <form ng-submit="updateTask(editedTask)">
+                        <!-- Input fields -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="editTaskName">
+                                    Name:<span class="input-required">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="editTaskName" maxlength="100" required
+                                       ng-model="editedTask.name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label for="editTaskDesc">
+                                    Description:
+                                </label>
+                                <input type="text" class="form-control" id="editTaskDesc" maxlength="150"
+                                       ng-model="editedTask.description">
+                            </div>
+                        </div>
+                        <!-- Submit & cancel -->
+                        <div class="form-group">
+                            <div class="text-left">
+                                <button class="btn btn-primary" type="submit">
+                                    Save details
+                                </button>
+                                <button class="btn btn-default" type="button"
+                                        ng-click="guiParams.expandedTaskRow = -1">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </section>
 

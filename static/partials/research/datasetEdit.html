@@ -15,7 +15,7 @@
     </div>
 
     <div class="panel-body text-left">
-        <form ng-submit="submitDataset()">
+        <form ng-submit="updateDataset(editedDataset)">
             <div class="row">
                 <!-- Basic dataset attributes -->
                 <div class="col-md-6">
@@ -26,7 +26,7 @@
                                 Name:<span class="input-required">*</span>
                             </label>
                             <input type="text" class="form-control" id="datasetName" maxlength="100"
-                                   ng-value="dataset.name" ng-model="editedDataset.name" required>
+                                   ng-model="editedDataset.name" required>
                         </div>
                     </div>
 
@@ -35,8 +35,8 @@
                             <label for="datasetDesc">
                                 Description:
                             </label>
-                            <input type="text" class="form-control" id="datasetDesc" maxlength="100"
-                                   ng-value="dataset.description" ng-model="editedDataset.description">
+                            <input type="text" class="form-control" id="datasetDesc" maxlength="150"
+                                   ng-model="editedDataset.description">
                         </div>
                     </div>
                 </div>
@@ -56,8 +56,7 @@
                                     Screen diagonal size (inch):
                                 </label>
                                 <input type="number" class="form-control" id="datasetScreenSize" min="0" max="100"
-                                       step="any" ng-value="dataset.recEnvironment.screenSize"
-                                       ng-model="editedDataset.recEnvironment.screenSize">
+                                       step="any" ng-model="editedDataset.recEnvironment.screenSize">
                             </div>
                         </div>
 
@@ -67,7 +66,6 @@
                                     Horizontal screen resolution (px):
                                 </label>
                                 <input type="number" class="form-control" id="datasetScreenResX" min="0" max="5000"
-                                       ng-value="dataset.recEnvironment.screenResX"
                                        ng-model="editedDataset.recEnvironment.screenResX">
                             </div>
                         </div>
@@ -78,7 +76,6 @@
                                     Vertical screen resolution (px):
                                 </label>
                                 <input type="number" class="form-control" id="datasetScreenResY" min="0" max="3500"
-                                       ng-value="dataset.recEnvironment.screenResY"
                                        ng-model="editedDataset.recEnvironment.screenResY">
                             </div>
                         </div>
@@ -90,19 +87,17 @@
                                     Eye tracker accuracy degree (decimal):
                                 </label>
                                 <input type="number" class="form-control" id="datasetAccDegree" min="0" max="10"
-                                       step="any" ng-value="dataset.recEnvironment.accDegree"
-                                       ng-model="editedDataset.recEnvironment.accDegree">
+                                       step="any" ng-model="editedDataset.recEnvironment.accDegree">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="input-group">
-                                <label for="datasetTackerDistance">
+                                <label for="datasetTrackerDistance">
                                     Eye tracker distance from participants (cm):
                                 </label>
-                                <input type="number" class="form-control" id="datasetTackerDistance" min="0" max="1000"
-                                       step="any" ng-value="dataset.recEnvironment.trackerDistance"
-                                       ng-model="editedDataset.recEnvironment.trackerDistance">
+                                <input type="number" class="form-control" id="datasetTrackerDistance" min="0" max="1000"
+                                       step="any" ng-model="editedDataset.recEnvironment.trackerDistance">
                             </div>
                         </div>
                     </div>
@@ -113,10 +108,10 @@
                 <div class="col-md-12">
                     <hr />
                     <div class="text-left">
-                        <button class="btn btn-primary" type="submit" ng-click="updateDataset(dataset)">
+                        <button class="btn btn-primary" type="submit">
                             Save details
                         </button>
-                        <button class="btn btn-default" type="submit" ng-click="toggleEditDatasetForm()">
+                        <button class="btn btn-default" type="button" ng-click="toggleEditDatasetForm()">
                             Cancel
                         </button>
                     </div>

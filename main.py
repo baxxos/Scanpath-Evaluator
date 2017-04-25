@@ -178,8 +178,11 @@ def add_dataset():
         json_data = json.loads(request.data)
         user_id = json_data['userId']
 
+        # Check authorization & validate attribute values
         if not is_user_authorized(user_id):
             return handle_unauthorized()
+        elif len(json_data['name']) == 0:
+            raise KeyError
 
         dataset = Dataset(
             name=json_data['name'], description=json_data['description'], user_id=user_id,
@@ -219,8 +222,11 @@ def edit_dataset():
         json_data = json.loads(request.data)
         dataset = db_session.query(Dataset).filter(Dataset.id == json_data['id']).one()
 
+        # Check authorization & validate attribute values
         if not is_user_authorized(dataset.user_id):
             return handle_unauthorized()
+        elif len(json_data['name']) == 0:
+            raise KeyError
 
         # Update all attributes of the mapped object
         dataset.name = json_data['name']
@@ -332,8 +338,11 @@ def add_dataset_task():
             # Find parent dataset and verify its owner
             dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
 
+            # Check authorization & validate attribute values
             if not is_user_authorized(dataset.user_id):
                 return handle_unauthorized()
+            elif len(json_data['name']) == 0:
+                raise KeyError
 
             # Create a new empty task instance
             task = DatasetTask(name=json_data['name'],
@@ -370,6 +379,38 @@ def add_dataset_task():
 
             traceback.print_exc()
             return handle_error('Failed to parse the submitted data format.')
+    except:
+        traceback.print_exc()
+        return handle_error()
+
+
+@app.route('/api/task', methods=['PUT'])
+def edit_task():
+    """ Updates an existing dataset instance, if owned by the currently logged in user """
+
+    try:
+        json_data = json.loads(request.data)
+        task = db_session.query(DatasetTask).filter(DatasetTask.id == json_data['id']).one()
+
+        # Check authorization & validate attribute values
+        if not is_user_authorized(task.dataset.user_id):
+            return handle_unauthorized()
+        elif len(json_data['name']) == 0:
+            raise KeyError
+
+        # Update all attributes of the mapped object
+        task.name = json_data['name']
+        task.date_updated = datetime.now()
+        task.description = json_data['description']
+
+        # Commit DB changes
+        db_session.commit()
+
+        return handle_success()
+    except KeyError:
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try logging in again.')
     except:
         traceback.print_exc()
         return handle_error()

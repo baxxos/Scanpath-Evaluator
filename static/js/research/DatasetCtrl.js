@@ -49,10 +49,53 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		}
 	};
 
-	// Utility method to de-bloat the html
+	// Utility methods to de-bloat the html
 	$scope.concatFileErrors = function(file){
 		if(file) {
 			return file.$error + ': ' + file.$errorParam;
+		}
+	};
+
+	$scope.toggleEditTaskForm = function(task) {
+		$scope.guiParams.expandedTaskRow = ($scope.guiParams.expandedTaskRow == task.id ? -1 : task.id);
+
+		// Save the object of the task which user requested to edit
+		if($scope.guiParams.expandedTaskRow >= 0) {
+			$scope.editedTask = angular.copy(task);
+		}
+	};
+
+	// Updates task details
+	$scope.updateTask = function(editedTask) {
+		var confirmed = confirm('Are you sure you want to edit this task?');
+
+		if(confirmed) {
+			$http({
+				url: 'api/task',
+				method: 'PUT',
+				data: editedTask  // This must match the backend dataset object in terms of attributes
+			}).then(
+				function(response) {
+					if (response.data.success) {
+						// Update navigation view
+						DataTreeService.updateNavTreeData($rootScope.globals.currentUser.id);
+
+						// Update current screen & notify the user
+						loadDataset($scope.dataset.id);
+						alert('Your task was edited successfully.');
+						// Hide the editing form
+						$scope.guiParams.expandedTaskRow = -1;
+					}
+					else {
+						alert(response.data.message);
+						console.error(response.data.message);
+					}
+				},
+				function(response) {
+					alert('No response from the server');
+					console.error('There was no response to from the server to the dataset delete request.');
+				}
+			)
 		}
 	};
 
@@ -163,14 +206,14 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	};
 
 	/*** CURRENT DATASET RELATED METHODS ***/
-	$scope.updateDataset = function(dataset) {
+	$scope.updateDataset = function(editedDataset) {
 		var confirmed = confirm('Are you sure you want to edit this dataset?');
 
 		if(confirmed) {
 			$http({
 				url: 'api/dataset',
 				method: 'PUT',
-				data: $scope.editedDataset  // This must match the backend dataset object in terms of attributes
+				data: editedDataset  // This must match the backend dataset object in terms of attributes
 			}).then(
 				function(response) {
 					if (response.data.success) {
@@ -261,24 +304,27 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 	};
 
 	var initController = function() {
-		// New task form related variables (from the dataset screen)
+		// New task form related variables
 		$scope.taskNew = {
 			errors: [],
 			success: false,
 			uploadState: 0 // System feedback to user: -1: failure, 0: default, 1: uploading, 2: success
 		};
 
+		// Edit task form related variables
+		$scope.editedTask = {};
+
 		$scope.guiParams = {
-			// Misc params
+			// Misc GUI params
 			showTaskForm: false,
 			recEnvCollapsed: true,
 			showEditDatasetForm: false,
 			datasetFormErrors: []
 		};
 
-		// For displaying purposes
+		// For displaying dataset attributes etc.
 		$scope.dataset = {};
-		// For edit form purposes
+		// Edit dataset form related variables
 		$scope.editedDataset = {};
 
 		// Get basic dataset information and fill $scope.dataset object

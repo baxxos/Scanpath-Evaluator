@@ -33,7 +33,7 @@
                     <label for="taskDesc">
                         Description:
                     </label>
-                    <input type="text" class="form-control" id="taskDesc" maxlength="100"
+                    <input type="text" class="form-control" id="taskDesc" maxlength="150"
                            placeholder="Short description of the new task" ng-model="taskNew.description">
                 </div>
             </div>
@@ -42,7 +42,8 @@
                 <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
                     Submit
                 </button>
-                <button class="btn btn-default" ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
+                <button class="btn btn-default" type="button"
+                        ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
                     Cancel
                 </button>
             </div>

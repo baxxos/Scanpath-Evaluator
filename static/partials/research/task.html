@@ -80,7 +80,7 @@
             <span class="glyphicon glyphicon-refresh spinning"></span>
         </span>
     </button>
-    <button class="btn btn-default" ng-click="toggleAlgDescription()">
+    <button type="button" class="btn btn-default" ng-click="toggleAlgDescription()">
         {{ guiParams.algDescText }}
     </button>
 </form>
@@ -228,7 +228,7 @@
                         </td>
                         <td ng-hide="scanpath.simToCommon >= 0">N/A</td>
                     </tr>
-                    <tr ng-if="expandedRows[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
+                    <tr ng-show="expandedRows[scanpath.identifier]" ng-class="{'row-excluded': scanpath.excluded}">
                         <td colspan="42" class="userScanpathFixations">
                             <span ng-repeat="fixation in scanpath.fixations track by $index">
                                 {{ fixation[0]}} <sup>{{ fixation[1] }}</sup>

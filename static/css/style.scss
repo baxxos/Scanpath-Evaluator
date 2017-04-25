@@ -321,6 +321,16 @@ optgroup {
 }
 
 /*** Dataset related screens **/
+#tasksTable {
+	.row-container-expanded {
+		background-color: #efefef;
+	}
+
+	.input-group {
+		width: 100%;
+	}
+}
+
 #new-task-panel {
 	.input-group {
 		width: 100%;
