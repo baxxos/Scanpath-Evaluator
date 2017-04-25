@@ -54,7 +54,7 @@ angular.module('ScanpathEvaluator')
 				})
 				// State which allows to choose a dataset for an UX experiment stored in the DB
 				.state('research.dataset', {
-					url: '/dataset/:id',
+					url: '/dataset/:datasetId',
 					views: {
 						'right@research': {
 							templateUrl: 'static/partials/research/dataset.html',
@@ -62,7 +62,7 @@ angular.module('ScanpathEvaluator')
 						}
 					},
 					ncyBreadcrumb: {
-						label: 'Dataset detail',
+						label: '{{ dataset.name ? dataset.name : "Dataset detail"}}',
 						parent: 'research'
 					}
 				})
@@ -80,8 +80,8 @@ angular.module('ScanpathEvaluator')
 					}
 				})
 				// State which allows to choose a task (sub-dataset) from the previously selected dataset
-				.state('research.task', {
-					url: '/task/:id',
+				.state('research.dataset.task', {
+					url: '/task/:taskId',
 					views: {
 						'right@research': {
 							templateUrl: 'static/partials/research/task.html',
@@ -89,12 +89,12 @@ angular.module('ScanpathEvaluator')
 						}
 					},
 					ncyBreadcrumb: {
-						label: 'Task detail',
-						parent: 'research'
+						label: '{{ task.name ? task.name : "Task detail" }}',
+						parent: 'research.dataset'
 					}
 				})
 				// State which performs a run of all common scanpath algorithms on a chosen dataset task
-				.state('research.task.compare', {
+				.state('research.dataset.task.compare', {
 					url: '/alg-compare',
 					views: {
 						'right@research': {
@@ -104,7 +104,7 @@ angular.module('ScanpathEvaluator')
 					},
 					ncyBreadcrumb: {
 						label: 'Algorithm comparison',
-						parent: 'research.task'
+						parent: 'research.dataset.task'
 					}
 				});
 			// Set default fallback URL

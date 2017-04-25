@@ -381,7 +381,8 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {
 			// Store the actual task ID from URL (ui-router functionality)
-			id: $state.params.id,
+			id: $state.params.taskId,
+			datasetId: $state.params.datasetId,
 			scanpaths: [],
 			// Scanpaths temporarily excluded from all computations
 			excludedRows: [],

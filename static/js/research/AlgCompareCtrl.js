@@ -13,6 +13,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 				$scope.task.scanpaths = response.data.load.scanpaths;
 				$scope.task.visuals = response.data.load.visuals;
 				$scope.task.aois = response.data.load.aois;
+				$scope.task.name = response.data.load.name;
 
 				// Load the canvas background image again to get its natural resolution
 				$scope.canvasInfo.backgroundImg = new Image();
@@ -387,7 +388,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 		// Forward declaration of similarity objects to prevent IDE warnings. May be omitted later.
 		$scope.task = {
 			// Store the actual task ID from URL (ui-router functionality)
-			id: $state.params.id,
+			id: $state.params.taskId,
 			scanpaths: [],
 			// Scanpaths temporarily excluded from all computations
 			excludedRows: [],

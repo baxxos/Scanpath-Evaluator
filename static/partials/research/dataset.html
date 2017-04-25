@@ -40,7 +40,7 @@
         <tbody ng-repeat="task in dataset.tasks"
                ng-class="{'row-container-expanded': guiParams.expandedTaskRow == task.id}">
             <tr>
-                <td><a ng-href="#/research/task/{{ task.id }}">{{ task.name }}</a></td>
+                <td><a ng-href="#/research/dataset/{{ dataset.id }}/task/{{ task.id }}">{{ task.name }}</a></td>
                 <td>{{ task.description }}</td>
                 <td>
                     <button class="btn btn-primary btn-xs" ng-click="toggleEditTaskForm(task)">
@@ -107,7 +107,7 @@
                     in 5 seconds.</span>
                 </p>
                 <p ng-show="taskNew.redirect">If you want to continue now
-                    <a ng-href="#/research/task/{{ taskNew.id }}">click here</a>.
+                    <a ng-href="#/research/dataset/{{ dataset.id }}/task/{{ taskNew.id }}">click here</a>.
                 </p>
             </div>
         </div>

@@ -25,7 +25,8 @@ angular.module('ScanpathEvaluator').controller('SidebarCtrl', function($scope, $
                         // Compose task object in the format suitable for nav tree
                         var formatted_task = {
                             'label': data[datasetIter].children[taskIter].label,
-                            'href': '#/research/task/' + data[datasetIter].children[taskIter].id
+                            'href': '#/research/dataset/' + data[datasetIter].id +
+                                    '/task/' + data[datasetIter].children[taskIter].id
                         };
                         formatted_dataset.children.push(formatted_task);
                     }

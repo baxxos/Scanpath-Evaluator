@@ -123,7 +123,7 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 			url: '/api/task',
 			method: 'POST',
 			data: {
-				datasetId: $state.params.id,
+				datasetId: $scope.dataset.id,
 				name: $scope.taskNew.name,
 				url: $scope.taskNew.url,
 				// Optional attributes, replace 'undefined' by empty string as undefined value is not a valid JSON
@@ -328,8 +328,8 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 		$scope.editedDataset = {};
 
 		// Get basic dataset information and fill $scope.dataset object
-		if($state.params.id) {
-			loadDataset($state.params.id);
+		if($state.params.datasetId) {
+			loadDataset($state.params.datasetId);
 		}
 	};
 
