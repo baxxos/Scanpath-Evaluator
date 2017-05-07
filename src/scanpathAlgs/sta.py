@@ -200,7 +200,7 @@ def calculateTotalNumberDurationofFixationsandNSV(AoIList, Sequences):
                     duration += Sequences[keys[y]][k][3]
                     totalNSV += Sequences[keys[y]][k][4]
                     flag += 1
-        if flag >= len(Sequences):
+        if flag == len(Sequences):
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [True]
         else:
             AoIList[x] = AoIList[x] + [counter] + [duration] + [totalNSV] + [False]

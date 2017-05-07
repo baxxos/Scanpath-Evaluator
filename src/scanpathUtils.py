@@ -116,7 +116,7 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
     # return key of minimal value in dictionary
     return min(sums_of_distances, key=sums_of_distances.get)
 
-import traceback
+
 # Basic functionality used to load scanpath sequences and their properties in default format
 def get_raw_sequences(dataset_task):
     """
@@ -133,7 +133,6 @@ def get_raw_sequences(dataset_task):
             screen_size_diagonal=float(dataset_task.dataset.screen_size)
         ).get_error_rate_area()
     except:
-        traceback.print_exc()
         my_error_rate_area = 0
 
     my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
