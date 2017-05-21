@@ -15,7 +15,7 @@ DEPENDENCIES:
     <ul>
         <li>
             <a href="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js">
-                AngularJS 1.5.8
+                AngularJS 1.5.11
             </a>
         </li>
         <li>
