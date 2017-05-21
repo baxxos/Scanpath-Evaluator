@@ -73,3 +73,10 @@ CONSTRAINTS:
         <li>The original AOI image and its resolution must exactly match the uploaded AOI data</li>
     </ul>
 </p>
+
+TODOs:
+* Upgrade backend to Python 3.X
+* Upgrade frontend to AngularJS 1.6.X
+* Upgrade frontend JS to ES6
+* Hash passwords on the [client side](https://crackstation.net/hashing-security.htm) as well 
+* Ditch the user dataset folders and store the scanpath data in database (formatted as JSON) instead
