@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from database import Base
+
+from src.database import Base
 
 
 class Dataset(Base):

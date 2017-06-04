@@ -2,13 +2,11 @@ from __future__ import division
 
 import math
 
-from models.Environment import Environment
-from stringEditAlgs import *
+import src.stringEditAlgs as seAlg
+from src.models.Environment import Environment
+
 
 # TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
-# Environment in which the eye tracking experiment was performed
-
-
 def createSequences(participants, myAoIs, errorRateArea):
     """
     Default method for converting raw sequence data loaded from a CSV-ish file into a temporary string representation:
@@ -175,7 +173,7 @@ def run_custom(dataset_task, custom_scanpath):
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
-    scanpath_strs = convert_to_str_array(formatted_sequences)
+    scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)
 
     custom_scanpath_arr = []
     for i in range(0, len(custom_scanpath)):
@@ -184,7 +182,7 @@ def run_custom(dataset_task, custom_scanpath):
     res_data = {
         'identifier': 'custom',
         'fixations': custom_scanpath_arr,
-        'similarity': calc_similarity_to_common(scanpath_strs, custom_scanpath)
+        'similarity': seAlg.calc_similarity_to_common(scanpath_strs, custom_scanpath)
     }
 
     return res_data

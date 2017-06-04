@@ -1,9 +1,9 @@
-from stringEditAlgs import calc_similarity_to_common
-from operator import itemgetter
-from math import *
-from scanpathUtils import get_raw_sequences
-
 import copy
+import math
+from operator import itemgetter
+
+import src.scanpathUtils as spUtil
+import src.stringEditAlgs as seAlg
 
 dotplot_max_aois = 100
 dotplot_error_rate_area = 0
@@ -58,17 +58,17 @@ def getCloserAOI(Participants_pos, myAoIs, tempAoI):
                 temp_distance = []
                 # sum distance of all 4 corners
                 # up, left
-                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - float(myAoIs[n][1]), 2) +
-                                           pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
+                temp_distance.append(math.sqrt(pow(float(Participants_pos[3]) - float(myAoIs[n][1]), 2) +
+                                               pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
                 # up right
-                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
-                                           pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
+                temp_distance.append(math.sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
+                                               pow(float(Participants_pos[4]) - float(myAoIs[n][3]), 2)))
                 # down left
-                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1])), 2) +
-                                           pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
+                temp_distance.append(math.sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1])), 2) +
+                                               pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
                 # down, right
-                temp_distance.append(sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
-                                           pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
+                temp_distance.append(math.sqrt(pow(float(Participants_pos[3]) - (float(myAoIs[n][1]) + float(myAoIs[n][2])), 2) +
+                                               pow(float(Participants_pos[4]) - (float(myAoIs[n][3]) + float(myAoIs[n][4])), 2)))
                 sums_of_distances[tempAoI[m]] = sum(temp_distance)
                 break
     # return key of minimal value in dictionary
@@ -77,7 +77,7 @@ def getCloserAOI(Participants_pos, myAoIs, tempAoI):
 def getArrayRepresentationOfSequence(mySequences):
     """
     Args:
-        sequence: String format of sequence
+        mySequences: String format of sequences
 
     Returns: array representation of sequence
     """
@@ -175,14 +175,14 @@ def calculateDistance(xStart, yStart, xEnd, yEnd):
     """
     Calculate distance of 2D coordinates.
     """
-    return sqrt(pow(xEnd - xStart, 2) + pow(yEnd - yStart, 2))
+    return math.sqrt(pow(xEnd - xStart, 2) + pow(yEnd - yStart, 2))
 
 def getAOIBasedOnRange(value, aoiRange):
     """
     Determine AOI based on range
     Args:
         value: distance between fixations
-        range: range of distance for single AOI
+        aoiRange: range of distance for single AOI
 
     Returns: character representation of AOI
     """
@@ -226,7 +226,7 @@ def calculateAngle(vect1, vect2):
     vect1Size = calculateDistance(0, 0, vect1[0], vect1[1])
     vect2Size = calculateDistance(0, 0, vect2[0], vect2[1])
     dotProduct = (vect1[0] * vect2[0]) + (vect1[1] * vect2[1])
-    return degrees(acos(dotProduct / (vect1Size * vect2Size)))
+    return math.degrees(math.acos(dotProduct / (vect1Size * vect2Size)))
 
 
 def createSequencesBasedOnRelativeAngle(my_dataset):
@@ -415,7 +415,7 @@ def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
         my_sequences = simplifySequence(my_sequences)
     """
 
-    my_sequences = get_raw_sequences(dataset_task)
+    my_sequences = spUtil.get_raw_sequences(dataset_task)
 
     string_sequences = getStringRepresentation(my_sequences)
     common_scanpath_str = findCommonSequence(string_sequences)
@@ -434,7 +434,7 @@ def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
     res_data = {
         'identifier': 'dotplot',
         'fixations': common_scanpath,
-        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
+        'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
 
     return res_data

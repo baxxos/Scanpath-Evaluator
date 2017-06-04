@@ -1,4 +1,4 @@
-from math import radians, tan, sqrt
+import math
 
 
 class Environment:
@@ -15,17 +15,14 @@ class Environment:
         self.screen_size_diagonal = screen_size_diagonal
 
     def get_ppi(self):
-        diagonal_res = sqrt(pow(self.screen_res_x, 2) + pow(self.screen_res_y, 2))
+        diagonal_res = math.sqrt(pow(self.screen_res_x, 2) + pow(self.screen_res_y, 2))
         ppi = diagonal_res / self.screen_size_diagonal
 
         return ppi
 
     def get_error_rate_area(self):
         # Calculate error rate area (in cm by default)
-        error_rate_area_cm = tan(radians(self.eyetracker_accuracy)) * self.eyetracker_distance
+        error_rate_area_cm = math.tan(math.radians(self.eyetracker_accuracy)) * self.eyetracker_distance
         error_rate_area_pixels = (error_rate_area_cm * self.get_ppi()) / 2.54
 
         return round(error_rate_area_pixels, 2)
-
-
-

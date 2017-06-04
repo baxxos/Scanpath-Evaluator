@@ -1,26 +1,28 @@
 import json
 import os
 import traceback
-import fileFormat
 
+from datetime import timedelta, datetime
 from flask import Flask, render_template, request, session
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
-from datetime import timedelta, datetime
 
-from config import config
-from scanpathAlgs import sta, emine, dotplot
-from database import db_session
-from models.Dataset import Dataset
-from models.DatasetTask import DatasetTask
-from models.User import User
-from scanpathUtils import run_custom, run_empty, get_task_data
+import src.fileFormat as fileFormat
+import src.scanpathUtils as spUtil
+from src.config import config
+from src.database import db_session
+from src.models.Dataset import Dataset
+from src.models.DatasetTask import DatasetTask
+from src.models.User import User
+from src.scanpathAlgs import sta, emine, dotplot
 
 # App configuration
-# TODO error/exception logging & unit tests
 app = Flask(__name__)
 app.secret_key = os.urandom(24).encode('hex')
 app.debug = True
+
+# For mocking sessions etc.
+dev_mode = True
 
 
 @app.before_request
@@ -30,13 +32,11 @@ def make_session_permanent():
 
 
 def is_user_logged_in():
-    return True
-    return 'user' in session
+    return dev_mode or ('user' in session)
 
 
 def is_user_authorized(user_id):
-    return True
-    return is_user_logged_in() and (session['user'] == user_id)
+    return dev_mode or (is_user_logged_in() and (session['user'] == user_id))
 
 
 # Response methods
@@ -311,7 +311,7 @@ def get_dataset_task():
         if not is_user_authorized(task.dataset.user_id):
             return handle_unauthorized()
         else:
-            return handle_success(get_task_data(task))
+            return handle_success(spUtil.get_task_data(task))
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
@@ -473,7 +473,7 @@ def get_similarity_to_custom():
             task.load_data()
             task.exclude_participants(json_data['excludedScanpaths'])
 
-            return handle_success(run_custom(task, custom_scanpath))
+            return handle_success(spUtil.run_custom(task, custom_scanpath))
         else:
             return handle_error('Wrong custom scanpath format - alphabet characters only.')
     except KeyError:
@@ -576,9 +576,9 @@ def get_alg_comparison():
 
         # Check for any excluded algorithms and push the rest into the results array
         return handle_success([
-            sta.run_sta(task) if 'sta' not in json_data['excludedAlgs'] else run_empty('sta'),
-            dotplot.run_dotplot(task) if 'dotplot' not in json_data['excludedAlgs'] else run_empty('dotplot'),
-            emine.run_emine(task) if 'emine' not in json_data['excludedAlgs'] else run_empty('emine')
+            sta.run_sta(task) if 'sta' not in json_data['excludedAlgs'] else spUtil.run_empty('sta'),
+            dotplot.run_dotplot(task) if 'dotplot' not in json_data['excludedAlgs'] else spUtil.run_empty('dotplot'),
+            emine.run_emine(task) if 'emine' not in json_data['excludedAlgs'] else spUtil.run_empty('emine')
         ])
     except KeyError:
         return handle_error('Task ID is missing')

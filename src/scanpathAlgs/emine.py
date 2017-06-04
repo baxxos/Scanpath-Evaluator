@@ -1,6 +1,7 @@
-from scanpathUtils import *
-
 import copy
+
+import src.scanpathUtils as spUtil
+import src.stringEditAlgs as seAlg
 
 
 def simplify_scanpath(scanpath):
@@ -17,11 +18,11 @@ def simplify_scanpath(scanpath):
 
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
 def run_emine(dataset_task):
-    my_sequences = get_raw_sequences(dataset_task)
+    my_sequences = spUtil.get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(my_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)
-    scanpath_strs = convert_to_str_array(formatted_sequences)
+    scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)
     scanpath_strs_set = copy.deepcopy(scanpath_strs)
 
     # For determining get_edit_distance distance we need a pure string version of the common scanpath ('ABC')
@@ -31,15 +32,15 @@ def run_emine(dataset_task):
     while len(scanpath_strs_set):
         # Calculate the mutual similarities if there are at least 2 scanpaths in the set
         if len(scanpath_strs_set) > 1:
-            calc_mutual_similarity(scanpath_strs_set)
+            seAlg.calc_mutual_similarity(scanpath_strs_set)
         else:
             common_scanpath_str = simplify_scanpath(scanpath_strs_set[0]['raw_str'])
             break
 
         # Get the two most similar scanpaths
-        most_similar_pair = get_most_similar_pair(scanpath_strs_set)
+        most_similar_pair = seAlg.get_most_similar_pair(scanpath_strs_set)
 
-        lcs = get_longest_common_subsequence(
+        lcs = seAlg.get_longest_common_subsequence(
             most_similar_pair[0]['raw_str'],
             most_similar_pair[1]['raw_str'],
         )
@@ -49,7 +50,7 @@ def run_emine(dataset_task):
             break
 
         # Remove the most similar pair of scanpaths from the set
-        rem_scanpath_strs_by_id(
+        seAlg.rem_scanpath_strs_by_id(
             scanpath_strs_set,
             [most_similar_pair[0]['identifier'], most_similar_pair[1]['identifier']]
         )
@@ -66,7 +67,7 @@ def run_emine(dataset_task):
     res_data = {
         'identifier': 'emine',
         'fixations': common_scanpath_arr,
-        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
+        'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
 
     return res_data

@@ -1,4 +1,5 @@
-from scanpathUtils import *
+import src.scanpathUtils as spUtil
+import src.stringEditAlgs as seAlg
 
 
 def getNumberedSequence(Sequence, dataset_task):
@@ -230,7 +231,7 @@ def getValueableAoIs(AoIList):
 # STA Algorithm
 def run_sta(dataset_task):
     # Preliminary Stage
-    mySequences = get_raw_sequences(dataset_task)
+    mySequences = spUtil.get_raw_sequences(dataset_task)
 
     # First-Pass
     mySequences_num = {}
@@ -261,7 +262,7 @@ def run_sta(dataset_task):
     formatted_sequences = dataset_task.format_sequences(mySequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
-    scanpath_strs = convert_to_str_array(formatted_sequences)
+    scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)
 
     common_scanpath = getAbstractedSequence(commonSequence)
     common_scanpath_str = ''
@@ -273,7 +274,7 @@ def run_sta(dataset_task):
     res_data = {
         'identifier': 'sta',
         'fixations': common_scanpath,
-        'similarity': calc_similarity_to_common(scanpath_strs, common_scanpath_str)
+        'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
 
     return res_data

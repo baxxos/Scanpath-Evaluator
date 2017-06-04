@@ -3,10 +3,10 @@ from os import listdir, path
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
 
-from config import config
-from database import Base, db_session
-from models.Dataset import Dataset
-from stringEditAlgs import convert_to_str_array, calc_mutual_similarity
+import src.stringEditAlgs as seAlg
+from src.config import config
+from src.database import Base, db_session
+from src.models.Dataset import Dataset
 
 
 class DatasetTask(Base):
@@ -192,11 +192,11 @@ class DatasetTask(Base):
 
     def calc_edit_distances(self, scanpaths):
         # Store scanpaths as an array of string-converted original scanpaths
-        scanpath_strs = convert_to_str_array(scanpaths)
+        scanpath_strs = seAlg.convert_to_str_array(scanpaths)
 
         # Calculate the edit distances
         # The order of records in scanpaths and scanpath_strs must be the same!
-        calc_mutual_similarity(scanpath_strs)
+        seAlg.calc_mutual_similarity(scanpath_strs)
 
         for i_first in range(0, len(scanpath_strs)):
             # Save the calculations to the original scanpaths object

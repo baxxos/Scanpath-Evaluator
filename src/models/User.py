@@ -4,9 +4,9 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 
-from database import Base, db_session
-from models.Dataset import Dataset
-from models.DatasetTask import DatasetTask
+from src.database import Base, db_session
+from src.models.Dataset import Dataset
+from src.models.DatasetTask import DatasetTask
 
 
 class User(Base):
@@ -52,6 +52,3 @@ class User(Base):
                 })
 
         return json.dumps(data_tree)
-
-# from database import engine
-# Base.metadata.create_all(engine)
