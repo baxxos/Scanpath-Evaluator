@@ -3,12 +3,13 @@ import os
 import pandas as pd
 import shutil
 import string
+import tempfile
 import traceback
 
 from config import config
 
 
-# Utility methods to handle directory/file deletions even if they don't exist
+# Utility methods to handle directory and file deletions (even if they don't exist)
 def silent_dir_remove(path):
     try:
         shutil.rmtree(path)
@@ -23,42 +24,6 @@ def silent_file_remove(path):
     except OSError:
         print 'Incomplete clean up after unsuccessful data parsing'
         traceback.print_exc()
-
-
-def create_task_folders(dataset, task, file_aois, file_scanpaths, file_bg_image):
-    path_task_folder = os.path.join(
-        config['DATASET_FOLDER'],
-        config['DATASET_PREFIX'] + str(dataset.id),
-        config['TASK_PREFIX'] + str(task.id)
-    )
-
-    try:
-        os.makedirs(path_task_folder)
-    except OSError:
-        # Raise exception only if it's something else than 'Directory already exists' error
-        if not os.path.isdir(path_task_folder):
-            raise
-
-    # Save the unformatted scanpath data file (to be deleted after formatting) in the directory created above
-    path_file_scanpaths = os.path.join(path_task_folder, config['SCANPATHS_FILE_RAW'])
-    file_scanpaths.save(path_file_scanpaths)
-
-    # Select the columns we wish to keep after formatting
-    keep = ['ParticipantName', 'FixationIndex', 'GazeEventType', 'GazeEventDuration', 'FixationPointX (MCSpx)',
-            'FixationPointY (MCSpx)', 'MediaName']
-
-    # Format the newly created file according to selected columns and remove the original one
-    format_scanpaths(keep, path_task_folder)
-
-    # Save the unformatted AOIs file (to be deleted after formatting)
-    path_file_aois = os.path.join(path_task_folder, config['AOIS_FILE_RAW'])
-    file_aois.save(path_file_aois)
-
-    # Format the newly created file and remove the original one
-    format_aois(path_task_folder)
-
-    # Create the static images folder for the new dataset task
-    create_task_img_folder(dataset, task, file_bg_image)
 
 
 def create_task_img_folder(dataset, task, file_bg_image):
@@ -79,14 +44,16 @@ def create_task_img_folder(dataset, task, file_bg_image):
     # Save the background image without any content modifications
     file_bg_image.save(os.path.join(
         path_task_static_folder,
-        # Save the background image with name specified in the config while keeping the original extension
+        # Save the background image with name specified in the config but keep its original extension
         config['BG_IMG_FILE']) + os.path.splitext(file_bg_image.filename)[-1]
     )
 
 
-def format_scanpaths(keep_cols, path_folder):
+def process_scanpaths(scanpath_file, keep_cols, min_fixation_dur):
+    """ Processes the input TSV file into a dictionary which is then saved into the database as JSON """
+
     try:
-        fr = pd.read_csv(os.path.join(path_folder, config['SCANPATHS_FILE_RAW']), sep='\t')
+        fr = pd.read_csv(scanpath_file, sep='\t')
 
         # Drop the duplicate fixation values from the CSV file
         fr = fr.drop_duplicates(subset=['ParticipantName', 'FixationIndex'])
@@ -94,125 +61,135 @@ def format_scanpaths(keep_cols, path_folder):
         # Keep only fixations lasting longer than X ms
         fr = fr[fr.GazeEventType != 'Unclassified']
         fr = fr[fr.GazeEventType != 'Saccade']
-        fr = fr[fr.GazeEventDuration > 100]
+        fr = fr[fr.GazeEventDuration > min_fixation_dur]
 
         # Drop fixations with negative point coordinates
         fr = fr[fr['FixationPointX (MCSpx)'] > 0]
         fr = fr[fr['FixationPointY (MCSpx)'] > 0]
+        # Optional sorting
         # fr = fr.sort_values(['ParticipantName', 'FixationIndex'])
 
         # Keep only relevant columns
         fr = fr[keep_cols]
 
-        # Save formatted data & delete raw file uploaded by the user
-        fr.to_csv(os.path.join(path_folder, config['SCANPATHS_FILE']), index=False, sep='\t')
-        silent_file_remove(os.path.join(path_folder, config['SCANPATHS_FILE_RAW']))
+        # Save formatted data
+        data_matrix = fr.as_matrix().tolist()
+
+        # Object to be returned from this method
+        scanpath_data = {}
+
+        # Transform data from Pandas dataframe to a formatted Python list
+        for row in data_matrix:
+            participant_id = row[0]
+
+            if participant_id not in scanpath_data:
+                scanpath_data[participant_id] = []
+
+            scanpath_data[participant_id].append(row[1:])
+
+        return scanpath_data
     except:
-        silent_file_remove(os.path.join(path_folder, config['SCANPATHS_FILE_RAW']))
         traceback.print_exc()
         raise ValueError('Failed to parse scanpath data file')
 
 
-def format_aois(path_folder):
+def process_aois(aoi_file):
+    # TODO check if the file is already formatted
     file_header = ['FullName', 'XFrom', 'XSize', 'YFrom', 'YSize', 'ShortName']
     sep = '\t'
+    data_matrix = []
 
-    with open(os.path.join(path_folder, config['AOIS_FILE']), 'w') as fw:
+    with tempfile.TemporaryFile() as fr:
         # Write table headers divided by separator (except for the last one)
-        for index, column in enumerate(file_header):
-            fw.write(column if index == (len(file_header) - 1) else column + sep)
+        for line in aoi_file:
+            fr.write(line)
 
-        fw.write('\n')
+        name_it = 0
+        fr.seek(0)
 
-        with open(os.path.join(path_folder, config['AOIS_FILE_RAW']), 'r') as fr:
-            name_it = 0
+        for line in fr:
+            line_data = line.strip().split(':')
 
-            for line in fr:
-                line_data = line.strip().split(':')
-
-                # Handle blank lines
-                if not line.strip():
-                    continue
-                # Handle AOI names
-                elif line_data[0].lower().startswith('aoi'):
-                    act_aoi = {
-                        'name': line_data[1],
-                        'vertices': 0,
-                        'shortName': '',
-                        'expectCoords': 0
-                    }
-                # Handle number of vertices
-                elif 'vertices' in line_data[0].lower():
-                    if int(line_data[1]) == 4:
-                        act_aoi['vertices'] = 4
-                    else:
-                        silent_file_remove(os.path.join(path_folder, config['AOIS_FILE']))
-                        raise ValueError('All areas of interest must have exactly 4 vertices')
-                # Check for line marking coords: 'X\tY'
-                elif line_data[0].startswith('X') and line_data[0].endswith('Y') and act_aoi['vertices'] == 4:
-                    act_aoi['expectCoords'] = 1
-                # Parse coords in expected format
-                elif act_aoi['expectCoords'] == 1:
-                    # Parse the initial coords and calculate the width/height of the AOI
-                    act_aoi['expectCoords'] = 0
-                    coords_from = line.split()
-
-                    # '222,55' -> 222.55 -> 222
-                    x_from = int(float(coords_from[0].replace(',', '.')))
-                    y_from = int(float(coords_from[1].replace(',', '.')))
-
-                    # Normalize negative values of starting points
-                    x_from = x_from if x_from > 0 else 0
-                    y_from = y_from if y_from > 0 else 0
-
-                    # Calculate X coord of the starting point and width (x_size) of the aoi
-                    line = next(fr)
-                    x_to = int(float(line.split()[0].replace(',', '.')))
-                    x_size = x_to - x_from
-
-                    # Fix for occasionally inconsistent data format (swapped from/to lines)
-                    if x_size < 0:
-                        x_from, x_to = x_to, x_from  # Swaps the values of the from/to points in a pythonic way
-                        x_size *= -1
-
-                    # Calculate Y coord of the starting point and height (y_size) of the aoi
-                    line = next(fr)
-                    y_to = int(float(line.split()[1].replace(',', '.')))
-                    y_size = y_to - y_from
-
-                    # Fix for occasionally inconsistent data format (swapped from/to lines)
-                    if y_size < 0:
-                        y_from, y_to = y_to, y_from  # Swaps the values of the from/to points in a pythonic way
-                        y_size *= -1
-
-                    if name_it < len(string.uppercase):
-                        act_aoi['shortName'] = string.uppercase[name_it]
-                    elif name_it < (len(string.uppercase) + len(string.lowercase)):
-                        act_aoi['shortName'] = string.lowercase[name_it - len(string.lowercase)]
-                    else:
-                        silent_file_remove(os.path.join(path_folder, config['AOIS_FILE']))
-                        raise ValueError('Maximum number of AOIs (52) reached')
-
-                    fw.write(
-                        act_aoi['name'] + sep +
-                        str(x_from) + sep +
-                        str(x_size) + sep +
-                        str(y_from) + sep +
-                        str(y_size) + sep +
-                        act_aoi['shortName'] + '\n')
-
-                    # Two-character AOIs turned out to be a trouble later'
-                    name_it += 1
-
-                    # Skip last vertex (unnecessary) and move to the next AOI
-                    line = next(fr)
-                    line = next(fr)
-                # Skip empty or unknown formatted lines
+            # Handle blank lines
+            if not line.strip():
+                continue
+            # Handle AOI names
+            elif line_data[0].lower().startswith('aoi'):
+                act_aoi = {
+                    'name': line_data[1],
+                    'vertices': 0,
+                    'shortName': '',
+                    'expectCoords': 0
+                }
+            # Handle number of vertices
+            elif 'vertices' in line_data[0].lower():
+                if int(line_data[1]) == 4:
+                    act_aoi['vertices'] = 4
                 else:
-                    continue
+                    raise ValueError('All areas of interest must have exactly 4 vertices')
+            # Check for line marking coords: 'X\tY'
+            elif line_data[0].startswith('X') and line_data[0].endswith('Y') and act_aoi['vertices'] == 4:
+                act_aoi['expectCoords'] = 1
+            # Parse coords in expected format
+            elif act_aoi['expectCoords'] == 1:
+                # Parse the initial coords and calculate the width/height of the AOI
+                act_aoi['expectCoords'] = 0
+                coords_from = line.split()
 
-    # Delete raw data uploaded by the user
-    silent_file_remove(os.path.join(path_folder, config['AOIS_FILE_RAW']))
+                # '222,55' -> 222.55 -> 222
+                x_from = int(float(coords_from[0].replace(',', '.')))
+                y_from = int(float(coords_from[1].replace(',', '.')))
+
+                # Normalize negative values of starting points
+                x_from = x_from if x_from > 0 else 0
+                y_from = y_from if y_from > 0 else 0
+
+                # Calculate X coord of the starting point and width (x_size) of the aoi
+                line = next(fr)
+                x_to = int(float(line.split()[0].replace(',', '.')))
+                x_size = x_to - x_from
+
+                # Fix for occasionally inconsistent data format (swapped from/to lines)
+                if x_size < 0:
+                    x_from, x_to = x_to, x_from  # Swaps the values of the from/to points in a pythonic way
+                    x_size *= -1
+
+                # Calculate Y coord of the starting point and height (y_size) of the aoi
+                line = next(fr)
+                y_to = int(float(line.split()[1].replace(',', '.')))
+                y_size = y_to - y_from
+
+                # Fix for occasionally inconsistent data format (swapped from/to lines)
+                if y_size < 0:
+                    y_from, y_to = y_to, y_from  # Swaps the values of the from/to points in a pythonic way
+                    y_size *= -1
+
+                if name_it < len(string.uppercase):
+                    act_aoi['shortName'] = string.uppercase[name_it]
+                elif name_it < (len(string.uppercase) + len(string.lowercase)):
+                    act_aoi['shortName'] = string.lowercase[name_it - len(string.lowercase)]
+                else:
+                    raise ValueError('Maximum number of AOIs (52) reached')
+
+                data_matrix.append([
+                    act_aoi['name'],
+                    int(x_from),
+                    int(x_size),
+                    int(y_from),
+                    int(y_size),
+                    act_aoi['shortName']])
+
+                # Two-character AOIs turned out to be a trouble later'
+                name_it += 1
+
+                # Skip last vertex (unnecessary) and move to the next AOI
+                line = next(fr)
+                line = next(fr)
+            # Skip empty or unknown formatted lines
+            else:
+                continue
+
+    return data_matrix
 
 
 def format_from_array(path_file_scanpaths, path_file_aois, path_file_formatted):

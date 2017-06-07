@@ -13,7 +13,7 @@ def getNumberedSequence(Sequence, dataset_task):
             numberedSequence.append([Sequence[y][0], getSequenceNumber(Sequence[0:y], Sequence[y][0]), Sequence[y][1]])
 
     AoIList = getExistingAoIListForSequence(numberedSequence)
-    AoINames = dataset_task.aois
+    AoINames = dataset_task.aoi_data
     AoINames = [w[5] for w in AoINames]
     newSequence = []
 

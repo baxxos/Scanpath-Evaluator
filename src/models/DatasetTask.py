@@ -1,7 +1,7 @@
 from datetime import datetime
 from os import listdir, path
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, orm
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
 
 import src.stringEditAlgs as seAlg
 from src.config import config
@@ -23,13 +23,9 @@ class DatasetTask(Base):
     dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='CASCADE'), nullable=False)
     date_created = Column(DateTime, default=datetime.now())
     date_updated = Column(DateTime, default=datetime.now(), onupdate=datetime.now)
-
-    @orm.reconstructor
-    def __init_on_load__(self):
-        # Data holding objects - gets fired after the init method.
-        self.participants = {}
-        self.aois = []
-        self.visuals = {}
+    scanpath_data_raw = Column(JSON)
+    scanpath_data_formatted = Column(JSON)
+    aoi_data = Column(JSON)
 
     def to_json(self):
         return {
@@ -44,79 +40,20 @@ class DatasetTask(Base):
         # Get parent dataset name
         dataset = db_session.query(Dataset).filter(Dataset.id == self.dataset_id).one()
 
-        # Construct path to scanpath data based on config file - e.g. 'datasets/d1/t1/scanpaths/'
-        file_path_scanpaths = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
-                                        config['TASK_PREFIX'] + str(self.id), config['SCANPATHS_FILE'])
-
-        # Construct path to scanpath AOI data based on config file - e.g. 'datasets/d1/t1/regions/aoiFile.txt'
-        file_path_aoi = path.join(config['DATASET_FOLDER'], config['DATASET_PREFIX'] + str(dataset.id),
-                                  config['TASK_PREFIX'] + str(self.id), config['AOIS_FILE'])
-
         # Construct path to images based on config file - e.g. 'static/images/d1/t1/'
         folder_path_visuals = path.join('static', 'images', config['DATASET_FOLDER'], config['DATASET_PREFIX'] +
                                         str(dataset.id), config['TASK_PREFIX'] + str(self.id), '')
 
         # Fill the data holding objects
-        self.load_participants(file_path_scanpaths)
-        self.load_aois(file_path_aoi)
         self.load_visuals(folder_path_visuals)
 
     def exclude_participants(self, excluded):
         """ Exclude all given ids from the participants dict """
         try:
             for identifier in excluded:
-                self.participants.pop(identifier, None)
+                self.scanpath_data_raw.pop(identifier, None)
         except KeyError as e:
             print 'Participant ID to be excluded not found: ' + e.args[0]
-
-    def load_participants(self, file_path_scanpaths):
-        try:
-            with open(file_path_scanpaths, 'r') as fr:
-                # Skip the first line of scanpath file (table header)
-                next(fr)
-                # Read the rest of the file by lines
-                for act_line in fr:
-                    try:
-                        # Remove trailing newline and split the line into columns
-                        act_line = act_line.rstrip()
-                        line_cols = act_line.split('\t')
-
-                        # Subtract the user identifier from the act line
-                        participant_identifier = line_cols[0]
-
-                        if participant_identifier not in self.participants:
-                            self.participants[participant_identifier] = []
-
-                        # Write the the line data into the data object (under user ID key)
-                        self.participants[participant_identifier].append(line_cols[1:])
-                    except:
-                        print "Invalid data format - line will be skipped"
-                        continue
-        except:
-            print "Failed to open specified file: " + file_path_scanpaths
-
-    def load_aois(self, file_path_aoi):
-        try:
-            fo = open(file_path_aoi, "r")
-        except:
-            print "Failed to open directory containing areas of interest"
-            return {}
-
-        aoi_file = fo.read()
-
-        # Skip the first line containing table header
-        file_lines = aoi_file.split('\n')[1:]
-
-        # Read the file by lines and remember Identifier, X-from, X-length, Y-from, Y-length, ShortID
-        for x in range(0, len(file_lines)):
-            # Skip blank lines
-            if not file_lines[x].strip():
-                continue
-            else:
-                temp = file_lines[x].split('\t')
-                self.aois.append([temp[0], int(temp[1]), int(temp[2]), int(temp[3]), int(temp[4]), temp[5]])
-
-        fo.close()
 
     def load_visuals(self, folder_path_visuals):
         # Fetch all image files in specified folder (relying on extension atm)

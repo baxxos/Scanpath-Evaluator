@@ -265,12 +265,6 @@ def del_dataset():
         if not is_user_authorized(dataset.user_id):
             return handle_unauthorized()
 
-        # Remove server-side directories
-        fileFormat.silent_dir_remove(os.path.join(
-            config['DATASET_FOLDER'],
-            config['DATASET_PREFIX'] + str(dataset_id))
-        )
-
         # Remove the dataset visuals from static folder
         fileFormat.silent_dir_remove(os.path.join(
             'static', 'images', 'datasets',
@@ -311,7 +305,13 @@ def get_dataset_task():
         if not is_user_authorized(task.dataset.user_id):
             return handle_unauthorized()
         else:
-            return handle_success(spUtil.get_task_data(task))
+            # Return data formatted as expected by the frontend
+            return handle_success({
+                'name': task.name,
+                'scanpaths': task.scanpath_data_formatted,
+                'visuals': task.visuals,
+                'aois': task.aoi_data
+            })
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
     except:
@@ -325,60 +325,57 @@ def add_dataset_task():
         return handle_unauthorized()
 
     try:
-        # Handle request data
-        try:
-            # Parse the non-file form data (user inputs)
-            json_data = request.form.to_dict()
+        # Parse the non-file form data (user inputs)
+        json_data = request.form.to_dict()
 
-            # Multipart forms don't support nested objects - therefore the retarded key names
-            file_scanpaths = request.files['files[fileScanpaths]']
-            file_regions = request.files['files[fileRegions]']
-            file_bg_image = request.files['files[fileBgImage]']
+        # Multipart forms don't support nested objects - therefore the retarded key names
+        file_scanpaths = request.files['files[fileScanpaths]']
+        file_regions = request.files['files[fileRegions]']
+        file_bg_image = request.files['files[fileBgImage]']
 
-            # Find parent dataset and verify its owner
-            dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
+        # Find parent dataset and verify its owner
+        dataset = db_session.query(Dataset).filter(Dataset.id == int(json_data['datasetId'])).one()
 
-            # Check authorization & validate attribute values
-            if not is_user_authorized(dataset.user_id):
-                return handle_unauthorized()
-            elif len(json_data['name']) == 0:
-                raise KeyError
+        # Check authorization & validate attribute values
+        if not is_user_authorized(dataset.user_id):
+            return handle_unauthorized()
+        elif len(json_data['name']) == 0:
+            raise KeyError
 
-            # Create a new empty task instance
-            task = DatasetTask(name=json_data['name'],
-                               url=json_data['url'] if 'url' in json_data else 'N/A',
-                               description=json_data['description'],
-                               dataset_id=dataset.id)
-        except KeyError:
-            traceback.print_exc()
-            return handle_error('Required attributes are missing')
-        except orm.exc.NoResultFound:
-            return handle_error('Parent dataset ID not found - please create one first')
+        keep_cols = ['ParticipantName', 'FixationIndex', 'GazeEventType', 'GazeEventDuration',
+                     'FixationPointX (MCSpx)', 'FixationPointY (MCSpx)']
 
-        # Reflect the changes on the server side - commit & create a new folder named after dataset PK
-        try:
-            # Commit DB changes
-            dataset.tasks.append(task)
-            db_session.commit()
+        # Create a new empty task instance
+        task = DatasetTask(name=json_data['name'],
+                           url=json_data['url'] if 'url' in json_data else 'N/A',
+                           description=json_data['description'],
+                           dataset_id=dataset.id)
 
-            fileFormat.create_task_folders(dataset, task, file_regions, file_scanpaths, file_bg_image)
+        # Get relevant data from the input file
+        task.scanpath_data_raw = fileFormat.process_scanpaths(file_scanpaths, keep_cols, 100)
 
-            return handle_success({
-                'id': task.id
-            })
-        except ValueError:
-            # Try to delete any data previously created
-            db_session.delete(task)
-            db_session.commit()
+        # Additional data to be saved in the DB along with the previously processed raw scanpath data
+        task.aoi_data = fileFormat.process_aois(file_regions)
+        task.scanpath_data_formatted = spUtil.get_formatted_sequences(task)
 
-            fileFormat.silent_dir_remove(os.path.join(
-                config['DATASET_FOLDER'],
-                config['DATASET_PREFIX'] + str(dataset.id),
-                config['TASK_PREFIX'] + str(task.id))
-            )
+        # Commit DB changes
+        dataset.tasks.append(task)
+        db_session.commit()
 
-            traceback.print_exc()
-            return handle_error('Failed to parse the submitted data format.')
+        # Create a folder for this task's static images
+        fileFormat.create_task_img_folder(dataset, task, file_bg_image)
+
+        return handle_success({
+            'id': task.id
+        })
+    except KeyError:
+        traceback.print_exc()
+        return handle_error('Required attributes are missing')
+    except orm.exc.NoResultFound:
+        return handle_error('Parent dataset ID not found - create one first')
+    except ValueError:
+        traceback.print_exc()
+        return handle_error('Failed to parse the submitted data format.')
     except:
         traceback.print_exc()
         return handle_error()
@@ -427,13 +424,6 @@ def del_dataset_task():
 
         if not is_user_authorized(task.dataset.user_id):
             return handle_unauthorized()
-
-        # Remove the dataset
-        fileFormat.silent_dir_remove(os.path.join(
-            config['DATASET_FOLDER'],
-            config['DATASET_PREFIX'] + str(task.dataset_id),
-            config['TASK_PREFIX'] + str(task.id))
-        )
 
         # Remove the dataset visuals from static folder
         fileFormat.silent_dir_remove(os.path.join(

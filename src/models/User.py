@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Date
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, load_only
 
 from src.database import Base, db_session
 from src.models.Dataset import Dataset
@@ -42,8 +42,10 @@ class User(Base):
                 'children': []
             })
 
-            # Load tasks owned by current dataset
-            my_tasks = db_session.query(DatasetTask).filter(DatasetTask.dataset_id == dataset.id)
+            # Load tasks owned by current dataset (fetch only their id & label in order to save time)
+            my_tasks = db_session.query(DatasetTask)\
+                .filter(DatasetTask.dataset_id == dataset.id)\
+                .options(load_only('name', 'id'))
 
             for task in my_tasks:
                 data_tree[len(data_tree) - 1]['children'].append({

@@ -12,8 +12,8 @@ dotplot_error_rate_area = 0
 # CODE ORIGIN: https://github.com/Groosling/DP_features_and_scanpaths
 def createSequencesBasedOnVisualElements(my_dataset):
     Sequences = {}
-    Participants = my_dataset.participants
-    myAoIs = my_dataset.aois
+    Participants = my_dataset.scanpath_data_raw
+    myAoIs = my_dataset.aoi_data
     keys = Participants.keys()
 
     for y in range(0, len(keys)):
@@ -158,8 +158,8 @@ def createSequencesBasedOnDistances(my_dataset):
     """
     aoi_range = 300
     sequences = {}
-    participants = my_dataset.participants
-    myAoIs = my_dataset.aois
+    participants = my_dataset.scanpath_data_raw
+    myAoIs = my_dataset.aoi_data
     keys = participants.keys()
     for y in range(0, len(keys)):
         sequence = ""
@@ -197,8 +197,8 @@ def createSequencesBasedOnFixatonDurations(my_dataset):
     """
     aoi_range = 100
     sequences = {}
-    participants = my_dataset.participants
-    myAoIs = my_dataset.aois
+    participants = my_dataset.scanpath_data_raw
+    myAoIs = my_dataset.aoi_data
     keys = participants.keys()
     for y in range(0, len(keys)):
         sequence = ""
@@ -237,8 +237,8 @@ def createSequencesBasedOnRelativeAngle(my_dataset):
     """
     aoi_range = 30
     sequences = {}
-    participants = my_dataset.participants
-    myAoIs = my_dataset.aois
+    participants = my_dataset.scanpath_data_raw
+    myAoIs = my_dataset.aoi_data
     keys = participants.keys()
     for y in range(0, len(keys)):
         # TODO vec1 = vec2 at the beginning of the cycle ... better time complexity
@@ -266,8 +266,8 @@ def createSequencesBasedOnAbsoluteAngle(my_dataset):
     """
     aoi_range = 30
     sequences = {}
-    participants = my_dataset.participants
-    myAoIs = my_dataset.aois
+    participants = my_dataset.scanpath_data_raw
+    myAoIs = my_dataset.aoi_data
     keys = participants.keys()
     for y in range(0, len(keys)):
         sequence = ""

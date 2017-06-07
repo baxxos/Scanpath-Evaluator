@@ -116,6 +116,8 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
 
 
 # Basic functionality used to load scanpath sequences and their properties in default format
+# TODO the DatasetTask format has changed - participants/aois are stored in the DB, pass them as attributes instead
+# TODO also pass sequences as attribute
 def get_raw_sequences(dataset_task):
     """
     Converts the string represented sequences to a sensible dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. }
@@ -133,22 +135,24 @@ def get_raw_sequences(dataset_task):
     except:
         my_error_rate_area = 0
 
-    my_sequences = createSequences(dataset_task.participants, dataset_task.aois, my_error_rate_area)
+    my_sequences = createSequences(dataset_task.scanpath_data_raw, dataset_task.aoi_data, my_error_rate_area)
 
     keys = my_sequences.keys()
+    # String gets split into an array: ['G-138', 'C-184']
     for y in range(0, len(keys)):
         my_sequences[keys[y]] = my_sequences[keys[y]].split('.')
         del my_sequences[keys[y]][len(my_sequences[keys[y]]) - 1]
+    # Array string elements get split into an AOI-duration pairs: ['G', 138]
     for y in range(0, len(keys)):
         for z in range(0, len(my_sequences[keys[y]])):
             my_sequences[keys[y]][z] = my_sequences[keys[y]][z].split('-')
+            my_sequences[keys[y]][z][1] = int(my_sequences[keys[y]][z][1])  # Cast the fixation duration to a number
 
     return my_sequences
 
 
-def get_task_data(dataset_task):
-    """ Alters the sequences from their default format to the desired format used on client-side. """
-
+# TODO dont pass whole task object as an attribute, only sequences
+def get_formatted_sequences(dataset_task):
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
@@ -157,13 +161,7 @@ def get_task_data(dataset_task):
     formatted_sequences = dataset_task.calc_max_similarity(formatted_sequences)
     formatted_sequences = dataset_task.calc_min_similarity(formatted_sequences)
 
-    # Return necessary dataset info which will be processed and rendered on the client side
-    return {
-        'name': dataset_task.name,
-        'scanpaths': formatted_sequences,
-        'visuals': dataset_task.visuals,
-        'aois': dataset_task.aois
-    }
+    return formatted_sequences
 
 
 def run_custom(dataset_task, custom_scanpath):
