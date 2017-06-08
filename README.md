@@ -35,8 +35,6 @@
 * Upgrade frontend JS to ES6
 * Hash passwords on the [client side](https://crackstation.net/hashing-security.htm) as well 
 * Allow users to download their data in JSON/TSV format
-* Make use of the media URL
-* Add support for generic TSV input files
 * Create a branch for [Bootstrap 4](https://v4-alpha.getbootstrap.com/) beta upgrade
 * Exception & error logging
 * Write some more tests

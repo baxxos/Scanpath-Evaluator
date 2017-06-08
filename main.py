@@ -347,12 +347,12 @@ def add_dataset_task():
 
         # Create a new empty task instance
         task = DatasetTask(name=json_data['name'],
-                           url=json_data['url'] if 'url' in json_data else 'N/A',
+                           url=json_data['url'] if 'url' in json_data else None,
                            description=json_data['description'],
                            dataset_id=dataset.id)
 
         # Get relevant data from the input file
-        task.scanpath_data_raw = fileFormat.process_scanpaths(file_scanpaths, keep_cols, 100)
+        task.scanpath_data_raw = fileFormat.process_scanpaths(file_scanpaths, keep_cols, 100, task.url)
 
         # Additional data to be saved in the DB along with the previously processed raw scanpath data
         task.aoi_data = fileFormat.process_aois(file_regions)

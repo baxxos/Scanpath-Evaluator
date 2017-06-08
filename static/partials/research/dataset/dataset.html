@@ -36,8 +36,8 @@
                 <th>Controls</th>
             </tr>
         </thead>
-        <!-- Task overview -->
-        <tbody ng-repeat="task in dataset.tasks"
+        <!-- Tasks overview -->
+        <tbody ng-repeat="task in dataset.tasks | orderBy: 'name'"
                ng-class="{'row-container-expanded': guiParams.expandedTaskRow == task.id}">
             <tr>
                 <td><a ng-href="#/research/dataset/{{ dataset.id }}/task/{{ task.id }}">{{ task.name }}</a></td>

@@ -49,34 +49,38 @@ def create_task_img_folder(dataset, task, file_bg_image):
     )
 
 
-def process_scanpaths(scanpath_file, keep_cols, min_fixation_dur):
+def process_scanpaths(scanpath_file, keep_cols, min_fixation_dur, media_url):
     """ Processes the input TSV file into a dictionary which is then saved into the database as JSON """
 
     try:
-        fr = pd.read_csv(scanpath_file, sep='\t')
+        # Construct a Pandas dataframe from the input file
+        df = pd.read_csv(scanpath_file, sep='\t')
 
         # Drop the duplicate fixation values from the CSV file
-        fr = fr.drop_duplicates(subset=['ParticipantName', 'FixationIndex'])
+        df = df.drop_duplicates(subset=['ParticipantName', 'FixationIndex'])
 
-        # Keep only fixations
-        if 'GazeEventType' in fr.columns:
-            fr = fr[fr.GazeEventType != 'Unclassified']
-            fr = fr[fr.GazeEventType != 'Saccade']
+        # Keep only fixations (drop 'Saccade' and 'Unclassified' rows)
+        if 'GazeEventType' in df.columns:
+            df = df[df['GazeEventType'] == 'Fixation']
+
+        # Keep only data from the specified screen (otherwise keep all rows)
+        if media_url and ('MediaName' in df.columns):
+            df = df[df['MediaName'] == media_url]
 
         # Keep only those lasting longer than X ms
-        fr = fr[fr.GazeEventDuration > min_fixation_dur]
+        df = df[df['GazeEventDuration'] > min_fixation_dur]
 
         # Drop fixations with negative point coordinates
-        fr = fr[fr['FixationPointX (MCSpx)'] > 0]
-        fr = fr[fr['FixationPointY (MCSpx)'] > 0]
+        df = df[df['FixationPointX (MCSpx)'] > 0]
+        df = df[df['FixationPointY (MCSpx)'] > 0]
         # Optional sorting
         # fr = fr.sort_values(['ParticipantName', 'FixationIndex'])
 
         # Keep only relevant columns
-        fr = fr[keep_cols]
+        df = df[keep_cols]
 
         # Save formatted data
-        data_matrix = fr.as_matrix().tolist()
+        data_matrix = df.as_matrix().tolist()
 
         # Object to be returned from this method
         scanpath_data = {}
