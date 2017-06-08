@@ -58,9 +58,12 @@ def process_scanpaths(scanpath_file, keep_cols, min_fixation_dur):
         # Drop the duplicate fixation values from the CSV file
         fr = fr.drop_duplicates(subset=['ParticipantName', 'FixationIndex'])
 
-        # Keep only fixations lasting longer than X ms
-        fr = fr[fr.GazeEventType != 'Unclassified']
-        fr = fr[fr.GazeEventType != 'Saccade']
+        # Keep only fixations
+        if 'GazeEventType' in fr.columns:
+            fr = fr[fr.GazeEventType != 'Unclassified']
+            fr = fr[fr.GazeEventType != 'Saccade']
+
+        # Keep only those lasting longer than X ms
         fr = fr[fr.GazeEventDuration > min_fixation_dur]
 
         # Drop fixations with negative point coordinates
@@ -93,26 +96,60 @@ def process_scanpaths(scanpath_file, keep_cols, min_fixation_dur):
         raise ValueError('Failed to parse scanpath data file')
 
 
-def process_aois(aoi_file):
-    # TODO check if the file is already formatted
-    file_header = ['FullName', 'XFrom', 'XSize', 'YFrom', 'YSize', 'ShortName']
-    sep = '\t'
+def process_aois_formatted(lines_list, sep):
+    """ Converts list of TSV formatted lines into a data matrix format used by database """
+
     data_matrix = []
 
+    for line in lines_list:
+        # Skip empty lines
+        if line.strip():
+            cols = line.strip().split(sep)
+            # Cast numeric values (2nd-4th column) from string to number format
+            cols[1] = int(cols[1])  # AOI xFrom coord
+            cols[2] = int(cols[2])  # AOI xSize
+            cols[3] = int(cols[3])  # AOI yFrom coord
+            cols[4] = int(cols[4])  # AOI ySize
+
+            data_matrix.append(cols)
+
+    return data_matrix
+
+
+def process_aois(aoi_file):
+    """ Handles the processing of AOI files exported from Tobii Studio in its proprietary non-structured format """
+
+    # Line indicating that the file is structured as TSV instead of Tobii Studio export
+    sep = '\t'
+    tsv_file_header = 'FullName' + sep + 'XFrom' + sep + 'XSize' + sep + \
+                      'YFrom' + sep + 'YSize' + sep + 'ShortName'
+    # Data to be returned if the file is in the Tobii Studio format
+    data_matrix = []
+    # Data to be returned if the file is TSV formatted
+    tsv_check_lines = []
+
+    # Copy AOI file content into a temp file (for skipping lines etc.)
     with tempfile.TemporaryFile() as fr:
-        # Write table headers divided by separator (except for the last one)
-        for line in aoi_file:
-            fr.write(line)
+        # Copying content to the temp file & a secondary matrix used for a TSV file-type check
+        for temp_line_num, temp_line in enumerate(aoi_file):
+            fr.write(temp_line)
+
+            # Skip the first line for the secondary matrix since it may contain column names instead of data
+            if temp_line_num > 0:
+                tsv_check_lines.append(temp_line)
 
         name_it = 0
         fr.seek(0)
 
-        for line in fr:
+        for line_num, line in enumerate(fr):
             line_data = line.strip().split(':')
 
             # Handle blank lines
             if not line.strip():
                 continue
+            # The file is already formatted (e.g. TSV) - return the secondary matrix
+            elif line_num == 0 and line.strip() == tsv_file_header:
+                return process_aois_formatted(tsv_check_lines, sep)
             # Handle AOI names
             elif line_data[0].lower().startswith('aoi'):
                 act_aoi = {
@@ -169,17 +206,17 @@ def process_aois(aoi_file):
                 elif name_it < (len(string.uppercase) + len(string.lowercase)):
                     act_aoi['shortName'] = string.lowercase[name_it - len(string.lowercase)]
                 else:
+                    # Multiple-character labeled AOIs turned out to be problematic due to string-edit algorithms
                     raise ValueError('Maximum number of AOIs (52) reached')
 
                 data_matrix.append([
                     act_aoi['name'],
-                    int(x_from),
-                    int(x_size),
-                    int(y_from),
-                    int(y_size),
-                    act_aoi['shortName']])
+                    int(x_from), int(x_size),
+                    int(y_from), int(y_size),
+                    act_aoi['shortName']]
+                )
 
-                # Two-character AOIs turned out to be a trouble later'
+                # Move to another letter of the alphabet
                 name_it += 1
 
                 # Skip last vertex (unnecessary) and move to the next AOI
@@ -188,7 +225,7 @@ def process_aois(aoi_file):
             # Skip empty or unknown formatted lines
             else:
                 continue
-
+    # Return primary data matrix
     return data_matrix
 
 
