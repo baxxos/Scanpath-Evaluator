@@ -1,43 +1,51 @@
 <div class="container">
     <!-- Brand and nav toggle button grouped together -->
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed"
-              aria-expanded="false">
+        <button type="button" class="navbar-toggle" aria-expanded="false"
+              ng-click="$root.isNavCollapsed = !$root.isNavCollapsed">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand visible-xs" href="#/index" ng-click="isNavCollapsed = true">
+        </button>
+        <!-- Brand logo for wider devices -->
+        <a class="navbar-left hidden-xs" href="#/index">
+          <img id="navbarLogo" src="/static/images/favicon.png" height="50"/>
+        </a>
+        <!-- Basic brand name for portrait mobile devices -->
+        <a class="navbar-brand visible-xs" href="#/index">
           Scanpath Evaluator
-      </a>
+        </a>
     </div>
 
     <!-- Main nav buttons area -->
-    <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+    <div class="collapse navbar-collapse" uib-collapse="$root.isNavCollapsed">
         <ul class="nav navbar-nav">
             <!-- Navbar list items -->
             <li ui-sref-active="active">
-                <a href="#" ng-click="isNavCollapsed = true" ui-sref="index">Home</a>
+                <a href="#" ui-sref="index">Home</a>
             </li>
             <li ui-sref-active="active">
-                <a href="#/research" ng-click="isNavCollapsed = true" ui-sref="research">Research</a>
+                <a href="#/research" ui-sref="research">Research</a>
+            </li>
+            <li ui-sref-active="active">
+                <a href="#/faq" ui-sref="faq">FAQ</a>
             </li>
         </ul>
         <!-- Login/user-area button -->
         <ul class="nav navbar-nav navbar-right">
-            <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
+            <li ui-sref-active="active" ng-show="!$root.globals.currentUser">
                 <a href="#/login" ui-sref="login">Log in</a>
             </li>
-            <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="!$root.globals.currentUser">
+            <li ui-sref-active="active" ng-show="!$root.globals.currentUser">
                 <a href="#/register" ui-sref="register">Register</a>
             </li>
-            <li ng-click="isNavCollapsed = true" ui-sref-active="active" ng-show="$root.globals.currentUser">
+            <li ui-sref-active="active" ng-show="$root.globals.currentUser">
                 <a href="#/profile" ui-sref="profile">
                     <span class="glyphicon glyphicon-user"></span> {{ $root.globals.currentUser.email }}
                 </a>
             </li>
-            <li ng-click="isNavCollapsed = true; logout()" ng-show="$root.globals.currentUser">
+            <li ng-click="logout()" ng-show="$root.globals.currentUser">
                 <a href="#">Log out</a>
             </li>
         </ul>

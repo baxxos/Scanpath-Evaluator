@@ -3,8 +3,8 @@
 ## DEPENDENCIES:
 
 ### Back-end:
-* Python 2.7.X
-* Flask
+* Python (2.7.X)
+* [Flask](http://flask.pocoo.org/) (0.12.X)
 * PostgreSQL (SQLalchemy + psycopg2)
 * [Passlib](https://pythonhosted.org/passlib/install.html)
 
@@ -33,8 +33,7 @@
 * Upgrade backend to Python 3.X
 * Upgrade frontend to AngularJS 1.6.X
 * Upgrade frontend JS to ES6
-* Hash passwords on the [client side](https://crackstation.net/hashing-security.htm) as well 
-* Allow users to download their data in JSON/TSV format
-* Create a branch for [Bootstrap 4](https://v4-alpha.getbootstrap.com/) beta upgrade
+* Minify all the client side JavaScript code & create a custom Bootstrap build
+* Allow users to download their uploaded data in JSON/TSV format
 * Exception & error logging
 * Write some more tests

@@ -1,8 +1,8 @@
 // Default controller is defined as ng-controller on the body element of index.html
-angular.module('ScanpathEvaluator').controller('DefaultCtrl', function($scope, $rootScope, $state, AuthenticationService){
+angular.module('ScanpathEvaluator').controller('DefaultCtrl', function($scope, $rootScope, $state, $anchorScroll, AuthenticationService){
 	// Used for excluding breadcrumbs in particular states
 	$scope.isBreadcrumbAreaDisplayed = function() {
-		var excluded_states = ['login', 'register', 'index'];
+		var excluded_states = ['login', 'register', 'index', 'faq'];
 
 		for (var i = 0; i < excluded_states.length; i++) {
 			if ($state.includes(excluded_states[i])) {
@@ -23,8 +23,13 @@ angular.module('ScanpathEvaluator').controller('DefaultCtrl', function($scope, $
 		$state.go('login');
 	};
 
+	$scope.scrollTo = function(id) {
+		$anchorScroll(id);
+	};
+
     var initController = function() {
-		$scope.isNavCollapsed = true
+    	// Hide navigation on mobile devices by default when the page loads
+		$rootScope.isNavCollapsed = true;
 	};
 	// Perform view initialization
 	initController();

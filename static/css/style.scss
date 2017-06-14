@@ -32,6 +32,10 @@ footer {
 	}
 }
 
+#navbarLogo {
+	margin-right: 15px;
+}
+
 // Fix for this Angular-Bootstrap issue: https://github.com/angular-ui/bootstrap/issues/5474
 .collapsing.in-remove-active {
     overflow: hidden;
@@ -93,16 +97,17 @@ footer {
 // Modal dismiss button
 .modal-close {
     color: $red-cancel;
-    font-size: $text-size-default * 2;
+    font-size: $text-size-default * 3;
 	font-weight: bold;
     cursor: pointer;
+	line-height: 1;
 }
 
 // Modal content
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto; // 5% from the top and centered
-    padding: 20px;
+    padding: 15px;
     border: 1px solid #888;
     width: 80%;
     cursor: default;
@@ -376,6 +381,10 @@ label {
 }
 
 // Dataset sidebar screen
+#datasetNavHeading {
+	font-weight: bold;
+}
+
 // Hard coded link to add a new dataset under dataset global tree navigation
 #addTreeData {
     padding: 3px 10px;

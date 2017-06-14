@@ -26,10 +26,13 @@
     <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common/nav.html'"></nav>
 
     <!-- Breadcrumbs panel -->
-    <section class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></section>
+    <div class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></div>
 
     <!-- Main content view -->
-    <section ui-view></section>
+    <div class="container">
+        <!-- Generated content -->
+        <div ui-view></div>
+    </div>
 
     <!-- Bottom footer area -->
     <footer ng-include="'static/partials/common/footer.html'"></footer>
@@ -42,7 +45,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.11/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.4.2/angular-ui-router.min.js"></script>
 
-    <!-- CDN External components -->
+    <!-- CDN & external components -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-breadcrumb/0.5.0/angular-breadcrumb.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/ng-file-upload.min.js"></script>
@@ -75,15 +78,16 @@
     <script type="text/javascript" src="static/js/research/CanvasDrawService.js"></script>
 
     <!-- Angular filters -->
-    <script type="text/javascript" src="static/js/research/TaskUndefFilter.js"></script>
+    <script type="text/javascript" src="static/js/research/task/TaskUndefFilter.js"></script>
 
     <!-- Angular controllers -->
     <script type="text/javascript" src="static/js/app/DefaultCtrl.js"></script>
     <script type="text/javascript" src="static/js/login/LoginCtrl.js"></script>
     <script type="text/javascript" src="static/js/register/RegisterCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/DatasetCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/DatasetNewCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/TaskCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/AlgCompareCtrl.js"></script>
+    <script type="text/javascript" src="static/js/faq/FaqCtrl.js"></script>
+    <script type="text/javascript" src="static/js/research/dataset/DatasetCtrl.js"></script>
+    <script type="text/javascript" src="static/js/research/dataset/DatasetNewCtrl.js"></script>
+    <script type="text/javascript" src="static/js/research/task/TaskCtrl.js"></script>
+    <script type="text/javascript" src="static/js/research/task/AlgCompareCtrl.js"></script>
     <script type="text/javascript" src="static/js/research/SidebarCtrl.js"></script>
 </html>

@@ -1,0 +1,111 @@
+<div class="row">
+    <div class="col-md-12">
+        <h1>Frequently asked questions <span class="glyphicon glyphicon-question-sign pull-right"></span></h1>
+
+        <!-- Basic information about this application -->
+        <h2>Basics</h2>
+        <!-- TODO skusit urobit nejaku direktivu aby sa neopakovalo tolko kodu + Markdown -->
+        <uib-accordion>
+            <div uib-accordion-group class="panel-default" is-open="questionStates['featured']">
+                <uib-accordion-heading>
+                    What is Scanpath Evaluator?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['featured'], 'glyphicon-chevron-right': !questionStates['featured']}">
+                    </span>
+                </uib-accordion-heading>
+                An universal tool for viewing, evaluating and comparing eye tracking data -
+                namely scanpaths and areas of interest. However, its main purpose is to provide a way of comparing
+                algorithms for <a href="" ng-click="scrollAndExpand('commonScanpath')">common scanpath</a> computation.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['register']">
+                <uib-accordion-heading>
+                    Why do I need to register?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['register'], 'glyphicon-chevron-right': !questionStates['register']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['bugReport']">
+                <uib-accordion-heading>
+                    Something doesn't work. Where should I report it?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['bugReport'], 'glyphicon-chevron-right': !questionStates['bugReport']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+        </uib-accordion>
+
+        <!-- How to import & handle user data -->
+        <h2>Importing & exporting data</h2>
+        <uib-accordion>
+            <div uib-accordion-group class="panel-default" is-open="questionStates['dataImport']">
+                <uib-accordion-heading>
+                    How to import eye tracking data?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['dataImport'], 'glyphicon-chevron-right': !questionStates['dataImport']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['dataFormats']">
+                <uib-accordion-heading>
+                    What data formats are supported?
+                    <span class="pull-right glyphicon"
+                          ng-class="{'glyphicon-chevron-down': questionStates['dataFormats'], 'glyphicon-chevron-right': !questionStates['dataFormats']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['dataExport']">
+                <uib-accordion-heading>
+                    Can I export any results?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['dataExport'], 'glyphicon-chevron-right': !questionStates['dataExport']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+        </uib-accordion>
+
+        <!-- What can be done with imported data -->
+        <h2>Evaluating data</h2>
+        <uib-accordion>
+            <div uib-accordion-group class="panel-default" is-open="questionStates['commonScanpath']"
+                 id="commonScanpath">
+                <uib-accordion-heading>
+                    What is a common scanpath?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['commonScanpath'], 'glyphicon-chevron-right': !questionStates['commonScanpath']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['commonScanpathAlg']">
+                <uib-accordion-heading>
+                    What common scanpath algorithm should I choose?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['commonScanpathAlg'], 'glyphicon-chevron-right': !questionStates['commonScanpathAlg']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+
+            <div uib-accordion-group class="panel-default" is-open="questionStates['scanpathSim']">
+                <uib-accordion-heading>
+                    How is mutual scanpath similarity calculated?
+                    <span class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': questionStates['scanpathSim'], 'glyphicon-chevron-right': !questionStates['scanpathSim']}">
+                    </span>
+                </uib-accordion-heading>
+                This is just some content to illustrate fancy headings.
+            </div>
+        </uib-accordion>
+    </div>
+</div>

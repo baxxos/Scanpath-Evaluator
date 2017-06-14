@@ -15,12 +15,18 @@ angular.module('ScanpathEvaluator').run(function($rootScope, $cookies, $state, $
 	// Keep user logged on after page refresh
 	$rootScope.globals = $cookies.getObject('globals') || {};
 
+	// This was replaced by client cookies and sessions provided by Flask
 	// Remember current user data
+	/*
 	if ($rootScope.globals.currentUser) {
 		$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata;
 	}
+	*/
 
 	$rootScope.$on('$stateChangeSuccess', function (event, next, current) {
+		// Hide the mobile navigation on state change
+		$rootScope.isNavCollapsed = true;
+
 		// Redirect to login page if not logged in and trying to access a restricted page
 		var allowed_states = ['login', 'register', 'index'];
 		var allowedPage = false;

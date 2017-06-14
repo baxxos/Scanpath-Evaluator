@@ -31,6 +31,15 @@ angular.module('ScanpathEvaluator')
 						parent: 'index'
 					}
 				})
+				.state('faq', {
+					url: '/faq',
+					controller: 'FaqCtrl',
+					templateUrl: 'static/partials/faq.html',
+					ncyBreadcrumb: {
+						label: 'FAQ',
+						parent: 'index'
+					}
+				})
 				// State displaying static information about datasets and their tasks
 				.state('research', {
 					url: '/research',
