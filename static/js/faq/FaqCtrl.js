@@ -6,9 +6,12 @@ angular.module('ScanpathEvaluator').controller('FaqCtrl', function($scope, $anch
     };
 
     var initController = function() {
+        // Open only one question at a time (true) or allow multiple ones to be opened (false)
+        $scope.closeOthers = false;
+
         // True = question with given ID is expanded, false = collapsed
         $scope.questionStates = {
-            // Featured question is always expanded
+            // Featured question is initially expanded
             'featured': true
         };
     };

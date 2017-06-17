@@ -98,7 +98,7 @@
                         <th ng-click="setSort('simToCommon')">Similarity to common</th>
                     </tr>
                 </thead>
-                <tbody ng-repeat="algResult in task.algResults | orderBy: [task.sortBy, 'identifier'] | UndefToEnd: task.sortBy"
+                <tbody ng-repeat="algResult in task.algResults | orderBy: [task.sortBy, 'identifier'] | undefToEndFilter: task.sortBy"
                        ng-class="{'row-container-expanded': expandedRows[algResult.identifier]}">
                     <tr ng-class="{'row-selected': task.individualScanpath.identifier == algResult.identifier, 'row-excluded': algResult.excluded}">
                         <td class="userScanpathId"

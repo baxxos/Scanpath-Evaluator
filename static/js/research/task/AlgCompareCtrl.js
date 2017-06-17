@@ -149,8 +149,9 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 						var algResult = $scope.task.algResults[algName];
 
 						// If the algorithm computed common scanpath successfully, calculate the achieved avg similarity
+						// Otherwise replace the 0 similarity with 'undefined' to use in the 'undefToEnd' filter
 						algResult.simToCommon =
-							(algResult.fixations.length > 0 ? calcAvgSimToCommon(algResult.similarity) : 0);
+							(algResult.fixations.length > 0 ? calcAvgSimToCommon(algResult.similarity) : undefined);
 
 						// Assign a random color for future drawings on canvas (seed ensures distinguishable colors)
 						algResult.color = randomColor({ luminosity: 'dark', seed: algResult.identifier });

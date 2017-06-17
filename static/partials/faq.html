@@ -4,107 +4,107 @@
 
         <!-- Basic information about this application -->
         <h2>Basics</h2>
-        <!-- TODO skusit urobit nejaku direktivu aby sa neopakovalo tolko kodu + Markdown -->
-        <uib-accordion>
+        <uib-accordion close-others="closeOthers">
             <div uib-accordion-group class="panel-default" is-open="questionStates['featured']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     What is Scanpath Evaluator?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['featured'], 'glyphicon-chevron-right': !questionStates['featured']}">
-                    </span>
-                </uib-accordion-heading>
-                An universal tool for viewing, evaluating and comparing eye tracking data -
-                namely scanpaths and areas of interest. However, its main purpose is to provide a way of comparing
+                </faq-accordion-heading>
+
+                An universal tool for viewing, evaluating and comparing eye tracking data - namely scanpaths
+                and areas of interest. However, it's main purpose is to provide an easy way of comparing
                 algorithms for <a href="" ng-click="scrollAndExpand('commonScanpath')">common scanpath</a> computation.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['register']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     Why do I need to register?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['register'], 'glyphicon-chevron-right': !questionStates['register']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                </faq-accordion-heading>
+                User roles are essential for keeping track of data ownership. This way, the system can automatically
+                determine which data is each particular user allowed to view. As for registration itself, you can use
+                basically any login credentials since the e-mail address is (currently) not being verified and the password
+                is never stored as plaintext. However, it's good to keep in mind that this is just a demo
+                project with no advanced security measures except for password hashing & salting on the server side.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['bugReport']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     Something doesn't work. Where should I report it?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['bugReport'], 'glyphicon-chevron-right': !questionStates['bugReport']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                </faq-accordion-heading>
+                <a href="https://github.com/baxxos/Scanpath-Evaluator/issues">Open an issue at GitHub</a>
+                or send me an e-mail at meluch.m[at]gmail.com.
             </div>
         </uib-accordion>
 
         <!-- How to import & handle user data -->
         <h2>Importing & exporting data</h2>
-        <uib-accordion>
+        <uib-accordion close-others="closeOthers">
             <div uib-accordion-group class="panel-default" is-open="questionStates['dataImport']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     How to import eye tracking data?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['dataImport'], 'glyphicon-chevron-right': !questionStates['dataImport']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                </faq-accordion-heading>
+                Individual scanpaths of participants are grouped together into data structures called dataset tasks.
+                A dataset task represents recording of one screen and - in case of web pages - can be identified
+                by its URL. Therefore, in order to import your data, you need to create a new (blank) dataset first.
+                Then, for each recorded screen you need to add a new task to this dataset. When adding a new task,
+                you will be prompted to fill in its name and upload two data files - one for scanpaths and the other
+                one for areas of interest.
+
+                <hr />
+                Optional dataset task attributes are its description and media URL. The media URL corresponds to
+                Tobii Studio's '<span class="italic">MediaName</span>' column and its purpose is to filter out only
+                relevant rows in case of a file containing mixed recordings (e.g. from several screens).
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['dataFormats']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     What data formats are supported?
-                    <span class="pull-right glyphicon"
-                          ng-class="{'glyphicon-chevron-down': questionStates['dataFormats'], 'glyphicon-chevron-right': !questionStates['dataFormats']}">
-                    </span>
-                </uib-accordion-heading>
+                </faq-accordion-heading>
                 This is just some content to illustrate fancy headings.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['dataExport']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     Can I export any results?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['dataExport'], 'glyphicon-chevron-right': !questionStates['dataExport']}">
-                    </span>
-                </uib-accordion-heading>
+                </faq-accordion-heading>
                 This is just some content to illustrate fancy headings.
             </div>
         </uib-accordion>
 
         <!-- What can be done with imported data -->
         <h2>Evaluating data</h2>
-        <uib-accordion>
+        <uib-accordion close-others="closeOthers">
             <div uib-accordion-group class="panel-default" is-open="questionStates['commonScanpath']"
                  id="commonScanpath">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     What is a common scanpath?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['commonScanpath'], 'glyphicon-chevron-right': !questionStates['commonScanpath']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                </faq-accordion-heading>
+                Common scanpath reflects the most followed gaze path when exploring given visual stimulus.
+                In other words, it's a single artificial scanpath representing a path most commonly
+                followed by the majority of users. Usually, we try to maximize the average similarity of all individual
+                scanpaths to the calculated common scanpath.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['commonScanpathAlg']">
-                <uib-accordion-heading>
-                    What common scanpath algorithm should I choose?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['commonScanpathAlg'], 'glyphicon-chevron-right': !questionStates['commonScanpathAlg']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                <faq-accordion-heading>
+                    What common scanpath calculation algorithm should I choose?
+                </faq-accordion-heading>
+                Generally, the <span class="italic">Scanpath Trend Analysis</span> produces the best similarity
+                results for complex datasets. However, the <span class="italic">eMINE</span> algorithm sometimes
+                outperforms STA when comparing smaller number of rather similar scanpaths. The
+                <span class="italic">Dotplot</span> algorithm is currently the least advanced one and provides
+                basically no advantage against the others.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['scanpathSim']">
-                <uib-accordion-heading>
+                <faq-accordion-heading>
                     How is mutual scanpath similarity calculated?
-                    <span class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': questionStates['scanpathSim'], 'glyphicon-chevron-right': !questionStates['scanpathSim']}">
-                    </span>
-                </uib-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                </faq-accordion-heading>
+                Mutual scanpath simialrity calculation is based on string edit distance (also known as
+                <a href="https://en.wikipedia.org/wiki/Levenshtein_distance" target="_blank">Levenshtein distance</a>).
+                It means that the similarity of two scanpaths is based on the number of insertions, deletions
+                and modifications required in order to transform one sequence into another. The score is then
+                normalized in order to get a value in the 0-100 percentage interval. If two scanpaths have absolutely
+                no similarities, their mutual similarity will be equal to 0%.
             </div>
         </uib-accordion>
     </div>
