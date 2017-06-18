@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
@@ -28,6 +29,20 @@ class Dataset(Base):
 
     # Reference to the dataset tasks owned by this dataset
     tasks = relationship('DatasetTask', backref='dataset', cascade='all, delete-orphan', passive_deletes=True)
+
+    def get_ppi(self):
+        # Pythagorean theorem
+        diagonal_res = math.sqrt(pow(int(self.screen_res_x), 2) + pow(int(self.screen_res_y), 2))
+        ppi = diagonal_res / float(self.screen_size)
+
+        return ppi
+
+    def get_error_rate_area(self):
+        # Calculate error rate area (in cm by default)
+        error_rate_area_cm = math.tan(math.radians(float(self.accuracy_degree))) * float(self.tracker_distance)
+        error_rate_area_pixels = (error_rate_area_cm * self.get_ppi()) / 2.54
+
+        return round(error_rate_area_pixels, 2)
 
     def to_json(self):
         tasks_json = []

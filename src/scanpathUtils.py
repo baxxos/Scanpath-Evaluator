@@ -1,21 +1,21 @@
 from __future__ import division
 
 import math
+import traceback
 
 import src.stringEditAlgs as seAlg
-from src.models.Environment import Environment
 
 
-# TODO scanpaths & visuals are for one page (dataset -> template_sta). Change to dataset -> template_sta -> first_screen
-def createSequences(participants, myAoIs, errorRateArea):
+# *** Scanpath composing ***
+def create_initial_sequences(participants, aois, error_rate_area):
     """
-    Default method for converting raw sequence data loaded from a CSV-ish file into a temporary string representation:
+    Default method for converting raw sequence data loaded from a TSV-ish format into a temporary string representation:
     Input:
         {
             'ID02': [
-                ['0.0', 'Fixation', '150', '557', '40', 'http://ncc.metu.edu.tr/'],
-                ['1.0', 'Fixation', '600', '478', '159', 'http://ncc.metu.edu.tr/'],
-                ['2.0', 'Fixation', '300', '499', '300', 'http://ncc.metu.edu.tr/']
+                ['0.0', 'Fixation', '150', '557', '40'],
+                ['1.0', 'Fixation', '600', '478', '159'],
+                ['2.0', 'Fixation', '300', '499', '300']
                 ],
             'ID03': ...
         }
@@ -25,29 +25,34 @@ def createSequences(participants, myAoIs, errorRateArea):
     # LEGACY CODE downloaded from the STA research paper
     my_sequences = {}
     for participant_id in participants:
-        # An individual sequence/scanpath
+        # For constructing the individual sequence (scanpath)
         sequence = ''
+
         # For simplifying/normalizing the scanpaths ('AAABBBC' -> 'ABC')
         prev_aoi = ''
-        prev_duration = 0
-        prev_total_duration = 0
+        prev_duration, prev_total_duration = 0, 0
+
         for fixation in participants[participant_id]:
             temp_aoi = ''
-            temp_duration = 0
-            for act_aoi in myAoIs:
-                if float(fixation[3]) >= (act_aoi[1] - errorRateArea) and \
-                        float(fixation[3]) < ((act_aoi[1] - errorRateArea) + (act_aoi[2] + 2 * errorRateArea)) and \
-                        float(fixation[4]) >= (act_aoi[3] - errorRateArea) and \
-                        float(fixation[4]) < ((act_aoi[3] - errorRateArea) + (act_aoi[4] + 2 * errorRateArea)):
+            fixation_duration = 0
+
+            for act_aoi in aois:
+                # Save the fixation coordinates
+                fixation_x, fixation_y = fixation[3], fixation[4]
+
+                if (act_aoi[1] - error_rate_area) <= fixation_x < ((act_aoi[1] - error_rate_area) + (act_aoi[2] + 2 * error_rate_area)) and \
+                        (act_aoi[3] - error_rate_area) <= fixation_y < ((act_aoi[3] - error_rate_area) + (act_aoi[4] + 2 * error_rate_area)):
                     temp_aoi += act_aoi[5]
-                    temp_duration = int(fixation[2])
+                    fixation_duration = int(fixation[2])
 
             distanceList = []
 
             if len(temp_aoi) > 1:
-                temp_aoi = get_closer_aoi(fixation, myAoIs, temp_aoi)
+                # Fixation target lies in multiple AOIs - choose the closest one
+                temp_aoi = get_closer_aoi(fixation, aois, temp_aoi)
+
                 # The code below was supposed to solve the cases when a fixation points to two AOIs at the same time.
-                # However, it was causing STA to run extremely slow so we just pick the AOI that is closer.
+                # However, it was causing STA to run extremely slow so we just pick the closest AOI.
                 """
                 for m in temp_aoi:
                     for n in range(0, len(myAoIs)):
@@ -64,19 +69,19 @@ def createSequences(participants, myAoIs, errorRateArea):
             if len(temp_aoi) == 1:
                 # If the current fixation target is a different AOI than the one before
                 if prev_aoi != temp_aoi[0][0]:
-                    sequence = sequence + temp_aoi[0][0] + "-" + str(temp_duration) + "."
-                    prev_total_duration = temp_duration
+                    sequence = sequence + temp_aoi[0][0] + "-" + str(fixation_duration) + "."
+                    prev_total_duration = fixation_duration
                 # If the current fixation target is the same as before then just update the duration
                 else:
                     # Updated fixation duration
-                    new_len = prev_total_duration + temp_duration
+                    new_len = prev_total_duration + fixation_duration
                     # Updated sequence string
                     sequence = sequence[0:(len(sequence) - len(str(prev_total_duration)) - 1)] + str(new_len) + '.'
                     # Save the updated values
-                    prev_total_duration += temp_duration
+                    prev_total_duration += fixation_duration
 
                 prev_aoi = temp_aoi[0][0]
-                prev_duration = temp_duration
+                prev_duration = fixation_duration
 
         my_sequences[participant_id] = sequence
 
@@ -88,29 +93,34 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
     Function helps with solving the cases when a fixation points to two AOIs at the same time - it returns
     the closer one based on distance to the corners of the 2 target AOIs.
     """
+    fixation_x, fixation_y = float(fixation[3]), float(fixation[4])
 
     sums_of_distances = {}
     for target_aoi in possible_aois:
         for curr_aoi in all_aois:
             if target_aoi == curr_aoi[5]:
+                aoi_x, aoi_width = float(curr_aoi[1]), float(curr_aoi[2])
+                aoi_y, aoi_height = float(curr_aoi[3]), float(curr_aoi[4])
+
                 # Sum distance of all 4 corners
                 temp_distance = []
 
                 # up, left
-                temp_distance.append(math.sqrt(pow(float(fixation[3]) - float(curr_aoi[1]), 2) +
-                                               pow(float(fixation[4]) - float(curr_aoi[3]), 2)))
+                temp_distance.append(math.sqrt(pow(fixation_x - aoi_x, 2) +
+                                               pow(fixation_y - aoi_y, 2)))
                 # up right
-                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1]) + float(curr_aoi[2])), 2) +
-                                               pow(float(fixation[4]) - float(curr_aoi[3]), 2)))
+                temp_distance.append(math.sqrt(pow(fixation_x - (aoi_x + aoi_width), 2) +
+                                               pow(fixation_y - aoi_y, 2)))
                 # down left
-                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1])), 2) +
-                                               pow(float(fixation[4]) - (float(curr_aoi[3]) + float(curr_aoi[4])), 2)))
+                temp_distance.append(math.sqrt(pow(fixation_x - aoi_x, 2) +
+                                               pow(fixation_y - (aoi_y + aoi_height), 2)))
                 # down, right
-                temp_distance.append(math.sqrt(pow(float(fixation[3]) - (float(curr_aoi[1]) + float(curr_aoi[2])), 2) +
-                                               pow(float(fixation[4]) - (float(curr_aoi[3]) + float(curr_aoi[4])), 2)))
+                temp_distance.append(math.sqrt(pow(fixation_x - (aoi_x + aoi_width), 2) +
+                                               pow(fixation_y - (aoi_y + aoi_height), 2)))
                 # Push the current aoi to the list
                 sums_of_distances[target_aoi] = sum(temp_distance)
                 break
+
     # return key of minimal value in dictionary
     return min(sums_of_distances, key=sums_of_distances.get)
 
@@ -125,17 +135,12 @@ def get_raw_sequences(dataset_task):
 
     # Try to set error rate area (set to 0 if any parameters are missing)
     try:
-        my_error_rate_area = Environment(
-            eyetracker_accuracy=float(dataset_task.dataset.accuracy_degree),
-            eyetracker_distance=float(dataset_task.dataset.tracker_distance),
-            screen_res_x=dataset_task.dataset.screen_res_x,
-            screen_res_y=dataset_task.dataset.screen_res_y,
-            screen_size_diagonal=float(dataset_task.dataset.screen_size)
-        ).get_error_rate_area()
+        my_error_rate_area = dataset_task.dataset.get_error_rate_area()
     except:
+        traceback.print_exc()
         my_error_rate_area = 0
 
-    my_sequences = createSequences(dataset_task.scanpath_data_raw, dataset_task.aoi_data, my_error_rate_area)
+    my_sequences = create_initial_sequences(dataset_task.scanpath_data_raw, dataset_task.aoi_data, my_error_rate_area)
 
     keys = my_sequences.keys()
     # String gets split into an array: ['G-138', 'C-184']
@@ -151,19 +156,76 @@ def get_raw_sequences(dataset_task):
     return my_sequences
 
 
-# TODO dont pass whole task object as an attribute, only sequences
+# TODO don't pass whole task object as an attribute, only sequences
 def get_formatted_sequences(dataset_task):
     raw_sequences = get_raw_sequences(dataset_task)
     formatted_sequences = dataset_task.format_sequences(raw_sequences)
 
     # Additional info - calculate edit distances/similarity between dataset scanpaths
-    formatted_sequences = dataset_task.calc_edit_distances(formatted_sequences)
-    formatted_sequences = dataset_task.calc_max_similarity(formatted_sequences)
-    formatted_sequences = dataset_task.calc_min_similarity(formatted_sequences)
+    formatted_sequences = calc_edit_distances(formatted_sequences)
+    formatted_sequences = calc_max_similarity(formatted_sequences)
+    formatted_sequences = calc_min_similarity(formatted_sequences)
 
     return formatted_sequences
 
 
+# *** Similarity calculations ***
+def calc_max_similarity(scanpaths):
+    """ Function calculates most similar pair for each scanpath in the set """
+    for scanpath in scanpaths:
+        # Create empty max_similarity object
+        max_similar = {
+            'identifier':  '',
+            'value': -1
+        }
+        # Iterate through previously calculated similarity values of given scanpath
+        for similarity_iter in scanpath['similarity']:
+            similarity_val = scanpath['similarity'][similarity_iter]
+            if similarity_val > max_similar['value']:
+                max_similar['value'] = similarity_val
+                max_similar['identifier'] = similarity_iter
+        # Assign max_similarity object to scanpath (in JSON-style)
+        scanpath['maxSimilarity'] = max_similar
+
+    return scanpaths
+
+
+def calc_min_similarity(scanpaths):
+    """ Function calculates least similar pair for each scanpath in the set """
+    for scanpath in scanpaths:
+        # Create empty max_similarity object
+        min_similar = {
+            'identifier': '',
+            'value': 101
+        }
+        # Iterate through previously calculated similarity values of given scanpath
+        for similarity_iter in scanpath['similarity']:
+            similarity_val = scanpath['similarity'][similarity_iter]
+            if similarity_val < min_similar['value']:
+                min_similar['value'] = similarity_val
+                min_similar['identifier'] = similarity_iter
+        # Assign max_similarity object to scanpath (in JSON-style)
+        scanpath['minSimilarity'] = min_similar
+
+    return scanpaths
+
+
+def calc_edit_distances(scanpaths):
+    # Store scanpaths as an array of string-converted original scanpaths
+    scanpath_strs = seAlg.convert_to_str_array(scanpaths)
+
+    # Calculate the edit distances
+    # The order of records in scanpaths and scanpath_strs must be the same!
+    seAlg.calc_mutual_similarity(scanpath_strs)
+
+    for i_first in range(0, len(scanpath_strs)):
+        # Save the calculations to the original scanpaths object
+        scanpaths[i_first]['similarity'] = scanpath_strs[i_first]['similarity']
+
+    return scanpaths
+
+
+# *** Custom runs ***
 def run_custom(dataset_task, custom_scanpath):
     """ Reversed common scanpath algorithm - the "common" scanpath is known from the start. """
 

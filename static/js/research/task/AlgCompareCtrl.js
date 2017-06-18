@@ -149,7 +149,7 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 						var algResult = $scope.task.algResults[algName];
 
 						// If the algorithm computed common scanpath successfully, calculate the achieved avg similarity
-						// Otherwise replace the 0 similarity with 'undefined' to use in the 'undefToEnd' filter
+						// Otherwise, replace the 0 similarity with 'undefined' for sorting purposes (undefToEndFilter)
 						algResult.simToCommon =
 							(algResult.fixations.length > 0 ? calcAvgSimToCommon(algResult.similarity) : undefined);
 

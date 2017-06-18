@@ -33,7 +33,7 @@
 * Upgrade backend to Python 3.X
 * Upgrade frontend to AngularJS 1.6.X
 * Upgrade frontend JS to ES6
-* Minify all the client side JavaScript code & create a custom Bootstrap build
+* Lazy load Angular modules & create a custom Bootstrap build
 * Allow users to download their uploaded data in JSON/TSV format
 * Exception & error logging
 * Write some more tests
