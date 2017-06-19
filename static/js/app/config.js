@@ -2,8 +2,8 @@
 
 // State machine for named states based on URL and (currently) unnamed corresponding views
 angular.module('ScanpathEvaluator')
-	.config(['$stateProvider', '$urlRouterProvider', '$locationProvider',
-		function($stateProvider, $urlRouterProvider) {
+	.config(['$stateProvider', '$urlRouterProvider',
+		function($stateProvider, $urlRouterProvider, $ocLazyLoad) {
 			$stateProvider
 				.state("index", {
 					url: "/",
@@ -17,6 +17,11 @@ angular.module('ScanpathEvaluator')
 					url: '/login',
 					controller: 'LoginCtrl',
 					templateUrl: 'static/partials/login.html',
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/login/LoginCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: 'Login',
 						parent: 'index'
@@ -26,6 +31,11 @@ angular.module('ScanpathEvaluator')
 					url: '/register',
 					controller: 'RegisterCtrl',
 					templateUrl: 'static/partials/register.html',
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/register/RegisterCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: 'Register',
 						parent: 'index'
@@ -35,6 +45,11 @@ angular.module('ScanpathEvaluator')
 					url: '/faq',
 					controller: 'FaqCtrl',
 					templateUrl: 'static/partials/faq.html',
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/faq/FaqCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: 'FAQ',
 						parent: 'index'
@@ -56,6 +71,11 @@ angular.module('ScanpathEvaluator')
 							templateUrl: 'static/partials/research/static.html'
 						}
 					},
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/research/SidebarCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: 'Research',
 						parent: 'index'
@@ -70,6 +90,11 @@ angular.module('ScanpathEvaluator')
 							controller: 'DatasetCtrl'
 						}
 					},
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/research/dataset/DatasetCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: '{{ dataset.name ? dataset.name : "Dataset detail"}}',
 						parent: 'research'
@@ -83,12 +108,17 @@ angular.module('ScanpathEvaluator')
 							controller: 'DatasetNewCtrl'
 						}
 					},
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/research/dataset/DatasetNewCtrl.js');
+						}]
+					},
 					ncyBreadcrumb: {
 						label: 'New dataset',
 						parent: 'research'
 					}
 				})
-				// State which allows to choose a task (sub-dataset) from the previously selected dataset
+				// State which allows to view a task (sub-dataset) from the previously selected dataset
 				.state('research.dataset.task', {
 					url: '/task/:taskId',
 					views: {
@@ -96,6 +126,11 @@ angular.module('ScanpathEvaluator')
 							templateUrl: 'static/partials/research/task/task.html',
 							controller: 'TaskCtrl'
 						}
+					},
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/research/task/TaskCtrl.js');
+						}]
 					},
 					ncyBreadcrumb: {
 						label: '{{ task.name ? task.name : "Task detail" }}',
@@ -110,6 +145,11 @@ angular.module('ScanpathEvaluator')
 							templateUrl: 'static/partials/research/task/algCompare.html',
 							controller: 'AlgCompareCtrl'
 						}
+					},
+					resolve: {
+						loadCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+							return $ocLazyLoad.load('static/js/research/task/AlgCompareCtrl.js');
+						}]
 					},
 					ncyBreadcrumb: {
 						label: 'Algorithm comparison',

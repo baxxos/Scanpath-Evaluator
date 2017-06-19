@@ -221,7 +221,7 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 	};
 
 	$scope.viewCanvasAsImage = function() {
-		window.open($scope.canvas.toDataURL('image/jpeg', 0.5), '_blank');
+		$window.open($scope.canvas.toDataURL('image/jpeg', 0.5), '_blank');
 	};
 
 	$scope.drawIndividualScanpath = function(scanpath) {

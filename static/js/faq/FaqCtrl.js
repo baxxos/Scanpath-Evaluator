@@ -1,4 +1,8 @@
 angular.module('ScanpathEvaluator').controller('FaqCtrl', function($scope, $anchorScroll) {
+    // Lazy-load paths for JS & HTML components (ocLazyLoad)
+    $scope.lazyLoadParams = [
+        'static/js/faq/faqAccordionHeading.js'
+    ];
 
     $scope.scrollAndExpand = function(id) {
         $anchorScroll(id);

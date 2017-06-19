@@ -1,27 +1,20 @@
-// ngAnimate and ngTouch provide basic animations e.g. on a collapsing element
-// ui.router defines routes and states (app.config.js) - these are then used in ncy-angular-breadcrumb
-// ui.bootstrap to prevent full jQuery import in bootstrapJS
-// TODO migrate to Angular 1.6.x
+/* ngAnimate and ngTouch provide basic animations support - e.g. on a collapsing element
+ * ui.router defines routes and states (app.config.js) - these are then used in ncy-angular-breadcrumb
+ * ui.bootstrap to get rid of jQuery dependency in Bootstrap JS
+ * ocLazyLoad for lazy-loading own modules such as controllers, directives etc.
+ */
 angular.module(
 	'ScanpathEvaluator',
 	[
 		'ngAnimate', 'ngTouch', 'ui.router', 'ui.bootstrap', 'ncy-angular-breadcrumb',
-		'angularBootstrapNavTree', 'ngCookies', 'ngFileUpload', 'ngSanitize', 'ngCsv'
+		'angularBootstrapNavTree', 'ngCookies', 'ngFileUpload', 'ngSanitize', 'ngCsv', 'oc.lazyLoad'
 	]
 );
 
 // Default app initialization (globals, rootScope etc.)
-angular.module('ScanpathEvaluator').run(function($rootScope, $cookies, $state, $http) {
+angular.module('ScanpathEvaluator').run(function($rootScope, $cookies, $state) {
 	// Keep user logged on after page refresh
 	$rootScope.globals = $cookies.getObject('globals') || {};
-
-	// This was replaced by client cookies and sessions provided by Flask
-	// Remember current user data
-	/*
-	if ($rootScope.globals.currentUser) {
-		$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata;
-	}
-	*/
 
 	$rootScope.$on('$stateChangeSuccess', function (event, next, current) {
 		// Hide the mobile navigation on state change

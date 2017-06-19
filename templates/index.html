@@ -1,72 +1,74 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="ScanpathEvaluator">
-<head>
-    <!-- For relative paths -->
-    <base href="/">
-    <!-- Metadata -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Michal Melúch">
-    <meta name="keywords" content="scanpath, eye tracking, scanpaths, common scanpath, user experience">
-    <meta name="description" content="Online eye tracking data evaluation service.">
-    <title>Personalized gaze visualization</title>
-    <!-- Bootstrap minified CSS -->
-    <link rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-      crossorigin="anonymous">
-    <!-- Own/custom CSS -->
-    <link rel="stylesheet" href="static/css/abn_tree.css">
-    <link rel="stylesheet" href="static/css/style.css">
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/static/images/favicon.png" />
-</head>
-<body ng-controller="DefaultCtrl" ng-class="{'landingHeroImage': isHomePage()}">
-    <!-- Top navigation bar area -->
-    <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common/nav.html'"></nav>
+    <head>
+        <!-- For relative paths -->
+        <base href="/">
+        <!-- Metadata -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Michal Melúch">
+        <meta name="keywords" content="scanpath, eye tracking, scanpaths, common scanpath, user experience">
+        <meta name="description" content="Online eye tracking data evaluation service.">
+        <title>Personalized gaze visualization</title>
+        <!-- Bootstrap minified CSS -->
+        <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+        <!-- Own/custom CSS -->
+        <link rel="stylesheet" href="static/css/abn_tree.css">
+        <link rel="stylesheet" href="static/css/style.css">
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="/static/images/favicon.png" />
+    </head>
+    <body ng-controller="DefaultCtrl" ng-class="{'landingHeroImage': isHomePage()}">
+        <!-- Top navigation bar area -->
+        <nav class="navbar navbar-inverse navbar-static-top" ng-include="'static/partials/common/nav.html'"></nav>
 
-    <!-- Breadcrumbs panel -->
-    <div class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></div>
+        <!-- Breadcrumbs panel -->
+        <div class="container" ncy-breadcrumb ng-hide="isBreadcrumbAreaDisplayed()"></div>
 
-    <!-- Main content view -->
-    <div class="container">
-        <!-- Generated content -->
-        <div ui-view></div>
-    </div>
+        <!-- Main content view -->
+        <div class="container">
+            <!-- Generated content -->
+            <div ui-view></div>
+        </div>
 
-    <!-- Bottom footer area -->
-    <footer ng-include="'static/partials/common/footer.html'"></footer>
-</body>
+        <!-- Bottom footer area -->
+        <footer ng-include="'static/partials/common/footer.html'"></footer>
+    </body>
+
     <!-- CDN Angular libraries -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular-animate.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular-touch.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.11/angular-cookies.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.11/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.4.2/angular-ui-router.min.js"></script>
 
-    <!-- CDN & external components -->
+    <!-- CDN external components -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-breadcrumb/0.5.0/angular-breadcrumb.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/ng-file-upload.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ng-csv/0.3.6/ng-csv.min.js"></script>
-    <script type="text/javascript" src="static/lib/abn_tree.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/oclazyload/1.1.0/ocLazyLoad.min.js"></script>
 
-    <!-- Angular libraries --><!--
+    <!-- Angular libraries (for local use) --><!--
     <script type="text/javascript" src="static/lib/angular.js"></script>
     <script type="text/javascript" src="static/lib/angular-animate.min.js"></script>
     <script type="text/javascript" src="static/lib/angular-touch.min.js"></script>
     <script type="text/javascript" src="static/lib/angular-cookies.min.js"></script>
     <script type="text/javascript" src="static/lib/angular-ui-router.min.js"></script>
     -->
-    <!-- External components --><!--
+    <!-- External components (for local use) --><!--
     <script type="text/javascript" src="static/lib/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="static/lib/angular-breadcrumb.min.js"></script>
     <script type="text/javascript" src="static/lib/ng-file-upload.min.js"></script>
     <script type="text/javascript" src="static/lib/randomColor.min.js"></script>
     <script type="text/javascript" src="static/lib/abn_tree.min.js"></script>
     <script type="text/javascript" src="static/lib/ng-csv.min.js"></script>
+    <script type="text/javascript" src="static/lib/ocLazyLoad.min.js"></script>
     -->
     <!-- Angular App -->
     <script type="text/javascript" src="static/js/app/app.js"></script>
@@ -80,17 +82,9 @@
     <!-- Angular filters -->
     <script type="text/javascript" src="static/js/research/task/undefToEndFilter.js"></script>
 
-    <!-- Angular directives -->
-    <script type="text/javascript" src="static/js/faq/faqAccordionHeading.js"></script>
+    <!-- Other (simpler) Angular directives are lazy-loaded -->
+    <script type="text/javascript" src="static/lib/abn_tree.min.js"></script>
 
-    <!-- Angular controllers -->
+    <!-- Default Angular controller - other controllers are lazy-loaded via oc.lazyLoad (see config.js) -->
     <script type="text/javascript" src="static/js/app/DefaultCtrl.js"></script>
-    <script type="text/javascript" src="static/js/login/LoginCtrl.js"></script>
-    <script type="text/javascript" src="static/js/register/RegisterCtrl.js"></script>
-    <script type="text/javascript" src="static/js/faq/FaqCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/dataset/DatasetCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/dataset/DatasetNewCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/task/TaskCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/task/AlgCompareCtrl.js"></script>
-    <script type="text/javascript" src="static/js/research/SidebarCtrl.js"></script>
 </html>
