@@ -59,14 +59,45 @@
                 <faq-accordion-heading>
                     What data formats are supported?
                 </faq-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                Currently support data formats are:
+                <ul>
+                    <li>
+                        Tobii Studio Export -
+                        click <a href="/static/dataSamples/dataSampleScanpaths.tsv">here</a> for an example of Tobii
+                        scanpaths file or <a href="/static/dataSamples/dataSampleAois.txt">here</a> for an example
+                        of Tobii AOIs file.
+                    </li>
+                    <li>
+                        TSV (tab separated values) -
+                        see <a href="/static/dataSamples/dataSampleScanpathsFormatted.txt">this</a> for an example of
+                        TSV scanpaths file or <a href="/static/dataSamples/dataSampleAoisFormatted.txt">this</a> for an
+                        example of TSV AOIs file.
+                        <ul>
+                            <li>
+                                Scanpath data - the input file <span class="italic">must</span> contain the following
+                                columns: <span class="italic">ParticipantName, FixationIndex, GazeEventType,
+                                GazeEventDuration, FixationPointX (MCSpx), FixationPointY (MCSpx)</span>. Any other
+                                columns will be ignored.
+                            </li>
+                            <li>
+                                AOI data - the input file <span class="italic">must</span> contain the following
+                                columns: <span class="italic">FullName, XFrom, XSize, YFrom, YSize,
+                                ShortName</span> where <span class="italic">XSize</span> and
+                                <span class="italic">YSize</span> represent width and height (px) of the current AOI.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                After upload, the data is processed and permanently stored on the server-side in JSON format.
             </div>
 
             <div uib-accordion-group class="panel-default" is-open="questionStates['dataExport']">
                 <faq-accordion-heading>
                     Can I export any results?
                 </faq-accordion-heading>
-                This is just some content to illustrate fancy headings.
+                You can export results displayed in the main scanpaths table (at the bottom of the screen) by selecting
+                the "<span class="italic">CSV export</span>" button. This action can be performed only on the dataset
+                task or algorithm comparison screens.
             </div>
         </uib-accordion>
 
