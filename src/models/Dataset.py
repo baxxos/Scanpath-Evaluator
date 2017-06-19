@@ -55,10 +55,10 @@ class Dataset(Base):
         rec_environment = {
             'screenResX': self.screen_res_x,
             'screenResY': self.screen_res_y,
-            # Decimal type is not a valid JSON value
-            'screenSize': float(self.screen_size),
-            'accDegree': float(self.accuracy_degree),
-            'trackerDistance': float(self.tracker_distance)
+            # Decimal type is not a valid JSON value - convert to float (if defined)
+            'screenSize': float(self.screen_size) if self.screen_size else None,
+            'accDegree': float(self.accuracy_degree) if self.accuracy_degree else None,
+            'trackerDistance': float(self.tracker_distance) if self.tracker_distance else None
         }
 
         return {

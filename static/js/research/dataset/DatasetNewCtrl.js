@@ -48,7 +48,7 @@ angular.module('ScanpathEvaluator').controller('DatasetNewCtrl', function($scope
                         $timeout(function() {
                             $state.go(
                                 'research.dataset',
-                                { id: $scope.datasetNew.id }
+                                { datasetId: $scope.datasetNew.id }
                             );
                         }, 5000);
                     }

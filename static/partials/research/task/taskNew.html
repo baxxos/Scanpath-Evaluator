@@ -1,167 +1,188 @@
-<div class="panel panel-primary text-left" id="new-task-panel">
+<div class="panel panel-primary text-left" id="newTaskPanel">
     <div class="panel-heading">
         Add a new task to the dataset
     </div>
 
     <div class="panel-body text-left">
-        <div class="col-md-6">
-            <!-- Task name -->
-            <div class="form-group">
-                <div class="input-group">
-                    <label for="taskName">
-                        Name:<span class="input-required">*</span>
-                    </label>
-                    <input type="text" class="form-control" placeholder="myTask"
-                       id="taskName" maxlength="100" ng-model="taskNew.name" required>
-                </div>
-            </div>
-
-            <!-- Task URL -->
-            <div class="form-group">
-                <div class="input-group">
-                    <label for="taskUrl">
-                        Task screen URL:
-                    </label>
-                    <input type="url" class="form-control" id="taskUrl" maxlength="100"
-                           placeholder="http://myurl.com" ng-model="taskNew.url">
-                </div>
-            </div>
-
-            <!-- Task description (opt) -->
-            <div class="form-group">
-                <div class="input-group">
-                    <label for="taskDesc">
-                        Description:
-                    </label>
-                    <input type="text" class="form-control" id="taskDesc" maxlength="150"
-                           placeholder="Short description of the new task" ng-model="taskNew.description">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
-                    Submit
-                </button>
-                <button class="btn btn-default" type="button"
-                        ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
-                    Cancel
-                </button>
-            </div>
-
-            <div class="form-group">
-                <span class="label label-warning" ng-show="taskNew.uploadState == 1">
-                    Uploading data..
-                </span>
-                <span class="label label-success" ng-show="taskNew.uploadState == 2">
-                    Done
-                </span>
-                <span class="label label-danger" ng-show="taskNew.uploadState == -1">
-                    Failed
-                </span>
-            </div>
-        </div>
-
-        <!-- User-uploaded files -->
-        <div class="col-md-6">
-            <!-- SCANPATH DATA file -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <p class="fake-label">
-                                File containing scanpath data:<span class="input-required">*</span>
-                            </p>
-                            <label class="btn btn-default">
-                                Select File
-                                <input type="file" accept=".txt,.tsv,.csv" ng-model="taskNew.fileScanpaths"
-                                       ngf-select="" ngf-model-invalid="taskNew.errFileScanpaths"
-                                       ngf-max-size="100MB" required>
-                            </label>
-                        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Task name -->
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="taskName">
+                            Name:<span class="input-required">*</span>
+                        </label>
+                        <input type="text" class="form-control" placeholder="myTask"
+                           id="taskName" maxlength="100" ng-model="taskNew.name" required>
                     </div>
+                </div>
 
-                    <div class="form-group" ng-show="taskNew.fileScanpaths.name || taskNew.errFileScanpaths.name">
-                        <div class="input-group">
-                            <p class="fake-label">Selected file:</p>
-                            <p>
-                                {{ taskNew.fileScanpaths.name }}
-                                {{ taskNew.errFileScanpaths.name }}
-                            </p>
-                            <p>
-                                <span class="label label-danger" ng-show="taskNew.errFileScanpaths">
-                                    {{ concatFileErrors(taskNew.errFileScanpaths) }}
-                                </span>
-                            </p>
-                        </div>
+                <!-- Task URL -->
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="taskUrl">
+                            Task screen URL:
+                        </label>
+                        <input type="url" class="form-control" id="taskUrl" maxlength="100"
+                               placeholder="http://myurl.com" ng-model="taskNew.url">
+                    </div>
+                </div>
+
+                <!-- Task description (opt) -->
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="taskDesc">
+                            Description:
+                        </label>
+                        <input type="text" class="form-control" id="taskDesc" maxlength="150"
+                               placeholder="Short description of the new task" ng-model="taskNew.description">
                     </div>
                 </div>
             </div>
 
-            <!-- AOI DATA file -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <p class="fake-label">
-                                File containing AOI data:<span class="input-required">*</span>
-                            </p>
-                            <label class="btn btn-default">
-                                Select File
-                                <input type="file" accept=".txt" ng-model="taskNew.fileRegions" ngf-select=""
-                                       ngf-model-invalid="taskNew.errFileRegions" ngf-max-size="10MB" required>
-                            </label>
+            <!-- User-uploaded files -->
+            <div class="col-md-6">
+                <!-- SCANPATH DATA file -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake-label">
+                                    File containing scanpath data:<span class="input-required">*</span>
+                                </p>
+                                <label class="btn btn-default">
+                                    Select File
+                                    <input type="file" accept=".txt,.tsv" ng-model="taskNew.fileScanpaths"
+                                           ngf-select="" ngf-model-invalid="taskNew.errFileScanpaths"
+                                           ngf-max-size="100MB" required>
+                                </label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group" ng-show="taskNew.fileRegions.name || taskNew.errFileRegions.name">
-                        <div class="input-group">
-                            <p class="fake-label">Selected file:</p>
-                            <p>
-                                {{ taskNew.fileRegions.name }}
-                                {{ taskNew.errFileRegions.name }}
-                            </p>
-                            <p>
-                                <span class="label label-danger" ng-show="taskNew.errFileRegions">
-                                    {{ concatFileErrors(taskNew.errFileRegions) }}
-                                </span>
-                            </p>
+                        <div class="form-group" ng-show="taskNew.fileScanpaths.name || taskNew.errFileScanpaths.name">
+                            <div class="input-group">
+                                <p class="fake-label">Selected file:</p>
+                                <p class="italic">
+                                    {{ taskNew.fileScanpaths.name }}
+                                    {{ taskNew.errFileScanpaths.name }}
+                                </p>
+                                <p>
+                                    <span class="label label-danger" ng-show="taskNew.errFileScanpaths">
+                                        {{ concatFileErrors(taskNew.errFileScanpaths) }}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- BACKGROUND IMAGE file -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <p class="fake-label">
-                                Background image:<span class="input-required">*</span>
-                            </p>
-                            <label class="btn btn-default">
-                                Select Image
-                                <input type="file" accept="image/*" ng-model="taskNew.fileBgImage" ngf-select=""
-                                       ngf-model-invalid="taskNew.errFileBgImage" ngf-max-size="10MB" required>
-                            </label>
+                <!-- AOI DATA file -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake-label">
+                                    File containing AOI data:<span class="input-required">*</span>
+                                </p>
+                                <label class="btn btn-default">
+                                    Select File
+                                    <input type="file" accept=".txt,.tsv" ng-model="taskNew.fileRegions" ngf-select=""
+                                           ngf-model-invalid="taskNew.errFileRegions" ngf-max-size="10MB" required>
+                                </label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group" ng-show="taskNew.fileBgImage.name || taskNew.errFileBgImage.name">
-                        <div class="input-group">
-                            <p class="fake-label">Selected image:</p>
-                            <p>
-                                {{ taskNew.fileBgImage.name }}
-                                {{ taskNew.errFileBgImage.name }}
-                            </p>
-                            <p>
-                                <span class="label label-danger" ng-show="taskNew.errFileBgImage">
-                                    {{ concatFileErrors(taskNew.errFileBgImage) }}
-                                </span>
-                            </p>
+                        <div class="form-group" ng-show="taskNew.fileRegions.name || taskNew.errFileRegions.name">
+                            <div class="input-group">
+                                <p class="fake-label">Selected file:</p>
+                                <p class="italic">
+                                    {{ taskNew.fileRegions.name }}
+                                    {{ taskNew.errFileRegions.name }}
+                                </p>
+                                <p>
+                                    <span class="label label-danger" ng-show="taskNew.errFileRegions">
+                                        {{ concatFileErrors(taskNew.errFileRegions) }}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+
+                <!-- BACKGROUND IMAGE file -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <p class="fake-label">
+                                    Background image:<span class="input-required">*</span>
+                                </p>
+                                <label class="btn btn-default">
+                                    Select Image
+                                    <input type="file" accept="image/*" ng-model="taskNew.fileBgImage" ngf-select=""
+                                           ngf-model-invalid="taskNew.errFileBgImage" ngf-max-size="10MB" required>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="taskNew.fileBgImage.name || taskNew.errFileBgImage.name">
+                            <div class="input-group">
+                                <p class="fake-label">Selected image:</p>
+                                <p class="italic">
+                                    {{ taskNew.fileBgImage.name }}
+                                    {{ taskNew.errFileBgImage.name }}
+                                </p>
+                                <p>
+                                    <span class="label label-danger" ng-show="taskNew.errFileBgImage">
+                                        {{ concatFileErrors(taskNew.errFileBgImage) }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>  <!-- row -->
+            </div>  <!-- col -->
+        </div>  <!-- row -->
+
+        <hr />
+
+        <!-- Form controls - submit etc. -->
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Submit & cancel buttons -->
+                <div class="form-group">
+                    <button class="btn btn-primary" type="submit" ng-disabled="taskNew.uploading">
+                        Submit
+                    </button>
+                    <button class="btn btn-default" type="button"
+                            ng-click="toggleTaskForm()" ng-disabled="taskNew.uploading">
+                        Cancel
+                    </button>
+                </div>
+
+                <!-- Redirect & submit -->
+                <div class="form-group" id="newTaskRedirect">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="taskNew.redirect">
+                            Redirect me to the task overview afterwards
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Upload states -->
+                <div class="form-group" id="newTaskUploadStates">
+                    <span class="label label-warning" ng-show="taskNew.uploadState == 1">
+                        Uploading data..
+                    </span>
+                    <span class="label label-success" ng-show="taskNew.uploadState == 2">
+                        Done
+                    </span>
+                    <span class="label label-danger" ng-show="taskNew.uploadState == -1">
+                        Failed
+                    </span>
+                </div>
+            </div>  <!-- col -->
+        </div>  <!-- row -->
+    </div>  <!-- panel-body -->
 </div>

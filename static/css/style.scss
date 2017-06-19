@@ -336,9 +336,22 @@ optgroup {
 	}
 }
 
-#new-task-panel {
+#newTaskPanel {
 	.input-group {
 		width: 100%;
+	}
+
+	hr {
+		margin-top: 10px;
+	}
+
+	#newTaskRedirect, #newTaskUploadStates {
+		// The panel itself already has a 20px padding
+		margin-bottom: 0px;
+
+		div.checkbox {
+			margin-bottom: 0px;
+		}
 	}
 }
 

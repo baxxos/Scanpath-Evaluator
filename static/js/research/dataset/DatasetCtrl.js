@@ -139,8 +139,10 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 			}
 		}).then(
 			function(response) {
+				// For displaying the success message
+				$scope.taskNew.success = response.data.success;
+
 				if(response.data.success == true && response.data.load.id) {
-					$scope.taskNew.success = true;
 					$scope.taskNew.id = response.data.load.id;
 
 					// Update navigation view
@@ -151,12 +153,15 @@ angular.module('ScanpathEvaluator').controller('DatasetCtrl', function($scope, $
 					// Feedback to user & re-enable control buttons
 					$scope.taskNew.uploadState = 2;
 
-					// TODO If the user wishes to be redirected afterwards
+					// If the user wishes to be redirected afterwards
 					if($scope.taskNew.redirect == true) {
 						$timeout(function() {
 							$state.go(
-								'research.task',
-								{ id: $scope.taskNew.id }
+								'research.dataset.task',
+								{
+									datasetId: $state.params.datasetId,
+									taskId: $scope.taskNew.id
+								}
 							);
 						}, 5000);
 					}

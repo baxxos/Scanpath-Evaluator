@@ -102,9 +102,11 @@
                 <h4 class="panel-title">Success:</h4>
             </div>
             <div class="panel-body">
-                <p>Your new dataset task was created successfully.
-                    <span ng-show="taskNew.redirect">You will be redirected to the new task overview automatically
-                    in 5 seconds.</span>
+                <p>
+                    Your new dataset task was created successfully.
+                    <span ng-show="taskNew.redirect">
+                        You will be redirected to the new task overview automatically in 5 seconds.
+                    </span>
                 </p>
                 <p ng-show="taskNew.redirect">If you want to continue now
                     <a ng-href="#/research/dataset/{{ dataset.id }}/task/{{ taskNew.id }}">click here</a>.
