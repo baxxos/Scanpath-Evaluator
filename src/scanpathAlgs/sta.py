@@ -2,7 +2,7 @@ import src.scanpathUtils as spUtil
 import src.stringEditAlgs as seAlg
 
 
-def getNumberedSequence(Sequence, dataset_task):
+def getNumberedSequence(Sequence, aoi_data):
     numberedSequence = []
     numberedSequence.append([Sequence[0][0], 1, Sequence[0][1]])
 
@@ -13,7 +13,7 @@ def getNumberedSequence(Sequence, dataset_task):
             numberedSequence.append([Sequence[y][0], getSequenceNumber(Sequence[0:y], Sequence[y][0]), Sequence[y][1]])
 
     AoIList = getExistingAoIListForSequence(numberedSequence)
-    AoINames = dataset_task.aoi_data
+    AoINames = aoi_data
     AoINames = [w[5] for w in AoINames]
     newSequence = []
 
@@ -229,15 +229,15 @@ def getValueableAoIs(AoIList):
 
 
 # STA Algorithm
-def run_sta(dataset_task):
-    # Preliminary Stage
-    mySequences = spUtil.get_raw_sequences(dataset_task)
+def run_sta(raw_sequences, aoi_data):
+    # Preliminary Stage is already complete - sequences are passed via argument
+    # mySequences = spUtil.get_raw_sequences(dataset_task)
 
     # First-Pass
     mySequences_num = {}
-    keys = mySequences.keys()
+    keys = raw_sequences.keys()
     for y in range(0, len(keys)):
-        mySequences_num[keys[y]] = getNumberedSequence(mySequences[keys[y]], dataset_task)
+        mySequences_num[keys[y]] = getNumberedSequence(raw_sequences[keys[y]], aoi_data)
 
     myImportanceThreshold = calculateImportanceThreshold(mySequences_num)
     myImportantAoIs = updateAoIsFlag(getNumberDurationOfAoIs(mySequences_num), myImportanceThreshold)
@@ -259,7 +259,7 @@ def run_sta(dataset_task):
     for y in range(0, len(myFinalList)):
         commonSequence.append([myFinalList[y][0], int(myFinalList[y][3] / myFinalList[y][2])])
 
-    formatted_sequences = dataset_task.format_sequences(mySequences)
+    formatted_sequences = spUtil.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)
@@ -272,7 +272,7 @@ def run_sta(dataset_task):
         common_scanpath_str += fixation[0]
 
     res_data = {
-        'identifier': 'sta',
+        'identifier': 'STA',
         'fixations': common_scanpath,
         'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }

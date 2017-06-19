@@ -310,7 +310,8 @@ def get_dataset_task():
                 'name': task.name,
                 'scanpaths': task.scanpath_data_formatted,
                 'visuals': task.visuals,
-                'aois': task.aoi_data
+                'aois': task.aoi_data,
+                'datasetName': task.dataset.name
             })
     except orm.exc.NoResultFound:
         return handle_error('Incorrect task ID')
@@ -351,12 +352,15 @@ def add_dataset_task():
                            description=json_data['description'],
                            dataset_id=dataset.id)
 
-        # Get relevant data from the input file
+        # Get relevant data from the scanpaths input file
         task.scanpath_data_raw = fileFormat.process_scanpaths(file_scanpaths, keep_cols, 100, task.url)
 
-        # Additional data to be saved in the DB along with the previously processed raw scanpath data
+        # Get relevant data from the AOIs input file
         task.aoi_data = fileFormat.process_aois(file_regions)
-        task.scanpath_data_formatted = spUtil.get_formatted_sequences(task)
+
+        # Additional data to be saved in the DB along with the previously processed raw scanpath data
+        raw_sequences = spUtil.get_raw_sequences(task)
+        task.scanpath_data_formatted = spUtil.get_formatted_sequences(raw_sequences)
 
         # Commit DB changes
         dataset.tasks.append(task)
@@ -487,10 +491,11 @@ def get_sta_common():
 
         # Load additional required data and perform run_sta
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(sta.run_sta(task))
+        raw_sequences = spUtil.get_raw_sequences(task)
+
+        return handle_success(sta.run_sta(raw_sequences, task.aoi_data))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -512,10 +517,11 @@ def get_emine_common():
 
         # Load additional required data and perform run_sta
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(emine.run_emine(task))
+        raw_sequences = spUtil.get_raw_sequences(task)
+
+        return handle_success(emine.run_emine(raw_sequences))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -537,10 +543,11 @@ def get_dotplot_common():
 
         # Load additional required data and perform run_sta
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
-        task.load_data()
         task.exclude_participants(json_data['excludedScanpaths'])
 
-        return handle_success(dotplot.run_dotplot(task))
+        raw_sequences = spUtil.get_raw_sequences(task)
+
+        return handle_success(dotplot.run_dotplot(raw_sequences))
     except KeyError:
         return handle_error('Task ID is missing')
     except orm.exc.NoResultFound:
@@ -564,11 +571,14 @@ def get_alg_comparison():
         task = db_session.query(DatasetTask).filter(DatasetTask.id == task_id).one()
         task.load_data()
 
+        # Load scanpaths (for passing them to the algorithms)
+        raw_sequences = spUtil.get_raw_sequences(task)
+
         # Check for any excluded algorithms and push the rest into the results array
         return handle_success([
-            sta.run_sta(task) if 'sta' not in json_data['excludedAlgs'] else spUtil.run_empty('sta'),
-            dotplot.run_dotplot(task) if 'dotplot' not in json_data['excludedAlgs'] else spUtil.run_empty('dotplot'),
-            emine.run_emine(task) if 'emine' not in json_data['excludedAlgs'] else spUtil.run_empty('emine')
+            sta.run_sta(raw_sequences, task.aoi_data) if 'STA' not in json_data['excludedAlgs'] else spUtil.run_empty('STA'),
+            dotplot.run_dotplot(raw_sequences) if 'Dotplot' not in json_data['excludedAlgs'] else spUtil.run_empty('Dotplot'),
+            emine.run_emine(raw_sequences) if 'eMINE' not in json_data['excludedAlgs'] else spUtil.run_empty('eMINE')
         ])
     except KeyError:
         return handle_error('Task ID is missing')

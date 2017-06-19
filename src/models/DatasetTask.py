@@ -73,20 +73,4 @@ class DatasetTask(Base):
 
         self.visuals = images_list
 
-    def format_sequences(self, sequences):
-        """
-        {'01': [[A, 150], [B, 250]], '02': ...} gets transformed into:
-        [{'identifier': '01', 'fixations': [[A, 150], [B, 250]]}, {'identifier': '02' ... }]
-        """
-        formatted_sequences = []
-        keys = sequences.keys()
-        for it in range(0, len(sequences)):
-            act_rec = {
-                'identifier': keys[it],
-                'fixations': sequences[keys[it]]
-            }
-            formatted_sequences.append(act_rec)
-
-        return formatted_sequences
-
 

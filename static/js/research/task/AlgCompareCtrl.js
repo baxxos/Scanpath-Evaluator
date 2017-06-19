@@ -14,7 +14,10 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 				$scope.task.scanpaths = response.data.load.scanpaths;
 				$scope.task.visuals = response.data.load.visuals;
 				$scope.task.aois = response.data.load.aois;
-				$scope.task.name = response.data.load.name;  // For breadcrumbs navigation
+
+				// For displaying breadcrumbs, etc.
+				$scope.task.name = response.data.load.name;
+				$scope.dataset.name = response.data.load.datasetName;
 
 				// Load the canvas background image again to get its natural resolution
 				$scope.canvasInfo.backgroundImg = new Image();
@@ -57,8 +60,8 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 		var similaritySum = 0, total = 0;
 
 		for(var i = 0; i < algResults.length; i++) {
-			// We don't want to consider algorithms which failed to find a common scanpath
-			if(algResults[i].simToCommon == 0) {
+			// We don't consider algorithms which failed to find a common scanpath
+			if(!algResults[i].simToCommon) {
 				continue;
 			}
 
@@ -399,6 +402,9 @@ angular.module('ScanpathEvaluator').controller('AlgCompareCtrl', function($scope
 			// Remember last user action to determine modal canvas content
 			lastAction: ''
 		};
+
+		// For storing parent dataset data
+		$scope.dataset = {};
 
 		// Variables controlling hide/show/content properties of some GUI elements
 		$scope.guiParams = {

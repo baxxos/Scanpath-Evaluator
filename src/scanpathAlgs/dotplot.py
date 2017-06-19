@@ -307,7 +307,6 @@ def create_sequences_by_mod(my_dataset, mod):
     return my_func(my_dataset)
 
 
-
 def dotplotListofLists(sequenceX, sequenceY):
     # fill matrix with zeroes
     dotplotMatrix = [[0 for x in sequenceX] for y in sequenceY]
@@ -389,10 +388,10 @@ def findCommonSequence(my_str_sequences):
     return string_sequences[keys[0]]
 
 
-def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
+def run_dotplot(raw_sequences, simplify=True, fix_dur_threshold=None, mod=1):
     """
     Args:
-        dataset_task: scanpath data
+        raw_sequences: scanpath data
         simplify: urcuje ci redukovat opakujuce sa fixacie za sebou na jednu
         fix_dur_threshold: minimalna dlzka trvania fixacie
         mod: 1 vytvori standardny scanpath z AOI
@@ -415,9 +414,7 @@ def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
         my_sequences = simplifySequence(my_sequences)
     """
 
-    my_sequences = spUtil.get_raw_sequences(dataset_task)
-
-    string_sequences = getStringRepresentation(my_sequences)
+    string_sequences = getStringRepresentation(raw_sequences)
     common_scanpath_str = findCommonSequence(string_sequences)
 
     common_scanpath = []
@@ -432,7 +429,7 @@ def run_dotplot(dataset_task, simplify=True, fix_dur_threshold=None, mod=1):
         })
 
     res_data = {
-        'identifier': 'dotplot',
+        'identifier': 'Dotplot',
         'fixations': common_scanpath,
         'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }

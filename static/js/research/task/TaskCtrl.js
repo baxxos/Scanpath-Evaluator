@@ -14,7 +14,10 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 				$scope.task.scanpaths = response.data.load.scanpaths;
 				$scope.task.visuals = response.data.load.visuals;
 				$scope.task.aois = response.data.load.aois;
+
+				// For displaying breadcrumbs, etc.
 				$scope.task.name = response.data.load.name;
+				$scope.dataset.name = response.data.load.datasetName;
 
 				// Load the canvas background image again to get its natural resolution
 				$scope.canvasInfo.backgroundImg = new Image();
@@ -391,6 +394,9 @@ angular.module('ScanpathEvaluator').controller('TaskCtrl', function($scope, $roo
 			// Remember last user action to determine modal canvas content
 			lastAction: ''
 		};
+
+		// For storing parent dataset data
+		$scope.dataset = {};
 
 		// Variables controlling hide/show/content properties of some GUI elements
 		$scope.guiParams = {

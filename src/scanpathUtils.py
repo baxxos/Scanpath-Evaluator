@@ -126,11 +126,9 @@ def get_closer_aoi(fixation, all_aois, possible_aois):
 
 
 # Basic functionality used to load scanpath sequences and their properties in default format
-# TODO the DatasetTask format has changed - participants/aois are stored in the DB, pass them as attributes instead
-# TODO also pass sequences as attribute
 def get_raw_sequences(dataset_task):
     """
-    Converts the string represented sequences to a sensible dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. }
+    Converts the JSON sequences from the DB into a Python dict of arrays: {'ID1': [['F', '383'], ['G', '150']], .. }
     """
 
     # Try to set error rate area (set to 0 if any parameters are missing)
@@ -156,15 +154,30 @@ def get_raw_sequences(dataset_task):
     return my_sequences
 
 
-# TODO don't pass whole task object as an attribute, only sequences
-def get_formatted_sequences(dataset_task):
-    raw_sequences = get_raw_sequences(dataset_task)
-    formatted_sequences = dataset_task.format_sequences(raw_sequences)
+def get_formatted_sequences(raw_sequences):
+    formatted_sequences = format_sequences(raw_sequences)
 
     # Additional info - calculate edit distances/similarity between dataset scanpaths
     formatted_sequences = calc_edit_distances(formatted_sequences)
     formatted_sequences = calc_max_similarity(formatted_sequences)
     formatted_sequences = calc_min_similarity(formatted_sequences)
+
+    return formatted_sequences
+
+
+def format_sequences(raw_sequences):
+    """
+    {'01': [[A, 150], [B, 250]], '02': ...} gets transformed into:
+    [{'identifier': '01', 'fixations': [[A, 150], [B, 250]]}, {'identifier': '02' ... }]
+    """
+    formatted_sequences = []
+    keys = raw_sequences.keys()
+    for it in range(0, len(raw_sequences)):
+        act_rec = {
+            'identifier': keys[it],
+            'fixations': raw_sequences[keys[it]]
+        }
+        formatted_sequences.append(act_rec)
 
     return formatted_sequences
 
@@ -230,7 +243,7 @@ def run_custom(dataset_task, custom_scanpath):
     """ Reversed common scanpath algorithm - the "common" scanpath is known from the start. """
 
     raw_sequences = get_raw_sequences(dataset_task)
-    formatted_sequences = dataset_task.format_sequences(raw_sequences)
+    formatted_sequences = format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths
     scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)

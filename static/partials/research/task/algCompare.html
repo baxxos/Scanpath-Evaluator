@@ -22,7 +22,7 @@
         <!-- Calculated common scanpath -->
         <div class="row" ng-show="!userInputs.isCustomScanpath">
             <div class="col-md-12">
-                <h4>Average similarity to the produced common scanpath:</h4>
+                <h4>Average total similarity of the common scanpaths:</h4>
                 <p>
                     <span ng-show="task.avgTotalSimilarity > 0">
                         {{ task.avgTotalSimilarity | number: 2 }}%
@@ -30,7 +30,7 @@
                     <span ng-hide="task.avgTotalSimilarity">N/A</span>
                 </p>
 
-                <h4>Average length of the produced common scanpaths:</h4>
+                <h4>Average total length of the common scanpaths:</h4>
                 <p>
                     <span ng-show="task.avgTotalLength > 0">
                         {{ task.avgTotalLength | number: 1 }} fixation(s)
@@ -95,7 +95,7 @@
                         <th ng-click="setSort('identifier')">Name</th>
                         <th>Controls</th>
                         <th ng-click="setSort('fixations.length')">Scanpath length</th>
-                        <th ng-click="setSort('simToCommon')">Similarity to common</th>
+                        <th ng-click="setSort('simToCommon')">AVG similarity</th>
                     </tr>
                 </thead>
                 <tbody ng-repeat="algResult in task.algResults | orderBy: [task.sortBy, 'identifier'] | undefToEndFilter: task.sortBy"

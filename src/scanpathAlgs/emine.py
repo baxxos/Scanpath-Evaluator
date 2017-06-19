@@ -17,9 +17,8 @@ def simplify_scanpath(scanpath):
 
 
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
-def run_emine(dataset_task):
-    my_sequences = spUtil.get_raw_sequences(dataset_task)
-    formatted_sequences = dataset_task.format_sequences(my_sequences)
+def run_emine(raw_sequences):
+    formatted_sequences = spUtil.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)
     scanpath_strs = seAlg.convert_to_str_array(formatted_sequences)
@@ -65,7 +64,7 @@ def run_emine(dataset_task):
         common_scanpath_arr.append([common_scanpath_str[i], 0])
 
     res_data = {
-        'identifier': 'emine',
+        'identifier': 'eMINE',
         'fixations': common_scanpath_arr,
         'similarity': seAlg.calc_similarity_to_common(scanpath_strs, common_scanpath_str)
     }
