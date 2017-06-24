@@ -1,6 +1,14 @@
+import os
+
+# Database connection
+if os.environ.get('SE_DATABASE_URL') is None:
+    DB_URI = 'postgresql://postgres:postgres@localhost/scanpath-evaluator'
+else:
+    DB_URI = os.environ['SE_DATABASE_URL']
+
 # Basic app configuration
 config = {
-    'SQLALCHEMY_DATABASE_URI': 'postgresql://postgres:postgres@localhost/scanpath-evaluator',
+    'SQLALCHEMY_DATABASE_URI': DB_URI,
     'DATASET_FOLDER': 'datasets',
     'DATASET_PREFIX': 'dataset',
     'TASK_PREFIX': 'task',
