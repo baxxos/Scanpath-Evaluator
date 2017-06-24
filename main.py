@@ -19,10 +19,10 @@ from src.scanpathAlgs import sta, emine, dotplot
 # App configuration
 app = Flask(__name__)
 app.secret_key = os.urandom(24).encode('hex')
-app.debug = True
+app.debug = False
 
 # For mocking sessions etc.
-dev_mode = True
+dev_mode = False
 
 
 @app.before_request
