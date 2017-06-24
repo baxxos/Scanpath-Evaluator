@@ -19,9 +19,9 @@ def simplify_scanpath(scanpath):
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
 def run_emine(raw_sequences):
     """
-    :param
+    Args:
         raw_sequences: a Python dict of lists - {'ID1': [['F', '383'], ['G', '150']], 'ID2': .. }
-    :return:
+    Returns:
         identifier: for client-side purposes
         fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
         similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }

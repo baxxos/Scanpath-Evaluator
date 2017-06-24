@@ -390,7 +390,7 @@ def findCommonSequence(my_str_sequences):
 
 def run_dotplot(raw_sequences, simplify=True, fix_dur_threshold=None, mod=1):
     """
-    :param
+    Args:
         raw_sequences: a Python dict of lists - {'ID1': [['F', '383'], ['G', '150']], 'ID2': .. }
         simplify: simplify repeated fixations on the same AOI into one
         fix_dur_threshold: minimum fixation duration threshold
@@ -399,7 +399,7 @@ def run_dotplot(raw_sequences, simplify=True, fix_dur_threshold=None, mod=1):
              3 - vytvori scanpath na zaklade dlzky trvania fixacii
              4 - vytvori scanpath na zaklade relativnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
              5 - vytvori scanpath na zaklade absolutnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
-    :return:
+    Returns:
         identifier: for client-side purposes
         fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
         similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }
