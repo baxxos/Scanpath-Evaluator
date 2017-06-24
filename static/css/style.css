@@ -1,0 +1,266 @@
+/*** Imports ***/
+/*** Colors ***/
+/*** Globals ***/
+html {
+  min-height: 100%; }
+
+body {
+  font-size: 16px;
+  min-height: 100%;
+  padding-bottom: 20px; }
+
+footer div {
+  margin-bottom: 15px; }
+
+#navbarLogo {
+  margin-right: 15px; }
+
+.collapsing.in-remove-active {
+  overflow: hidden; }
+
+/*** Utilities **/
+.transparent {
+  opacity: 0; }
+
+.semi-transparent {
+  opacity: 0.5; }
+
+.italic {
+  font-style: italic; }
+
+.bold {
+  font-weight: bold; }
+
+.text-white {
+  color: #f8f9fa; }
+
+.glyphicon.spinning {
+  animation: spin 1s infinite ease;
+  -webkit-animation: spin-webkit 1s infinite ease;
+  margin-left: 5px; }
+
+@keyframes spin {
+  from {
+    transform: scale(1) rotate(0deg); }
+  to {
+    transform: scale(1) rotate(360deg); } }
+@-webkit-keyframes spin-webkit {
+  from {
+    -webkit-transform: rotate(0deg); }
+  to {
+    -webkit-transform: rotate(360deg); } }
+/*** Modals ***/
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: pointer; }
+
+.modal-close {
+  color: #c92a2a;
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1; }
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 15px;
+  border: 1px solid #888;
+  width: 80%;
+  cursor: default; }
+
+/*** Forms ***/
+#loginPanelMain .input-group, #newDatasetPanel .input-group, #editDatasetPanel .input-group, #registerPanel .input-group {
+  min-width: 0;
+  width: 100%; }
+#loginPanelMain .panel-heading a, #newDatasetPanel .panel-heading a, #editDatasetPanel .panel-heading a, #registerPanel .panel-heading a {
+  text-decoration: underline; }
+#loginPanelMain button, #newDatasetPanel button, #editDatasetPanel button, #registerPanel button {
+  width: 50%; }
+#loginPanelMain #register-prompt, #newDatasetPanel #register-prompt, #editDatasetPanel #register-prompt, #registerPanel #register-prompt {
+  margin-top: 15px; }
+
+form .input-required {
+  color: #c92a2a; }
+form label {
+  font-weight: normal; }
+
+select, optgroup {
+  font-size: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 4px; }
+  select option, optgroup option {
+    font-size: 16px; }
+
+optgroup {
+  padding-top: 6px;
+  padding-bottom: 6px; }
+
+#googleLoginBtn > div {
+  margin: auto;
+  width: 50%; }
+
+/*** Task related elements ***/
+#scanpathAlgDescription > p {
+  margin-bottom: 0px; }
+
+#scanpathTableWrapper {
+  max-height: 500px;
+  overflow: auto;
+  margin-bottom: 20px;
+  margin-top: 20px; }
+
+#scanpathTable {
+  font-size: 14px; }
+  #scanpathTable td, #scanpathTable th {
+    text-align: left; }
+  #scanpathTable th:not(:nth-child(2)):hover {
+    cursor: pointer;
+    text-decoration: underline; }
+  #scanpathTable tr:hover .userScanpathId {
+    text-decoration: underline; }
+  #scanpathTable .row-excluded {
+    background-color: #fff5f5; }
+    #scanpathTable .row-excluded td:not(:nth-child(2)), #scanpathTable .row-excluded .userScanpathFixations {
+      opacity: 0.25; }
+  #scanpathTable .row-selected {
+    background-color: #e8f7ff; }
+  #scanpathTable .control-include, #scanpathTable .control-exclude, #scanpathTable .control-expand, #scanpathTable .control-visualize {
+    margin-right: 5px;
+    cursor: pointer;
+    opacity: 0.25;
+    border-radius: 4px;
+    padding: 2px;
+    color: white; }
+    #scanpathTable .control-include:focus, #scanpathTable .control-include:active, #scanpathTable .control-include:hover, #scanpathTable .control-exclude:focus, #scanpathTable .control-exclude:active, #scanpathTable .control-exclude:hover, #scanpathTable .control-expand:focus, #scanpathTable .control-expand:active, #scanpathTable .control-expand:hover, #scanpathTable .control-visualize:focus, #scanpathTable .control-visualize:active, #scanpathTable .control-visualize:hover {
+      opacity: 1; }
+  #scanpathTable .control-include {
+    background-color: #2b8a3e; }
+  #scanpathTable .control-exclude {
+    background-color: #c92a2a; }
+  #scanpathTable .control-visualize {
+    color: #1862ab;
+    background-color: #fff;
+    border-color: #1862ab;
+    border: 1px solid; }
+  #scanpathTable .control-expand {
+    color: #1862ab;
+    background-color: #fff;
+    border-color: #1862ab;
+    border: 1px solid; }
+    #scanpathTable .control-expand:focus, #scanpathTable .control-expand:active, #scanpathTable .control-expand:hover {
+      background-color: #e8f7ff;
+      font-weight: bold; }
+  #scanpathTable .row-container-expanded {
+    background-color: #efefef; }
+  #scanpathTable .userScanpathId:hover {
+    cursor: pointer;
+    text-decoration: underline; }
+  #scanpathTable .userScanpathFixations {
+    text-align: justify; }
+
+#scanpathTableControls .btn-group {
+  margin-right: 15px;
+  margin-bottom: 10px; }
+
+#displayControls {
+  margin-bottom: 15px; }
+  #displayControls button {
+    margin-bottom: 5px; }
+
+#aoiLegend ul {
+  list-style-type: circle; }
+#aoiLegend .well {
+  overflow: auto;
+  max-height: 250px; }
+#aoiLegend .aoiFullName {
+  font-style: italic; }
+
+#scanpathCanvas {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 100%;
+  transition: opacity 0.3s ease-in-out;
+  max-width: 100%;
+  cursor: pointer; }
+
+#scanpathCanvasModal {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 100%; }
+
+.canvasWrapper {
+  max-width: 100%; }
+
+/*** Dataset related screens **/
+#tasksTable .row-container-expanded {
+  background-color: #efefef; }
+#tasksTable .input-group {
+  width: 100%; }
+
+#newTaskPanel .input-group {
+  width: 100%; }
+#newTaskPanel hr {
+  margin-top: 10px; }
+#newTaskPanel #newTaskRedirect, #newTaskPanel #newTaskUploadStates {
+  margin-bottom: 0px; }
+  #newTaskPanel #newTaskRedirect div.checkbox, #newTaskPanel #newTaskUploadStates div.checkbox {
+    margin-bottom: 0px; }
+
+#datasetNewEnvironment, #datasetEditEnvironment {
+  cursor: pointer; }
+  #datasetNewEnvironment #envHeadingText:hover, #datasetEditEnvironment #envHeadingText:hover {
+    text-decoration: underline; }
+
+#datasetEditControls {
+  margin-bottom: 15px; }
+
+.fake-label {
+  margin: 0 0 5px 0; }
+
+#editDatasetPanel hr {
+  margin-top: 5px; }
+#editDatasetPanel button {
+  width: auto; }
+
+label input[type="file"] {
+  visibility: hidden;
+  width: 0;
+  height: 0; }
+
+#datasetNavHeading {
+  font-weight: bold; }
+
+#addTreeData {
+  padding: 3px 10px;
+  border-radius: 4px; }
+  #addTreeData:hover {
+    background-color: #eee; }
+  #addTreeData .glyphicon-plus {
+    padding: 0 2px; }
+
+/*** Landing page ***/
+.landingHeroImage {
+  background-image: url("/static/images/landing.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center; }
+
+#landingContainer {
+  margin-top: -20px; }
+  #landingContainer #landingJumbotron {
+    background: transparent; }
+    #landingContainer #landingJumbotron a[role='button'] {
+      margin-bottom: 15px; }
+
+/*# sourceMappingURL=style.css.map */

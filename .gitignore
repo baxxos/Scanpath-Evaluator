@@ -67,6 +67,5 @@ src/Environment.pyc
 
 # SCSS/CSS mapping
 static/css/style.css.map
-static/css/style.css
 static/css/open-color.css
 static/css/open-color.css.map

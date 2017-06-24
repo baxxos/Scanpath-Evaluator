@@ -590,5 +590,4 @@ def get_alg_comparison():
 
 
 if __name__ == '__main__':
-    # App is threaded=true due to slow loading times on localhost
-    app.run(host='localhost', port=8888, threaded=True)
+    app.run(host='localhost')
