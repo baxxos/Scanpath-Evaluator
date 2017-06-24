@@ -366,7 +366,7 @@ def add_dataset_task():
         dataset.tasks.append(task)
         db_session.commit()
 
-        # Create a folder for this task's static images
+        # Create a folder for this tasks static images
         fileFormat.create_task_img_folder(dataset, task, file_bg_image)
 
         return handle_success({
