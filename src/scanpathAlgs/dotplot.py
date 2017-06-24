@@ -390,19 +390,23 @@ def findCommonSequence(my_str_sequences):
 
 def run_dotplot(raw_sequences, simplify=True, fix_dur_threshold=None, mod=1):
     """
-    Args:
-        raw_sequences: scanpath data
-        simplify: urcuje ci redukovat opakujuce sa fixacie za sebou na jednu
-        fix_dur_threshold: minimalna dlzka trvania fixacie
-        mod: 1 vytvori standardny scanpath z AOI
-             2 vytvori scanpah na zaklade dlzky sakad (zatial nefunguje, nemame udaje o sakadach)
-             3 vytvori scanpath na zaklade dlzky trvania fixacii
-             4 vytvori scanpath na zaklade relativnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
-             5 vytvori scanpath na zaklade absolutnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
+    :param
+        raw_sequences: a Python dict of lists - {'ID1': [['F', '383'], ['G', '150']], 'ID2': .. }
+        simplify: simplify repeated fixations on the same AOI into one
+        fix_dur_threshold: minimum fixation duration threshold
+        mod: 1 - vytvori standardny scanpath z AOI
+             2 - vytvori scanpah na zaklade dlzky sakad (zatial nefunguje, nemame udaje o sakadach)
+             3 - vytvori scanpath na zaklade dlzky trvania fixacii
+             4 - vytvori scanpath na zaklade relativnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
+             5 - vytvori scanpath na zaklade absolutnych uhlov sakad (zatial nefunguje, nemame udaje o sakadach)
+    :return:
+        identifier: for client-side purposes
+        fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
+        similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }
     """
 
     # The dotplot author originally provided mods for simplifying sequences and setting their min threshold
-    # However, our system already does that
+    # However, our system already does that automatically when uploading any scanpath data
     """
     my_sequences = create_sequences_by_mod(dataset_task, mod)
     my_sequences = getArrayRepresentationOfSequence(my_sequences)

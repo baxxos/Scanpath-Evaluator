@@ -230,8 +230,18 @@ def getValueableAoIs(AoIList):
 
 # STA Algorithm
 def run_sta(raw_sequences, aoi_data):
-    # Preliminary Stage is already complete - sequences are passed via argument
-    # mySequences = spUtil.get_raw_sequences(dataset_task)
+    """
+    :param
+        raw_sequences: a Python dict of lists - {'ID1': [['F', '383'], ['G', '150']], 'ID2': .. }
+        aoi_data: for additional scanpath processing - [['fullAoiName', xFrom, width, yFrom, height, 'shortName'] .. ]
+    :return:
+        identifier: for client-side purposes
+        fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
+        similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }
+    """
+
+    # Preliminary Stage is already complete - sequences are passed in via argument
+    print aoi_data
 
     # First-Pass
     mySequences_num = {}

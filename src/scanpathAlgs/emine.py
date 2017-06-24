@@ -18,6 +18,15 @@ def simplify_scanpath(scanpath):
 
 # eMINE algorithm (https://bop.unibe.ch/index.php/JEMR/article/view/2430)
 def run_emine(raw_sequences):
+    """
+    :param
+        raw_sequences: a Python dict of lists - {'ID1': [['F', '383'], ['G', '150']], 'ID2': .. }
+    :return:
+        identifier: for client-side purposes
+        fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
+        similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }
+    """
+
     formatted_sequences = spUtil.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)

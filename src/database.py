@@ -10,8 +10,8 @@ Base = declarative_base()
 engine = create_engine(config['SQLALCHEMY_DATABASE_URI'], echo=False)
 
 # Create missing tables etc:
-# Import missing class into main.py and add the following line after the class declaration
-Base.metadata.create_all(engine)
+# Example: import the missing class into main.py and add the following line just after the class declaration
+# Base.metadata.create_all(engine)
 
 # Construct session manager
 Session = sessionmaker(bind=engine)

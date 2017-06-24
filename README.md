@@ -1,6 +1,16 @@
 # Scanpath Evaluator
 
-## DEPENDENCIES:
+## Datasets
+To keep this repository clean, all datasets containing TSV-formatted scanpath & AOI data have been moved to [Google Drive](https://drive.google.com/open?id=0B9F-9_QAlgdGZFk1X1lzdExqZFk). You can also download them already zipped together [from here](https://drive.google.com/open?id=0B9F-9_QAlgdGY2xZOHB0SGxHSzg).
+
+## Local install
+In order to run the app locally, just clone this repository, download required packages (see below) and fire it up via your IDE (`main.py`) or [command line](http://flask.pocoo.org/docs/0.12/cli/). 
+
+However, in order to run it properly, you will also need to set up the PostgreSQL database. All tables can be created automatically via [SQLAlchemy's ORM](http://docs.sqlalchemy.org/en/latest/orm/tutorial.html#create-a-schema) - see the `Base.metadata.create_all(engine)` command in `database.py` (application re-launch is required).
+
+If you want to save yourself some time, [here](https://drive.google.com/open?id=0B9F-9_QAlgdGQjFnUEUxVHpCc00) is a template database backup containing 1 guest user and all the datasets linked above. You can use this file to set up your database within seconds by using the _pgAdmin_ app or CLI. The guest user credentials can be found in the `config.py` file.
+
+## Dependencies:
 
 ### Back-end:
 * Python (2.7.X)
@@ -21,7 +31,7 @@
 * [ng-csv](https://github.com/asafdav/ng-csv") - for exporting user calculations
     * requires [Angular-sanitize](https://cdnjs.com/libraries/angular-sanitize/1.5.11)
 
-## CONSTRAINTS:
+## Constraints:
 * File size - 100MB for scanpath data/10MB for AOI data
 * AOI count - maximum of 52 AOIs (26 lowercase + 26 uppercase characters)
 * AOI shape - exactly 4 vertices for each AOI (rect/square)
