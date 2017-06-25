@@ -1,10 +1,13 @@
 # Scanpath Evaluator
+![](https://reposs.herokuapp.com/?path=baxxos/Scanpath-Evaluator&color=brightgreen)
+
+[Currently hosted on Heroku](https://scanpath-evaluator.herokuapp.com/#/)
 
 ## Datasets
 To keep this repository clean, all datasets containing TSV-formatted scanpath & AOI data have been moved to [Google Drive](https://drive.google.com/open?id=0B9F-9_QAlgdGZFk1X1lzdExqZFk). You can also download them already zipped together [from here](https://drive.google.com/open?id=0B9F-9_QAlgdGY2xZOHB0SGxHSzg).
 
 ## Local install
-In order to run the app locally, just clone this repository, download required packages (see below) and fire it up via your IDE (`main.py`) or [command line](http://flask.pocoo.org/docs/0.12/cli/). 
+In order to run the app locally, clone this repository (development branch), download required packages (see below), compile SCSS files to CSS and fire it up via your IDE (`main.py`) or [command line](http://flask.pocoo.org/docs/0.12/cli/). 
 
 However, in order to run it properly, you will also need to set up the PostgreSQL database. All tables can be created automatically via [SQLAlchemy's ORM](http://docs.sqlalchemy.org/en/latest/orm/tutorial.html#create-a-schema) - see the `Base.metadata.create_all(engine)` command in `database.py` (application re-launch is required).
 
