@@ -18,7 +18,7 @@ from src.scanpathAlgs import sta, emine, dotplot
 
 # App configuration
 app = Flask(__name__)
-app.secret_key = os.urandom(24).encode('hex')
+app.secret_key = '\xe4<IF\\w]A;s\xc84$\x99\x1e\xeb\x1e\xd2D\x9a\x05\x03\x86\x8e'
 app.debug = False
 
 # For mocking sessions etc.
