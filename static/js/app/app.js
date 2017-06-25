@@ -21,18 +21,18 @@ angular.module('ScanpathEvaluator').run(function($rootScope, $cookies, $state) {
 		$rootScope.isNavCollapsed = true;
 
 		// Redirect to login page if not logged in and trying to access a restricted page
-		var allowed_states = ['login', 'register', 'index'];
-		var allowedPage = false;
+		var allowed_states = ['login', 'register', 'index', 'faq'];
+		var isPageAllowed = false;
 
 		for (var i = 0; i < allowed_states.length; i++) {
 			if ($state.includes(allowed_states[i])) {
-				allowedPage = true;
+				isPageAllowed = true;
 			}
 		}
 
 		// Redirect when an anonymous user is attempting to access private pages
 		var loggedIn = $rootScope.globals.currentUser;
-		if (!allowedPage && !loggedIn) {
+		if (!isPageAllowed && !loggedIn) {
 			$state.go('login');
 		}
 	});
