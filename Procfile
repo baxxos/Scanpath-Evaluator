@@ -1,1 +1,1 @@
-web: export FLASK_APP=main; flask run
+web: gunicorn main:app
