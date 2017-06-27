@@ -19,8 +19,11 @@ from src.scanpathAlgs import sta, emine, dotplot
 
 # App configuration
 app = Flask(__name__)
-app.secret_key = '\xe4<IF\\w]A;s\xc84$\x99\x1e\xeb\x1e\xd2D\x9a\x05\x03\x86\x8e'
+app.secret_key = config['FLASK_SECRET_KEY']
 app.debug = False
+
+# For uploading & retrieving user-uploaded images
+imgur_client = ImgurClient(config['IMGUR_CLIENT_ID'], config['IMGUR_CLIENT_SECRET'])
 
 # For mocking sessions etc.
 dev_mode = False
