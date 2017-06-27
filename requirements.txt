@@ -4,3 +4,4 @@ SQLAlchemy==1.1.9
 Flask==0.12.2
 psycopg2==2.6.2
 gunicorn==19.7.1
+imgurpython=1.1.7
