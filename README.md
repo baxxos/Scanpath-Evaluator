@@ -4,7 +4,7 @@
 [Currently hosted on Heroku](https://scanpath-evaluator.herokuapp.com/#/)
 
 ## Datasets
-To keep this repository clean, all datasets containing TSV-formatted scanpath & AOI data have been moved to [Google Drive](https://drive.google.com/open?id=0B9F-9_QAlgdGZFk1X1lzdExqZFk). You can also download them already zipped together [from here](https://drive.google.com/open?id=0B9F-9_QAlgdGY2xZOHB0SGxHSzg).
+To keep this repository clean, all datasets containing TSV-formatted scanpath & AOI data have been moved to [Google Drive](https://drive.google.com/open?id=0B9F-9_QAlgdGZFk1X1lzdExqZFk). You can also download them already zipped together [from here](https://drive.google.com/file/d/0B9F-9_QAlgdGeE9uS3JxOExqWTA/view).
 
 ## Local install
 In order to run the app locally, clone this repository (development branch), download required packages (see below), compile SCSS files to CSS and fire it up via your IDE (`main.py`) or [command line](http://flask.pocoo.org/docs/0.12/cli/). 

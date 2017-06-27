@@ -4,6 +4,7 @@ import traceback
 
 from datetime import timedelta, datetime
 from flask import Flask, render_template, request, session
+from imgurpython import ImgurClient
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
 
