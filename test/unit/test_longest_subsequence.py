@@ -6,20 +6,24 @@ import stringEditAlgs as stredit
 
 
 @pytest.mark.parametrize("str1, str2, expected", [
-    ("hello", "hello", 5),
-    ("hello", "hhelloo", 5),
-    ("hello", "ello", 4),
-    ("hello", "llo", 3),
-    ("hello", "lo", 2),
-    ("hello", "o", 1),
+    ("hello", "hello", "hello"),
+    ("hello", "h|e|l|l|o", "hello"),
+    ("hello", "e|l|l|o", "ello"),
+    ("hello", "l|l|o", "llo"),
+    ("hello", "l|o", "lo"),
+    ("hello", "o", "o"),
 ])
-def test_lcs_if_both_strings_are_valid(str1, str2, expected):
-    stredit.get_longest_common_subsequence()
+def test_longest_subsequence_if_both_strings_are_valid(str1, str2, expected):
+    actual = stredit.get_longest_common_subsequence(str1, str2)
+
+    assert actual == expected, \
+        "Longest common subsequence for string '{}' and '{}' should have been {}, but it was {}" \
+        .format(str1, str2, expected, actual)
 
 
-def test_lcs_if_one_string_is_empty():
+def test_longest_subsequence_if_one_string_is_empty():
     pass
 
 
-def test_lcs_if_both_strings_are_empty():
+def test_longest_subsequence_if_both_strings_are_empty():
     pass
