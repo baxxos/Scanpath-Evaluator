@@ -241,7 +241,7 @@ def run_sta(raw_sequences, aoi_data):
     """
 
     # Preliminary Stage is already complete - sequences are passed in via argument
-    print aoi_data
+    # print aoi_data
 
     # First-Pass
     mySequences_num = {}

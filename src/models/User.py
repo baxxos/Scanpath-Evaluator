@@ -4,9 +4,9 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship, load_only
 
-from src.database import Base, db_session
-from src.models.Dataset import Dataset
-from src.models.DatasetTask import DatasetTask
+from database import Base, db_session
+from models.Dataset import Dataset
+from models.DatasetTask import DatasetTask
 
 
 class User(Base):
@@ -14,6 +14,7 @@ class User(Base):
 
     # Name of corresponding schema table
     __tablename__ = 'users'
+    __table_args__ = {'keep_existing': True}
 
     # Table columns
     id = Column(Integer, primary_key=True)
@@ -24,7 +25,7 @@ class User(Base):
     date_created = Column(Date, default=datetime.now())
 
     # Reference to the datasets owned by current user
-    datasets = relationship('Dataset', backref='user', cascade='all, delete-orphan', passive_deletes=True)
+    datasets = relationship('Dataset', backref='User', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
         return "<User(name='%s', surname='%s', email='%s', password='%s')>" % (

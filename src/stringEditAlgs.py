@@ -151,6 +151,7 @@ def get_longest_common_substring(s1, s2):
 
     m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
     longest, x_longest = 0, 0
+
     for x in xrange(1, 1 + len(s1)):
         for y in xrange(1, 1 + len(s2)):
             if s1[x - 1] == s2[y - 1]:
@@ -160,6 +161,7 @@ def get_longest_common_substring(s1, s2):
                     x_longest = x
             else:
                 m[x][y] = 0
+
     return s1[x_longest - longest: x_longest]
 
 
@@ -174,9 +176,11 @@ def get_longest_common_subsequence(s1, s2):
                 lengths[i+1][j+1] = lengths[i][j] + 1
             else:
                 lengths[i+1][j+1] = max(lengths[i+1][j], lengths[i][j+1])
+
     # read the substring out from the matrix
     result = ""
     x, y = len(s1), len(s2)
+
     while x != 0 and y != 0:
         if lengths[x][y] == lengths[x-1][y]:
             x -= 1
@@ -187,6 +191,7 @@ def get_longest_common_subsequence(s1, s2):
             result = s1[x - 1] + result
             x -= 1
             y -= 1
+
     return result
 
 

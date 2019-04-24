@@ -1,25 +1,35 @@
 import json
 import os
 import traceback
+import logging
 
 from datetime import timedelta, datetime
 from flask import Flask, render_template, request, session
+from flask_compress import Compress
+from flask_cache import Cache
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
 
-import src.fileFormat as fileFormat
-import src.scanpathUtils as spUtil
-from src.config import config
-from src.database import db_session
-from src.models.Dataset import Dataset
-from src.models.DatasetTask import DatasetTask
-from src.models.User import User
-from src.scanpathAlgs import sta, emine, dotplot
+import fileFormat as fileFormat
+import scanpathUtils as spUtil
+from config import config
+from database import db_session
+from models.Dataset import Dataset
+from models.DatasetTask import DatasetTask
+from models.User import User
+from scanpathAlgs import sta, emine, dotplot
 
 # App configuration
 app = Flask(__name__)
 app.secret_key = os.urandom(24).encode('hex')
 app.debug = True
+# Compress(app)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+log.propagate = False
+log.disabled = True
 
 # For mocking sessions etc.
 dev_mode = True
@@ -129,6 +139,7 @@ def add_user():
         return handle_error()
 
 
+@cache.cached(timeout=60, key_prefix='get_data_tree')
 @app.route('/api/user/get_data_tree', methods=['GET'])
 def get_data_tree():
     """ Get the dataset-task tree structure available to the current user ID which is passed in as parameter """
@@ -150,6 +161,7 @@ def get_data_tree():
         return handle_error('Failed to obtain user data tree structure')
 
 
+@cache.cached(timeout=60, key_prefix='get_dataset')
 @app.route('/api/dataset', methods=['GET'])
 def get_dataset():
     if not is_user_logged_in():
@@ -287,6 +299,7 @@ def del_dataset():
         return handle_error()
 
 
+@cache.cached(timeout=60, key_prefix='get_task')
 @app.route('/api/task', methods=['GET'])
 def get_dataset_task():
     """ Returns JSON formatted task data (individual scanpaths, visuals, similarities etc.) """
@@ -479,6 +492,7 @@ def get_similarity_to_custom():
         return handle_error()
 
 
+@cache.cached(timeout=60, key_prefix='get_sta')
 @app.route('/api/scanpath/sta', methods=['POST'])
 def get_sta_common():
     if not is_user_logged_in():

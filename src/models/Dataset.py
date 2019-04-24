@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Numeric
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from database import Base
 
 
 class Dataset(Base):
@@ -12,6 +12,7 @@ class Dataset(Base):
 
     # Name of corresponding schema table
     __tablename__ = 'datasets'
+    __table_args__ = {'keep_existing': True}
 
     # Table columns
     id = Column(Integer, primary_key=True)
@@ -67,7 +68,7 @@ class Dataset(Base):
             'description': self.description,
             'dateCreated': str(self.date_created),
             'dateUpdated': str(self.date_updated),
-            'recEnvironment': rec_environment,
+            # 'recEnvironment': rec_environment,
             'tasks': tasks_json
         }
 
