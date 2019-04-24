@@ -52,21 +52,17 @@ fabric.properties
 
 # All user-specific stuff:
 .idea/
+venv/
 
 # Files with .pyc extension
-main.pyc
-src/Dataset.pyc
-src/DatasetTask.pyc
-src/fileFormat.pyc
-src/sta.pyc
-src/stringEditAlgs.pyc
-src/User.pyc
-src/config.pyc
-src/database.pyc
-src/Environment.pyc
+*.pyc
 
 # SCSS/CSS mapping
 static/css/style.css.map
 static/css/style.css
 static/css/open-color.css
 static/css/open-color.css.map
+
+# Tests
+.pytest_cache/
+.coverage
