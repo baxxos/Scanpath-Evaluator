@@ -10,26 +10,30 @@ from flask_cache import Cache
 from passlib.hash import sha256_crypt
 from sqlalchemy import exc, orm
 
-import fileFormat as fileFormat
-import scanpathUtils as spUtil
-from config import config
-from database import db_session
-from models.Dataset import Dataset
-from models.DatasetTask import DatasetTask
-from models.User import User
-from scanpathAlgs import sta, emine, dotplot
+import src.fileFormat as fileFormat
+import src.scanpathUtils as spUtil
+from src.config import config
+from src.database import db_session
+from src.models.Dataset import Dataset
+from src.models.DatasetTask import DatasetTask
+from src.models.User import User
+from src.scanpathAlgs import sta, emine, dotplot
+
+APP_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_PATH = os.path.join(APP_PATH, '..', 'templates')
+STATICS_PATH = os.path.join(APP_PATH, '..', 'static')
 
 # App configuration
-app = Flask(__name__)
+app = Flask(__name__, template_folder=TEMPLATES_PATH, static_folder=STATICS_PATH)
 app.secret_key = os.urandom(24).encode('hex')
 app.debug = True
-# Compress(app)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+# Compress(application)
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 log.propagate = False
-log.disabled = True
+log.disabled = False
 
 # For mocking sessions etc.
 dev_mode = True
@@ -601,8 +605,3 @@ def get_alg_comparison():
     except:
         traceback.print_exc()
         return handle_error()
-
-
-if __name__ == '__main__':
-    # App is threaded=true due to slow loading times on localhost
-    app.run(host='localhost', port=8888, threaded=True)

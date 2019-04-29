@@ -3,10 +3,9 @@ from os import listdir, path
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
 
-import src.stringEditAlgs as seAlg
-from config import config
-from database import Base, db_session
-from models.Dataset import Dataset
+from src.config import config
+from src.database import Base, db_session
+from src.models.Dataset import Dataset
 
 
 class DatasetTask(Base):

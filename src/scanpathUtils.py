@@ -3,7 +3,7 @@ from __future__ import division
 import math
 import traceback
 
-import src.stringEditAlgs as seAlg
+import stringEditAlgs as seAlg
 
 
 # *** Scanpath composing ***

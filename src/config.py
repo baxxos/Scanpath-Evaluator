@@ -4,19 +4,19 @@ import os
 if os.environ.get('DATABASE_URL'):
     DB_URL = os.environ['DATABASE_URL']
 else:
-    # For local testing of the deployed app
+    # For local testing of the deployed application
     DB_URL = 'postgresql://postgres:postgres@localhost/scanpath-evaluator'
 
-# Flask app secret key
+# Flask application secret key
 if os.environ.get('FLASK_SECRET_KEY'):
     FLASK_SECRET_KEY = os.environ['FLASK_SECRET_KEY']
 else:
-    # For local testing of the deployed app
+    # For local testing of the deployed application
     FLASK_SECRET_KEY = 'V3RY_S3CR3T_K3Y'
 
-# Basic app configuration
+# Basic application configuration
 config = {
-    'SQLALCHEMY_DATABASE_URI': DB_URL,
+    'SQLALCHEMY_DB_URI': DB_URL,
     'FLASK_SECRET_KEY': FLASK_SECRET_KEY,
     'IMGUR_CLIENT_ID': os.environ.get('IMGUR_CLIENT_ID'),
     'IMGUR_CLIENT_SECRET': os.environ.get('IMGUR_CLIENT_SECRET'),

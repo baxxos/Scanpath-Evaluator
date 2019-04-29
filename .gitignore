@@ -53,6 +53,7 @@ fabric.properties
 # All user-specific stuff:
 .idea/
 venv/
+.vscode/
 
 # Files with .pyc extension
 *.pyc
