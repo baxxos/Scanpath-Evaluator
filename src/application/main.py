@@ -72,10 +72,23 @@ def handle_unauthorized():
     return handle_error('Unauthorized access')
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Failed to shut down - not running with the Werkzeug Server')
+    func()
+
+
 # Routing methods
 @app.route('/')
 def redirect_index():
     return render_template('index.html')
+
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'The server is shutting down...'
 
 
 @app.route('/api/user/auth',  methods=['POST'])
