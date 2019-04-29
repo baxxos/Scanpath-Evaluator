@@ -67,3 +67,4 @@ static/css/open-color.css.map
 # Tests
 .pytest_cache/
 .coverage
+output_files/
