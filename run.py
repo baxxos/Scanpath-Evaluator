@@ -1,4 +1,4 @@
-from src.application.main import app
+from src.app.main import app
 
 if __name__ == '__main__':
     # App is threaded=true due to slow loading times on localhost

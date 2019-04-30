@@ -85,7 +85,7 @@ def redirect_index():
     return render_template('index.html')
 
 
-@app.route('/shutdown', methods=['POST'])
+@app.route('/api/shutdown', methods=['POST'])
 def shutdown():
     shutdown_server()
     return 'The server is shutting down...'

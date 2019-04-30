@@ -20,7 +20,7 @@ if ($psql_service.Status -ne "Running") {
 }
 
 # Run the DB setup script
-& $psql_path -U postgres -f test_db_setup.sql postgres
+& $psql_path -U postgres -f scripts/test_db_setup.sql postgres
 
 # Activate the Python virtual env
 & $venv_path"/Scripts/activate.ps1"
@@ -39,9 +39,9 @@ else {
 }
 
 # Run the tests
-robot --outputdir $output_dir example.robot
+robot --outputdir $output_dir .
 
 # Do cleanup (the app itself has already been terminated via a REST call in RobotFramework)
 deactivate
-& $psql_path -U postgres -f test_db_teardown.sql postgres
+& $psql_path -U postgres -f scripts/test_db_teardown.sql postgres
 Stop-Service $psql_service_name
