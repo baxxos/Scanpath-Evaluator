@@ -11,29 +11,59 @@ ${REQUEST_TIMEOUT_DEFAULT}  5000
 *** Test Cases ***
 Login Of Non-existing User Is Rejected
     ${response}=  Login With Email "non-existing@gmail.com" And Password "password"
-    Response "${response}" Should Contain Error
+    Response "${response}" Should Not Be Successful
+    Response "${response}" Should Contain Error Message "Invalid user credentials - try again."
 
 Login After Valid Registration Is Successful
     [Tags]  SE-8
     [Setup]   Run Keywords
     ...       Set Test Variable  ${name}      Test Name
     ...  AND  Set Test Variable  ${surname}   Test Surname
-    ...  AND  Set Test Variable  ${email}     test-email@gmail.com
+    ...  AND  Set Test Variable  ${email}     login-after-registration-valid@gmail.com
     ...  AND  Set Test Variable  ${password}  password
 
-    ${credentials_json}=  Create User Credentials JSON  ${name}  ${surname}  ${email}  ${password}
+    ${credentials_json}=  Create User Credentials JSON
+    ...  name=${name}  surname=${surname}  email=${email}  password=${password}
     ${response}=  Create User Account With Credentials "${credentials_json}"
     Response "${response}" Should Be Successful
+
     ${response}=  Login With Email "${email}" And Password "${password}"
     Response "${response}" Should Be Successful
     
 Registration With Missing Data Is Rejected
     [Tags]  SE-8
-    Pass Execution  Execution passed
+    
+    ${credentials_json}=  Create User Credentials JSON
+    ...  name=Test Name  surname=Test Surname  email=registration-missing-data@gmail.com  password=${NONE}
+    ${response}=  Create User Account With Credentials "${credentials_json}"
+    Response "${response}" Should Not Be Successful
+    Response "${response}" Should Contain Error Message "Required user attributes are missing"
 
 Registration With Invalid Data Is Rejected
     [Tags]  SE-8
-    Pass Execution  Execution passed
+
+    ${credentials_json}=  Create User Credentials JSON
+    ...  name=Test Name  surname=Test Surname  email=registration-invalid-data.com  password=${NONE}
+    ${response}=  Create User Account With Credentials "${credentials_json}"
+    Response "${response}" Should Not Be Successful
+    Response "${response}" Should Contain Error Message "Malformed input data - please, try again."
+
+Duplicate Registration Is Rejected
+    [Tags]  SE-8
+    [Setup]   Run Keywords
+    ...       Set Test Variable  ${name}      Test Name
+    ...  AND  Set Test Variable  ${surname}   Test Surname
+    ...  AND  Set Test Variable  ${email}     registration-duplicate@gmail.com
+    ...  AND  Set Test Variable  ${password}  password
+
+    ${credentials_json}=  Create User Credentials JSON
+    ...  name=${name}  surname=${surname}  email=${email}  password=${password}
+    ${response}=  Create User Account With Credentials "${credentials_json}"
+    Response "${response}" Should Be Successful
+
+    ${response}=  Create User Account With Credentials "${credentials_json}"
+    Response "${response}" Should Not Be Successful
+    Response "${response}" Should Contain Error Message "Integrity error: e-mail address is already taken."
 
 *** Keywords ***
 Create User Credentials JSON
