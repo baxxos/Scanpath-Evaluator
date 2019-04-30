@@ -23,9 +23,9 @@ if ($psql_service.Status -ne "Running") {
 
 # Run the DB setup scripts
 $env:PGPASSWORD  = "postgres"
-& $psql_path -U postgres -f scripts/test_db_setup.sql
+& $psql_path -U postgres -f scripts/db_setup_core.sql
 $env:PGPASSWORD  = "test_user"
-& $psql_path -U test_user -d $psql_test_db_name -f scripts/test_db_schema_setup.sql
+& $psql_path -U test_user -d $psql_test_db_name -f scripts/db_setup_schema.sql
 
 # Activate the Python virtual env
 & $venv_path"/Scripts/activate.ps1"
@@ -48,7 +48,7 @@ robot --outputdir $output_dir .
 
 # Do cleanup (the app itself has already been terminated via a REST call in RobotFramework)
 deactivate
-& $psql_path -U postgres -f scripts/test_db_teardown.sql postgres
+& $psql_path -U postgres -f scripts/db_teardown_core.sql postgres
 Stop-Service $psql_service_name
 Remove-Item Env:\DATABASE_URL
 Remove-Item Env:\PGPASSWORD
