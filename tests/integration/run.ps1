@@ -3,6 +3,8 @@ $venv_path = "../../venv"
 
 $psql_test_db_name = "scanpath-evaluator-test"
 $psql_path = "C:\Program Files\PostgreSQL\9.5\bin\psql.exe"
+$psql_dropdb_path = "C:\Program Files\PostgreSQL\9.5\bin\dropdb.exe"
+$psql_dropuser_path = "C:\Program Files\PostgreSQL\9.5\bin\dropuser.exe"
 $psql_service_name = "postgresql-x64-9.5"
 $psql_service = Get-Service -Name $psql_service_name
 $env:DATABASE_URL = "postgresql://test_user:test_user@localhost/$psql_test_db_name"
@@ -46,9 +48,14 @@ else {
 # Run the tests
 robot --outputdir $output_dir .
 
-# Do cleanup (the app itself has already been terminated via a REST call in RobotFramework)
+# Deactivate the Python virtual env
 deactivate
-& $psql_path -U postgres -f scripts/db_teardown_core.sql postgres
+
+# Database cleanup - drop the test DB, user and environment variables required for connecting
+$env:PGPASSWORD  = "test_user"
+& $psql_dropdb_path -U test_user $psql_test_db_name
+$env:PGPASSWORD  = "postgres"
+& $psql_dropuser_path -U postgres test_user
 Stop-Service $psql_service_name
 Remove-Item Env:\DATABASE_URL
 Remove-Item Env:\PGPASSWORD
