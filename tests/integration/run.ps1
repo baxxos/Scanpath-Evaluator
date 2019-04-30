@@ -1,9 +1,11 @@
 $output_dir = "output_files"
 $venv_path = "../../venv"
 
+$psql_test_db_name = "scanpath-evaluator-test"
 $psql_path = "C:\Program Files\PostgreSQL\9.5\bin\psql.exe"
 $psql_service_name = "postgresql-x64-9.5"
 $psql_service = Get-Service -Name $psql_service_name
+$env:DATABASE_URL = "postgresql://test_user:test_user@localhost/$psql_test_db_name"
 
 if ($psql_service.Status -ne "Running") {
     Write-host "Starting the PostgreSQL service"
@@ -19,8 +21,11 @@ if ($psql_service.Status -ne "Running") {
     }
 }
 
-# Run the DB setup script
-& $psql_path -U postgres -f scripts/test_db_setup.sql postgres
+# Run the DB setup scripts
+$env:PGPASSWORD  = "postgres"
+& $psql_path -U postgres -f scripts/test_db_setup.sql
+$env:PGPASSWORD  = "test_user"
+& $psql_path -U test_user -d $psql_test_db_name -f scripts/test_db_schema_setup.sql
 
 # Activate the Python virtual env
 & $venv_path"/Scripts/activate.ps1"
@@ -45,3 +50,5 @@ robot --outputdir $output_dir .
 deactivate
 & $psql_path -U postgres -f scripts/test_db_teardown.sql postgres
 Stop-Service $psql_service_name
+Remove-Item Env:\DATABASE_URL
+Remove-Item Env:\PGPASSWORD
