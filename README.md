@@ -40,7 +40,19 @@ If you want to save yourself some time, [here](https://drive.google.com/open?id=
 * AOI shape - exactly 4 vertices for each AOI (rect/square)
 * Nested and overlapping AOIs - try to avoid this for correct results
 * The original AOI image and its resolution must exactly match the uploaded AOI data
-        
+
+## Running tests
+### Unit tests
+Run following command from the project root directory:  
+```
+pytest --cov=src tests/unit --cov-branch --cov-report term-missing
+```
+
+### Integration tests
+Run the `run.ps1` PowerShell script from the integration tests folder.  
+
+PostgreSQL 9.5 with a default user account (`postgres/postgres`) has to be installed on the host machine prior to running these tests.
+
 ## TODOs:
 * __Write unit tests__ (Python & JS)
 * Upgrade backend to Python 3.X
