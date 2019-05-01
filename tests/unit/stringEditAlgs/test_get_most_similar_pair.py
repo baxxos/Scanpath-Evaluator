@@ -2,8 +2,7 @@ import os
 import pytest
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'src'))
-import stringEditAlgs as stredit
+import src.stringEditAlgs as stredit
 
 @pytest.mark.parametrize("scanpath_strs, expected", [
     (

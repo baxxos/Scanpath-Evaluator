@@ -2,8 +2,7 @@ import os
 import pytest
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'src'))
-import stringEditAlgs as stredit
+import src.stringEditAlgs as stredit
 
 
 def test_valid_conversion():
@@ -18,7 +17,7 @@ def test_valid_conversion():
 
     assert actual == expected, \
         "Scanpaths\n{}\nshould have been converted to\n{}\n, but they were converted into\n{}\ninstead" \
-        .format(input, expected, actual)
+        .format(input_data, expected, actual)
 
 
 def test_conversion_with_empty_scanpath():
