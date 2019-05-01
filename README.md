@@ -45,7 +45,7 @@ If you want to save yourself some time, [here](https://drive.google.com/open?id=
 ### Unit tests
 Run following command from the project root directory:  
 ```
-pytest --cov=src tests/unit --cov-branch --cov-report term-missing
+pytest . --cov=src --cov-branch --cov-report term-missing
 ```
 
 ### Integration tests
