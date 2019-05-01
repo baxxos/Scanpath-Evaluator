@@ -1,6 +1,7 @@
+import os
 import pytest
 import sys
-sys.path.append("C:\Users\Baxos\PycharmProjects\Scanpath-Evaluator\src")
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'src'))
 
 import stringEditAlgs as stredit
 
