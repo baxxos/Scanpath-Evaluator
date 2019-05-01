@@ -26,7 +26,6 @@ def run_emine(raw_sequences):
         fixations: a list of lists representing the common scanpath - [['A', 150], ['B', 500] .. ]
         similarity: a dict containing similarity of individual scanpaths to the common one - {'ID1': 66.66, 'ID2': ... }
     """
-
     formatted_sequences = spUtil.format_sequences(raw_sequences)
 
     # Store scanpaths as an array of string-converted original scanpaths (for calculating LCS etc.)
