@@ -60,7 +60,8 @@ class DatasetTask(Base):
         try:
             files_list = listdir(folder_path_visuals)
         except:
-            return {}
+            folder_path_visuals = path.join('..', '..', folder_path_visuals)
+            files_list = listdir(folder_path_visuals)
 
         images_list = {}
         valid_extensions = (".jpg", ".jpeg", ".png", ".gif", ".bmp")
