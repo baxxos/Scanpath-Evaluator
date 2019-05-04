@@ -12,14 +12,14 @@ ${REQUEST_TIMEOUT_DEFAULT}  5000
 Login Of Non-existing User Is Rejected
     [Tags]  SE-8  SE-27
     
-    When Log In With Email "non-existing@gmail.com" And Password "password"
+    When Log In With Email "test@email.com" And Password "password"
     Then Response Is Not Successful
     and Response Contains Error Message "Invalid user credentials - try again."
 
 Login After Valid Registration Is Successful
     [Tags]   SE-8  SE-27
     [Setup]  Set Test Variable  &{credentials}
-    ...      name=Test Name  surname=Test Surname  email=login-after-registration-valid@gmail.com  password=password
+    ...      name=Test Name  surname=Test Surname  email=test@email.com  password=password
     
     Given User Account With Credentials "${credentials}" Is Created
     and Response Is Successful
@@ -32,7 +32,7 @@ Login After Valid Registration Is Successful
 Registration With Missing Data Is Rejected
     [Tags]  SE-8  SE-26  SE-27
     [Setup]  Set Test Variable  &{credentials}
-    ...      name=Test Name  surname=Test Surname  email=registration-missing-data@gmail.com
+    ...      name=Test Name  surname=Test Surname  email=test@email.com
     
     When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
@@ -50,7 +50,7 @@ Registration With Empty Data Is Rejected
 Registration With Invalid Data Is Rejected
     [Tags]  SE-8  SE-26  SE-27
     [Setup]  Set Test Variable  &{credentials}
-    ...      name=Test Name  surname=Test Surname  email=registration-invalid-data.com  password=password
+    ...      name=Test Name  surname=Test Surname  email=test-email.com  password=password
     
     When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
@@ -59,7 +59,7 @@ Registration With Invalid Data Is Rejected
 Duplicate Registration Is Rejected
     [Tags]  SE-8  SE-27
     [Setup]   Set Test Variable  &{credentials}
-    ...  name=Test Name  surname=Test Surname  email=registration-duplicate@gmail.com  password=password
+    ...  name=Test Name  surname=Test Surname  email=test@email.com  password=password
 
     Given User Account With Credentials "${credentials}" Is Created
     and Response Is Successful
