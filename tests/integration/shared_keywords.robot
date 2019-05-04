@@ -19,14 +19,14 @@ Response Is Successful
 
     ${response_json}=  Set Variable  ${TEST_RESPONSE.json()}
     Log  ${response_json}
-    Should Be True  ${response_json['success']}  msg=Request should have been successful, but it was not.
+    Should Be True  ${response_json['success']}  msg=Response should have been successful, but it was not.
 
 Response Is Not Successful
     [Documentation]  Checks if the 'success' key is false for the specified response object.
 
     ${response_json}=  Set Variable  ${TEST_RESPONSE.json()}
     Log  ${response_json}
-    Should Not Be True  ${response_json['success']}  msg=Request should not have been successful, but it was.
+    Should Not Be True  ${response_json['success']}  msg=Response should not have been successful, but it was.
 
 Response Contains Payload "${payload}"
     [Documentation]  Checks if the specified success response contains the expected `${payload}`.
