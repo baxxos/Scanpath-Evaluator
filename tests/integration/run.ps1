@@ -24,10 +24,12 @@ if ($psql_service.Status -ne "Running") {
 }
 
 # Run the DB setup scripts
+Write-Host "Setting up test database instance"
 $env:PGPASSWORD  = "postgres"
-& $psql_path -U postgres -f scripts/db_setup_core.sql
+& $psql_path -U postgres -f scripts/db_setup_core.sql -q
 $env:PGPASSWORD  = "test_user"
-& $psql_path -U test_user -d $psql_test_db_name -f scripts/db_setup_schema.sql
+& $psql_path -U test_user -d $psql_test_db_name -f scripts/db_setup_schema.sql -q
+& $psql_path -U test_user -d $psql_test_db_name -f scripts/db_setup_data.sql -q
 
 # Activate the Python virtual env
 & $venv_path"/Scripts/activate.ps1"
@@ -52,6 +54,7 @@ robot --outputdir $output_dir .
 deactivate
 
 # Database cleanup - drop the test DB, user and environment variables required for connecting
+Write-Host "Cleaning up"
 $env:PGPASSWORD  = "test_user"
 & $psql_dropdb_path -U test_user $psql_test_db_name
 $env:PGPASSWORD  = "postgres"
