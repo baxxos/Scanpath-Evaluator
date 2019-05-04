@@ -155,6 +155,30 @@ def add_user():
         traceback.print_exc()
         return handle_error()
 
+@app.route('/api/user/delete', methods=['DELETE'])
+def del_user():
+    try:
+        json_data = json.loads(request.data)
+        email = json_data['email']
+        password = json_data['password']
+    except KeyError:
+        return handle_error('Failed to login - user auth data invalid.')
+
+    try:
+        user = db_session.query(User).filter(User.email == email).one()
+
+        if sha256_crypt.verify(password, user.password):
+            db_session.delete(user)
+            db_session.commit()
+
+            return handle_success()
+        else:
+            return handle_error('Invalid user credentials - try again.')
+    except orm.exc.NoResultFound:
+        return handle_error('Invalid user credentials - try again.')
+    except:
+        traceback.print_exc()
+        return handle_error()
 
 @cache.cached(timeout=60, key_prefix='get_data_tree')
 @app.route('/api/user/get_data_tree', methods=['GET'])
