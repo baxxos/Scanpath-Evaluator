@@ -11,7 +11,8 @@ ${REQUEST_TIMEOUT_DEFAULT}  5000
 *** Test Cases ***
 Login Of Non-existing User Is Rejected
     [Tags]  SE-8  SE-27
-    When Login With Email "non-existing@gmail.com" And Password "password"
+    
+    When Log In With Email "non-existing@gmail.com" And Password "password"
     Then Response Is Not Successful
     and Response Contains Error Message "Invalid user credentials - try again."
 
@@ -20,17 +21,20 @@ Login After Valid Registration Is Successful
     [Setup]  Set Test Variable  &{credentials}
     ...      name=Test Name  surname=Test Surname  email=login-after-registration-valid@gmail.com  password=password
     
-    Given Create User Account With Credentials "${credentials}"
+    Given User Account With Credentials "${credentials}" Is Created
     and Response Is Successful
-    When Login With Email "login-after-registration-valid@gmail.com" And Password "password"
+    When Log In With Email "${credentials['email']}" And Password "${credentials['password']}"
     Then Response Is Successful
     
+    [Teardown]  Run Keywords
+    ...  Delete User Account With Email "${credentials['email']}" And Password "${credentials['password']}"
+
 Registration With Missing Data Is Rejected
     [Tags]  SE-8  SE-26  SE-27
     [Setup]  Set Test Variable  &{credentials}
     ...      name=Test Name  surname=Test Surname  email=registration-missing-data@gmail.com
     
-    When Create User Account With Credentials "${credentials}"
+    When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
     and Response Contains Error Message "Required user attributes are missing"
 
@@ -39,7 +43,7 @@ Registration With Empty Data Is Rejected
     [Setup]  Set Test Variable  &{credentials}
     ...      name=${NONE}  surname=${NONE}  email=${NONE}  password=${NONE}
     
-    When Create User Account With Credentials "${credentials}"
+    When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
     and Response Contains Error Message "Required user attributes are empty"
 
@@ -48,7 +52,7 @@ Registration With Invalid Data Is Rejected
     [Setup]  Set Test Variable  &{credentials}
     ...      name=Test Name  surname=Test Surname  email=registration-invalid-data.com  password=password
     
-    When Create User Account With Credentials "${credentials}"
+    When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
     and Response Contains Error Message "Malformed input data - please, try again."
 
@@ -57,14 +61,17 @@ Duplicate Registration Is Rejected
     [Setup]   Set Test Variable  &{credentials}
     ...  name=Test Name  surname=Test Surname  email=registration-duplicate@gmail.com  password=password
 
-    Given Create User Account With Credentials "${credentials}"
+    Given User Account With Credentials "${credentials}" Is Created
     and Response Is Successful
-    When Create User Account With Credentials "${credentials}"
+    When User Account With Credentials "${credentials}" Is Created
     Then Response Is Not Successful
     and Response Contains Error Message "Integrity error: e-mail address is already taken."
 
+    [Teardown]  Run Keywords
+    ...  Delete User Account With Email "${credentials['email']}" And Password "${credentials['password']}"
+
 *** Keywords ***
-Create User Account With Credentials "${credentials}"
+User Account With Credentials "${credentials}" Is Created
     [Documentation]  Attempts to create a new user account with specified user credentials and sets the response as
     ...  a test variable.
 
@@ -74,7 +81,18 @@ Create User Account With Credentials "${credentials}"
     
     Set Test Variable  ${TEST_RESPONSE}  ${response}
 
-Login With Email "${email}" And Password "${password}"
+Delete User Account With Email "${email}" And Password "${password}"
+    [Documentation]  Attempts to delete a user account based on the specified credentials and sets the response as
+    ...  a test variable.
+
+    &{credentials}=  Create Dictionary  email=${email}  password=${password}
+    ${credentials_json}=  Evaluate  json.dumps(${credentials})  modules=json
+    ${response}=  Delete Request
+    ...  scanpath-evaluator  /api/user/delete  data=${credentials_json}  timeout=${REQUEST_TIMEOUT_DEFAULT}
+    
+    Set Test Variable  ${TEST_RESPONSE}  ${response}
+
+Log In With Email "${email}" And Password "${password}"
     [Documentation]  Performs a login request with specified credentials and sets the response as a test variable.
 
     &{credentials}=  Create Dictionary  email=${email}  password=${password}
