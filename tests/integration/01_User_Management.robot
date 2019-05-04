@@ -34,6 +34,15 @@ Registration With Missing Data Is Rejected
     Then Response Is Not Successful
     and Response Contains Error Message "Required user attributes are missing"
 
+Registration With Empty Data Is Rejected
+    [Tags]  SE-8  SE-26  SE-27
+    [Setup]  Set Test Variable  &{credentials}
+    ...      name=${NONE}  surname=${NONE}  email=${NONE}  password=${NONE}
+    
+    When Create User Account With Credentials "${credentials}"
+    Then Response Is Not Successful
+    and Response Contains Error Message "Required user attributes are empty"
+
 Registration With Invalid Data Is Rejected
     [Tags]  SE-8  SE-26  SE-27
     [Setup]  Set Test Variable  &{credentials}
