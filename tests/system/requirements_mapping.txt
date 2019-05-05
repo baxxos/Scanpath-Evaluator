@@ -1,4 +1,0 @@
-# Tests in this module partly or fully cover the following requirements:
-
-## SE-57
-As a researcher, I want to feel no major performance drop when other users are using the application
