@@ -49,7 +49,7 @@ else {
 
 # Run the tests
 $hostname = "http://localhost:8888"
-locust --csv=output_files/performance_results --no-web -t40s -c 20 -r 2 --host=$hostname
+locust --csv=output_files/performance_results --no-web -t60s -c 20 -r 2 --host=$hostname
 Invoke-RestMethod -Method Post -Uri $hostname/api/shutdown
 
 # Deactivate the Python virtual env
