@@ -16,6 +16,13 @@ Login Of Non-existing User Is Rejected
     Then Response Is Not Successful
     and Response Contains Error Message "Invalid user credentials - try again."
 
+Deletion Of Non-existing User Is Rejected
+    [Tags]  SE-8  SE-27
+
+    When Delete User Account With Email "test@email.com" And Password "password"
+    Then Response Is Not Successful
+    and Response Contains Error Message "Invalid user credentials - try again."
+
 Login After Valid Registration Is Successful
     [Tags]   SE-8  SE-27
     [Setup]  Set Test Variable  &{credentials}
