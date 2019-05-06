@@ -48,7 +48,7 @@ else {
 }
 
 # Run the tests
-robot --outputdir $output_dir .
+robot --critical Critical --outputdir $output_dir .
 
 # Deactivate the Python virtual env
 deactivate
