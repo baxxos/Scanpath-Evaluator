@@ -53,6 +53,9 @@ Run the `run.ps1` PowerShell script from the integration tests folder.
 
 PostgreSQL 9.5 with a default user account (`postgres/postgres`) has to be installed on the host machine prior to running these tests.
 
+### Performance tests
+Run the `run.ps1` PowerShell scripts from the system/performance tests folder.
+
 ## TODOs:
 * __Write unit tests__ (Python & JS)
 * Upgrade backend to Python 3.X
